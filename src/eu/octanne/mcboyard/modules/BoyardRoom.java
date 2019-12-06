@@ -32,7 +32,7 @@ public class BoyardRoom implements Listener{
 	
 	private HashMap<String, String> digiCodeCorrespondence = new HashMap<String, String>();
 	
-	protected int task;
+	protected int task, task2;
 	
 	protected boolean passwordisValidate = false;
 	
@@ -93,7 +93,7 @@ public class BoyardRoom implements Listener{
 					}
 				}
 			}
-			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_CONTRACT, 0.25f, 0.7f);
+			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_CONTRACT, 0.25f, 1.2f);
 		}
 		//Sound when leave on Letter
 		Location locFrom0 = e.getFrom().clone();
@@ -112,7 +112,7 @@ public class BoyardRoom implements Listener{
 					}
 				}
 			}
-			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_EXTEND, 0.25f, 0.7f);
+			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_EXTEND, 0.25f, 1.2f);
 		}
 		
 		
@@ -153,14 +153,14 @@ public class BoyardRoom implements Listener{
 		}
 		if(roomCode.checkPassword()) {
 			passwordisValidate = true;
+			
 			Bukkit.getScheduler().scheduleSyncDelayedTask(McBoyard.instance, new Runnable() {
 
 				@Override
 				public void run() {
-					
+					launchAnimation();
 				}
 			}, 20);
-			launchAnimation();
 		}
 	}
 	
@@ -186,6 +186,9 @@ public class BoyardRoom implements Listener{
 	 */
 	protected void launchAnimation() {
 		//Fireworks && Title
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			p.sendTitle("§aFélicitation !", " ", 10, 80, 20);
+		}
 		task = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 			
 			int round = 1;
@@ -195,9 +198,6 @@ public class BoyardRoom implements Listener{
 				if(round == 1) {
 					spawnFireworks(new Location(Bukkit.getWorld("world"), -242, 114.5, -185));
 					spawnFireworks(new Location(Bukkit.getWorld("world"), -242, 114.5, -165));
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						p.sendTitle("§aFélicitation !", "", 10, 70, 20);
-					}
 				}
 				else if(round == 2) {
 					spawnFireworks(new Location(Bukkit.getWorld("world"), -248, 114.5, -165));
@@ -222,9 +222,18 @@ public class BoyardRoom implements Listener{
 			}
 		}, 0, 15);
 		//Chrono de 1 minutes
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pchrono 1min");
+		Bukkit.getScheduler().scheduleSyncDelayedTask(McBoyard.instance, new Runnable() {
+
+			@Override
+			public void run() {
+				McBoyard.chronoModule.chrono(60, false);
+				for(Player p : Bukkit.getOnlinePlayers()) {
+					p.sendTitle("", "§eLet's Go !", 10, 5, 20);
+				}
+			}
+		}, 75);
 		//Laché des Boyards
-		task = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
+		task2 = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 			
 			int round = 1;
 			
@@ -259,11 +268,11 @@ public class BoyardRoom implements Listener{
 					}
 				}
 				else {
-					Bukkit.getScheduler().cancelTask(task);
+					Bukkit.getScheduler().cancelTask(task2);
 				}
 				round++;
 			}
-		}, 0, 20);
+		}, 75, 20);
 	}
 	
 	protected class SecureCode {
@@ -343,6 +352,7 @@ public class BoyardRoom implements Listener{
 						tabCompare.add(newPass.charAt(i)+"");
 					}
 					McBoyard.boyardRoomModule.changePassword(newPass);
+					if(McBoyard.chronoModule.isStart) McBoyard.chronoModule.cancel = true;
 					sender.sendMessage("§aLe mot de passe vient d'être changer pour : §c"+newPass);
 					return true;
 				}else {

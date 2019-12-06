@@ -35,7 +35,8 @@ public class Chrono {
 		bossBar.removeAll();
 	}
 	
-	public void chrono(int secondes) {
+	public void chrono(int secondes, boolean preventionTitle) {
+		if(isStart)return;
 		sec = secondes;
 		isStart = true;
 		task = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
@@ -45,7 +46,7 @@ public class Chrono {
 				if(sec == secondes) {
 					for(Player p : Bukkit.getOnlinePlayers()) {
 						bossBar.addPlayer(p);
-						p.sendTitle(ChatColor.GREEN+"C'est parti", "", 3, 12, 3);
+						if(preventionTitle)p.sendTitle(ChatColor.GREEN+"C'est parti", "", 3, 12, 3);
 					}
 				}
 				if(sec == 0 || cancel == true) {
@@ -93,7 +94,7 @@ public class Chrono {
 				if(args.length == 1) {
 					try {
 						int sec = Integer.parseInt(args[0]);
-						McBoyard.chronoModule.chrono(sec);
+						McBoyard.chronoModule.chrono(sec, true);
 						return true;
 					}
 					catch(NumberFormatException e){
@@ -118,17 +119,17 @@ public class Chrono {
 				if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("10min")) {
 						sender.sendMessage(ChatColor.GREEN+"Lancement du chrono 10 minutes.");
-						McBoyard.chronoModule.chrono(600);
+						McBoyard.chronoModule.chrono(600, true);
 						return true;
 					}
 					if(args[0].equalsIgnoreCase("5min")) {
 						sender.sendMessage(ChatColor.GREEN+"Lancement du chrono 5 minutes.");
-						McBoyard.chronoModule.chrono(300);
+						McBoyard.chronoModule.chrono(300, true);
 						return true;
 					}
 					if(args[0].equalsIgnoreCase("1min")) {
 						sender.sendMessage(ChatColor.GREEN+"Lancement du chrono 1 minutes.");
-						McBoyard.chronoModule.chrono(60);
+						McBoyard.chronoModule.chrono(60, true);
 						return true;
 					}else {
 						sender.sendMessage("Erreur syntaxe: /chronop <1min/5min/10min>");
