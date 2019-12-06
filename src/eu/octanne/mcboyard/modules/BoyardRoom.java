@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -71,96 +72,102 @@ public class BoyardRoom implements Listener{
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-		if(e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockY() == e.getTo().getBlockY()
-				&& e.getFrom().getBlockZ() == e.getTo().getBlockZ()) {
+		if(e.getPlayer().getLocation().getBlockX() < -258 || e.getPlayer().getLocation().getBlockZ() < -180 || 
+		   e.getPlayer().getLocation().getBlockX() > -241 || e.getPlayer().getLocation().getBlockZ() > -170) {
 			return;
-		}
+		}else{
+			if(e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) return;
+			if(e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockY() == e.getTo().getBlockY()
+					&& e.getFrom().getBlockZ() == e.getTo().getBlockZ()) {
+				return;
+			}
 
-		//Sound when enter on Letter
-		Location locTo0 = e.getTo().clone();
-		locTo0.setY(locTo0.getY()-1);
-		@SuppressWarnings("deprecation")
-		String blockIDTo = locTo0.getBlock().getType().getId() + ":" + (int) locTo0.getBlock().getData();
-		if(digiCodeCorrespondence.containsValue(blockIDTo)) {
-			boolean otherPlayer = false;
-			for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
-				if(entity instanceof Player) {
-					Location locEntity = entity.getLocation().clone();
-					locEntity.setY(locEntity.getY()-1);
-					if(locEntity.getBlock().equals(locTo0.getBlock())) {
-						otherPlayer = true;
-						break;
-					}
-				}
-			}
-			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_CONTRACT, 0.25f, 1.2f);
-		}
-		//Sound when leave on Letter
-		Location locFrom0 = e.getFrom().clone();
-		locFrom0.setY(locFrom0.getY()-1);
-		@SuppressWarnings("deprecation")
-		String blockIDFrom = locFrom0.getBlock().getType().getId() + ":" + (int) locFrom0.getBlock().getData();
-		if(digiCodeCorrespondence.containsValue(blockIDFrom)) {
-			boolean otherPlayer = false;
-			for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
-				if(entity instanceof Player) {
-					Location locEntity = entity.getLocation().clone();
-					locEntity.setY(locEntity.getY()-1);
-					if(locEntity.getBlock().equals(locFrom0.getBlock())) {
-						otherPlayer = true;
-						break;
-					}
-				}
-			}
-			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_EXTEND, 0.25f, 1.2f);
-		}
-		
-		
-		if(passwordisValidate) return;
-		for(LetterStat stat : roomCode.secretSentence) {
-			Location locFrom = e.getFrom().clone();
-			locFrom.setY(locFrom.getY()-1);
+			//Sound when enter on Letter
+			Location locTo0 = e.getTo().clone();
+			locTo0.setY(locTo0.getY()-1);
 			@SuppressWarnings("deprecation")
-			String blockID = locFrom.getBlock().getType().getId() + ":" + (int) locFrom.getBlock().getData();
-			/*Bukkit.broadcastMessage("[Debug] (From) Block ID : " + blockID + ", stat = " + stat.active);*/
-			if(blockID.equalsIgnoreCase(digiCodeCorrespondence.get(stat.letter))) {
-				//Check if have more than 1 player on the block
+			String blockIDTo = locTo0.getBlock().getType().getId() + ":" + (int) locTo0.getBlock().getData();
+			if(digiCodeCorrespondence.containsValue(blockIDTo)) {
 				boolean otherPlayer = false;
 				for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
-					if(entity instanceof Player) {
+					if(entity instanceof Player && !((Player) entity).getGameMode().equals(GameMode.SPECTATOR)) {
 						Location locEntity = entity.getLocation().clone();
 						locEntity.setY(locEntity.getY()-1);
-						if(locEntity.getBlock().equals(locFrom.getBlock())) {
+						if(locEntity.getBlock().equals(locTo0.getBlock())) {
 							otherPlayer = true;
 							break;
 						}
 					}
 				}
-				if(!otherPlayer)stat.active = false;
-				/*Bukkit.broadcastMessage("[Debug] (New) (From) Block ID : " + blockID + ", stat = " + stat.active);*/
+				if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_CONTRACT, 0.25f, 1.2f);
 			}
-		}
-		for(LetterStat stat : roomCode.secretSentence) {
-			Location locTo = e.getTo().clone();
-			locTo.setY(locTo.getY()-1);
+			//Sound when leave on Letter
+			Location locFrom0 = e.getFrom().clone();
+			locFrom0.setY(locFrom0.getY()-1);
 			@SuppressWarnings("deprecation")
-			String blockID = locTo.getBlock().getType().getId() + ":" + (int) locTo.getBlock().getData();
-			/*Bukkit.broadcastMessage("[Debug] (To) Block ID : " + blockID + ", stat = " + stat.active);*/
-			if(blockID.equalsIgnoreCase(digiCodeCorrespondence.get(stat.letter))) {
-				stat.active = true;
-				/*Bukkit.broadcastMessage("[Debug] (New) (To) Block ID : " + blockID + ", stat = " + stat.active);*/
-			}
-		}
-		if(roomCode.checkPassword()) {
-			passwordisValidate = true;
-			
-			Bukkit.getScheduler().scheduleSyncDelayedTask(McBoyard.instance, new Runnable() {
-
-				@Override
-				public void run() {
-					launchAnimation();
+			String blockIDFrom = locFrom0.getBlock().getType().getId() + ":" + (int) locFrom0.getBlock().getData();
+			if(digiCodeCorrespondence.containsValue(blockIDFrom)) {
+				boolean otherPlayer = false;
+				for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
+					if(entity instanceof Player && !((Player) entity).getGameMode().equals(GameMode.SPECTATOR)) {
+						Location locEntity = entity.getLocation().clone();
+						locEntity.setY(locEntity.getY()-1);
+						if(locEntity.getBlock().equals(locFrom0.getBlock())) {
+							otherPlayer = true;
+							break;
+						}
+					}
 				}
-			}, 20);
+				if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_EXTEND, 0.25f, 1.2f);
+			}
+			
+			
+			if(passwordisValidate) return;
+			for(LetterStat stat : roomCode.secretSentence) {
+				Location locFrom = e.getFrom().clone();
+				locFrom.setY(locFrom.getY()-1);
+				@SuppressWarnings("deprecation")
+				String blockID = locFrom.getBlock().getType().getId() + ":" + (int) locFrom.getBlock().getData();
+				/*Bukkit.broadcastMessage("[Debug] (From) Block ID : " + blockID + ", stat = " + stat.active);*/
+				if(blockID.equalsIgnoreCase(digiCodeCorrespondence.get(stat.letter))) {
+					//Check if have more than 1 player on the block
+					boolean otherPlayer = false;
+					for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
+						if(entity instanceof Player && !((Player) entity).getGameMode().equals(GameMode.SPECTATOR)) {
+							Location locEntity = entity.getLocation().clone();
+							locEntity.setY(locEntity.getY()-1);
+							if(locEntity.getBlock().equals(locFrom.getBlock())) {
+								otherPlayer = true;
+								break;
+							}
+						}
+					}
+					if(!otherPlayer)stat.active = false;
+					/*Bukkit.broadcastMessage("[Debug] (New) (From) Block ID : " + blockID + ", stat = " + stat.active);*/
+				}
+			}
+			for(LetterStat stat : roomCode.secretSentence) {
+				Location locTo = e.getTo().clone();
+				locTo.setY(locTo.getY()-1);
+				@SuppressWarnings("deprecation")
+				String blockID = locTo.getBlock().getType().getId() + ":" + (int) locTo.getBlock().getData();
+				/*Bukkit.broadcastMessage("[Debug] (To) Block ID : " + blockID + ", stat = " + stat.active);*/
+				if(blockID.equalsIgnoreCase(digiCodeCorrespondence.get(stat.letter))) {
+					stat.active = true;
+					/*Bukkit.broadcastMessage("[Debug] (New) (To) Block ID : " + blockID + ", stat = " + stat.active);*/
+				}
+			}
+			if(roomCode.checkPassword()) {
+				passwordisValidate = true;
+				
+				Bukkit.getScheduler().scheduleSyncDelayedTask(McBoyard.instance, new Runnable() {
+
+					@Override
+					public void run() {
+						launchAnimation();
+					}
+				}, 20);
+			}
 		}
 	}
 	
