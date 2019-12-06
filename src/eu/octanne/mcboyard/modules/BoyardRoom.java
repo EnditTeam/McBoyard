@@ -5,17 +5,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.util.Vector;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.BoyardRoom.SecureCode.LetterStat;
@@ -63,11 +71,52 @@ public class BoyardRoom implements Listener{
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-		if(passwordisValidate) return;
 		if(e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockY() == e.getTo().getBlockY()
 				&& e.getFrom().getBlockZ() == e.getTo().getBlockZ()) {
 			return;
 		}
+
+		//Sound when enter on Letter
+		Location locTo0 = e.getTo().clone();
+		locTo0.setY(locTo0.getY()-1);
+		@SuppressWarnings("deprecation")
+		String blockIDTo = locTo0.getBlock().getType().getId() + ":" + (int) locTo0.getBlock().getData();
+		if(digiCodeCorrespondence.containsValue(blockIDTo)) {
+			boolean otherPlayer = false;
+			for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
+				if(entity instanceof Player) {
+					Location locEntity = entity.getLocation().clone();
+					locEntity.setY(locEntity.getY()-1);
+					if(locEntity.getBlock().equals(locTo0.getBlock())) {
+						otherPlayer = true;
+						break;
+					}
+				}
+			}
+			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_CONTRACT, 0.25f, 0.7f);
+		}
+		//Sound when leave on Letter
+		Location locFrom0 = e.getFrom().clone();
+		locFrom0.setY(locFrom0.getY()-1);
+		@SuppressWarnings("deprecation")
+		String blockIDFrom = locFrom0.getBlock().getType().getId() + ":" + (int) locFrom0.getBlock().getData();
+		if(digiCodeCorrespondence.containsValue(blockIDFrom)) {
+			boolean otherPlayer = false;
+			for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
+				if(entity instanceof Player) {
+					Location locEntity = entity.getLocation().clone();
+					locEntity.setY(locEntity.getY()-1);
+					if(locEntity.getBlock().equals(locFrom0.getBlock())) {
+						otherPlayer = true;
+						break;
+					}
+				}
+			}
+			if(!otherPlayer) e.getPlayer().getWorld().playSound(locTo0, Sound.BLOCK_PISTON_EXTEND, 0.25f, 0.7f);
+		}
+		
+		
+		if(passwordisValidate) return;
 		for(LetterStat stat : roomCode.secretSentence) {
 			Location locFrom = e.getFrom().clone();
 			locFrom.setY(locFrom.getY()-1);
@@ -102,20 +151,40 @@ public class BoyardRoom implements Listener{
 				/*Bukkit.broadcastMessage("[Debug] (New) (To) Block ID : " + blockID + ", stat = " + stat.active);*/
 			}
 		}
-		Bukkit.getScheduler().scheduleSyncDelayedTask(McBoyard.instance, new Runnable() {
+		if(roomCode.checkPassword()) {
+			passwordisValidate = true;
+			Bukkit.getScheduler().scheduleSyncDelayedTask(McBoyard.instance, new Runnable() {
 
-			@Override
-			public void run() {
-				if(roomCode.checkPassword()) launchAnimation();
-			}
-		}, 20);
+				@Override
+				public void run() {
+					
+				}
+			}, 20);
+			launchAnimation();
+		}
 	}
+	
+    protected void spawnFireworks(Location location){
+        Location loc = location;
+        Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+        FireworkMeta fwm = fw.getFireworkMeta();
+        fwm.setPower(0);
+        fwm.addEffect(FireworkEffect.builder().with(Type.BURST).flicker(true).trail(true).withColor(Color.fromRGB(250,109,32)).withFade(Color.fromRGB(255, 255, 158)).build());
+       
+        fw.setFireworkMeta(fwm);
+        fw.detonate();
+       
+        for(int i = 0;i<1; i++){
+            Firework fw2 = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+            fw2.setVelocity(new Vector(0,0.001,0));
+            fw2.setFireworkMeta(fwm);
+        }
+    }
 	
 	/*
 	 * Launch all Animation (Boyard "WaterFall" and Firework)
 	 */
 	protected void launchAnimation() {
-		passwordisValidate = true;
 		//Fireworks && Title
 		task = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 			
@@ -124,23 +193,27 @@ public class BoyardRoom implements Listener{
 			@Override
 			public void run() {
 				if(round == 1) {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-242 114 -185" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-242 114 -165" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-268 114 -171" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-268 114 -179" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -242, 114.5, -185));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -242, 114.5, -165));
 					for(Player p : Bukkit.getOnlinePlayers()) {
 						p.sendTitle("§aFélicitation !", "", 10, 70, 20);
 					}
 				}
 				else if(round == 2) {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-248 114 -185" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-248 114 -165" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-262 114 -182" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-262 114 -167" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -248, 114.5, -165));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -248, 114.5, -185));
 				}
 				else if(round == 3) {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-254 114 -185" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/summon fireworks_rocket " + "-254 114 -165" + " {LifeTime:10,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1,Trail:1,Colors:[I;16411936],FadeColors:[I;16777118]}]}}}}");
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -254, 114.5, -165));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -254, 114.5, -185));
+				}
+				else if(round == 4) {
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -262, 114.5, -167));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -262, 114.5, -182));
+				}
+				else if(round == 5) {
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -268, 114.5, -171));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -268, 114.5, -179));
 				}
 				else {
 					Bukkit.getScheduler().cancelTask(task);
@@ -149,7 +222,7 @@ public class BoyardRoom implements Listener{
 			}
 		}, 0, 15);
 		//Chrono de 1 minutes
-		McBoyard.chronoModule.chrono(60);
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pchrono 1min");
 		//Laché des Boyards
 		task = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 			
@@ -190,7 +263,7 @@ public class BoyardRoom implements Listener{
 				}
 				round++;
 			}
-		}, 0, 15);
+		}, 0, 20);
 	}
 	
 	protected class SecureCode {
