@@ -180,7 +180,7 @@ public class BoyardRoom implements Listener{
        
         fw.setFireworkMeta(fwm);
         fw.detonate();
-       
+        
         for(int i = 0;i<1; i++){
             Firework fw2 = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
             fw2.setVelocity(new Vector(0,0.001,0));
