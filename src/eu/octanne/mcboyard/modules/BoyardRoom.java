@@ -249,7 +249,7 @@ public class BoyardRoom implements Listener{
 			
 			@Override
 			public void run() {
-				if(round <= 25) {
+				if(round <= 40) {
 					for(int xAdd = 0; xAdd < 9; xAdd++) {
 						for(int zAdd = 0; zAdd < 7; zAdd++) {
 							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_NUGGET, 3));
@@ -259,7 +259,7 @@ public class BoyardRoom implements Listener{
 				}
 				round++;
 			}
-		}, 75, 40);
+		}, 75, 20);
 	}
 	
 	protected class SecureCode {
