@@ -72,10 +72,12 @@ public class BoyardRoom implements Listener{
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-		if(e.getPlayer().getLocation().getBlockX() < -258 || e.getPlayer().getLocation().getBlockZ() < -180 || 
-		   e.getPlayer().getLocation().getBlockX() > -241 || e.getPlayer().getLocation().getBlockZ() > -170) {
-			return;
-		}else{
+		if((e.getFrom().getBlockY() == 115 || e.getTo().getBlockY() == 115) && 
+		  ((e.getTo().getBlockX() <= -241 && e.getTo().getBlockZ() <= -170 && 
+		    e.getTo().getBlockX() >= -258 && e.getTo().getBlockZ() >= -180) || 
+		   (e.getFrom().getBlockX() <= -241 && e.getFrom().getBlockZ() <= -170 && 
+		    e.getFrom().getBlockX() >= -258 && e.getFrom().getBlockZ() >= -180))) {
+			
 			if(e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) return;
 			if(e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockY() == e.getTo().getBlockY()
 					&& e.getFrom().getBlockZ() == e.getTo().getBlockZ()) {
@@ -246,40 +248,17 @@ public class BoyardRoom implements Listener{
 			
 			@Override
 			public void run() {
-				if(round == 1) {
+				if(round <= 25) {
 					for(int xAdd = 0; xAdd < 9; xAdd++) {
 						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_NUGGET, 10));
+							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_NUGGET, 3));
+							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
 						}
 					}
-				}
-				else if(round == 2) {
-					for(int xAdd = 0; xAdd < 9; xAdd++) {
-						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_INGOT, 2));
-						}
-					}
-				}
-				else if(round == 3) {
-					for(int xAdd = 0; xAdd < 9; xAdd++) {
-						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_NUGGET, 10));
-						}
-					}
-				}
-				else if(round == 4) {
-					for(int xAdd = 0; xAdd < 9; xAdd++) {
-						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_INGOT, 2));
-						}
-					}
-				}
-				else {
-					Bukkit.getScheduler().cancelTask(task2);
 				}
 				round++;
 			}
-		}, 75, 20);
+		}, 75, 40);
 	}
 	
 	protected class SecureCode {
