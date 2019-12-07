@@ -252,7 +252,7 @@ public class BoyardRoom implements Listener{
 				if(round <= 40) {
 					for(int xAdd = 0; xAdd < 9; xAdd++) {
 						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_NUGGET, 3));
+							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_NUGGET, 6));
 							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
 						}
 					}
