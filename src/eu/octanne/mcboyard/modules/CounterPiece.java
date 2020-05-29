@@ -103,6 +103,8 @@ public class CounterPiece implements Listener {
 	public void onDisable() {
 		holoCounter.remove();
 		holoTitle.remove();
+		holoTitle.setHealth(0);
+		holoCounter.setHealth(0);
 	}
 	
 	public void changeHoloCooldown(String string) {
