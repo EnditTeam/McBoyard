@@ -7,8 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Arrow.PickupStatus;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -122,9 +121,9 @@ public class Chairs implements Listener {
 	
 	@EventHandler
 	public void onArrowDeath(EntityDeathEvent e) {
-		if(e.getEntityType().equals(EntityType.ARROW)) {
+		if(e.getEntityType().equals(EntityType.ARMOR_STAND)) {
 			for(Chair chair : playerOnChairs) {
-				if(chair.arrow.getEntityId() == e.getEntity().getEntityId()) {
+				if(chair.armorstand.getEntityId() == e.getEntity().getEntityId()) {
 					chair.destroy();
 					playerOnChairs.remove(chair);
 					return;
@@ -171,24 +170,32 @@ public class Chairs implements Listener {
 	
 	public class Chair {
 		
-		Arrow arrow;
+		ArmorStand armorstand;
 		Player playerOnChair;
 		//Coord
 		int x,y,z;
 		Location locEnter;
 		
+		@SuppressWarnings("deprecation")
 		public Chair(Player p, Location loc) {
 			locEnter = p.getLocation();
 			x = loc.getBlockX(); y = loc.getBlockY(); z = loc.getBlockZ();
 			playerOnChair = p;
 			loc.setZ(loc.getZ()+0.5);
 			loc.setX(loc.getX()+0.5);
-			loc.setY(loc.getY()-0.05);
-			arrow = (Arrow) loc.getWorld().spawnEntity(loc, EntityType.ARROW);
-			arrow.setPickupStatus(PickupStatus.DISALLOWED);
-			arrow.setInvulnerable(true);
-			arrow.setSilent(true);
-			arrow.setGravity(false);
+			loc.setY(loc.getY()-0.4);
+			//loc.setYaw(0.0f);
+			//loc.setPitch(-90.0f);
+			armorstand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+			armorstand.setBasePlate(false);
+			armorstand.setAI(false);
+			armorstand.setHealth(2.0);
+			armorstand.setMaxHealth(2.0);
+			armorstand.setCollidable(false);
+			armorstand.setSmall(true);
+			armorstand.setInvulnerable(true);
+			armorstand.setVisible(false);
+			armorstand.setGravity(false);
 			
 			//PACKET
 			for(Player pS : Bukkit.getOnlinePlayers()) {
@@ -200,7 +207,7 @@ public class Chairs implements Listener {
 				    Field field = npc.getClass().getDeclaredField("a");
 				    field.setAccessible(true);// allows us to access the field
 				 
-				    field.setInt(npc, arrow.getEntityId());// sets the field to an integer
+				    field.setInt(npc, armorstand.getEntityId());// sets the field to an integer
 				    field.setAccessible(!field.isAccessible());//we want to stop accessing this now
 				    
 				    Field field2 = npc.getClass().getDeclaredField("b");
@@ -217,7 +224,7 @@ public class Chairs implements Listener {
 				//now comes the sending
 				pC.getHandle().playerConnection.sendPacket(npc);
 			}
-			arrow.addPassenger((CraftPlayer)p);
+			armorstand.addPassenger((CraftPlayer)p);
 		}
 		
 		public void destroy() {
@@ -225,7 +232,7 @@ public class Chairs implements Listener {
 			Location loc = playerOnChair.getLocation().clone();
 			loc.setY(loc.getY()+1);
 			playerOnChair.teleport(loc);
-			arrow.remove();
+			armorstand.remove();
 		}
 	}
 }
