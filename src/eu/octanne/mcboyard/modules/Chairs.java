@@ -187,14 +187,14 @@ public class Chairs implements Listener {
 			//loc.setYaw(0.0f);
 			//loc.setPitch(-90.0f);
 			armorstand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+			armorstand.setVisible(false);
+			armorstand.setSmall(true);
+			armorstand.setInvulnerable(true);
 			armorstand.setBasePlate(false);
 			armorstand.setAI(false);
 			armorstand.setHealth(2.0);
 			armorstand.setMaxHealth(2.0);
 			armorstand.setCollidable(false);
-			armorstand.setSmall(true);
-			armorstand.setInvulnerable(true);
-			armorstand.setVisible(false);
 			armorstand.setGravity(false);
 			
 			//PACKET
