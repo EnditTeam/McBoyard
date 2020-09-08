@@ -54,6 +54,16 @@ public class MusicModule implements Module {
 							for(Sound soundS : Sound.values()) {
 								p.stopSound(soundS);
 							}
+							/*  CUSTOM SOUND  */
+							p.stopSound("alarme");
+							p.stopSound("alive");
+							p.stopSound("generique1");
+							p.stopSound("generique2");
+							p.stopSound("generique3");
+							p.stopSound("gong");
+							p.stopSound("herse");
+							p.stopSound("horreur");
+							p.stopSound("spectacle");
 							sender.sendMessage("§9Arret de tous les sons en cours !");
 						}else {
 							sender.sendMessage("§9Arret du son : §e"+sound);
