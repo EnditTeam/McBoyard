@@ -20,13 +20,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import eu.octanne.mcboyard.McBoyard;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-
 import net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMount;
 
@@ -91,6 +89,29 @@ public class Chairs implements Listener {
 			@Override
 			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
 				//Bukkit.getServer().getConsoleSender().sendMessage("§bPacket READ : §c" + packet.toString());
+				
+				/*if(packet instanceof PacketPlayOutCustomPayload) {
+					PacketPlayOutCustomPayload packetCustom = (PacketPlayOutCustomPayload) packet;
+					
+                	Field b = packetCustom.getClass().getDeclaredField("b");
+                	b.setAccessible(true);
+                	PacketDataSerializer serial = (PacketDataSerializer) b.get(packetCustom);
+                	
+                	Field a = serial.getClass().getDeclaredField("a");
+                	a.setAccessible(true);
+                	ByteBuf buff = (ByteBuf) a.get(serial);
+                	
+                	String msg = "";
+                	for(Byte bit : buff.array()) {
+                		msg+=bit+" ";
+                	}
+                	
+                	Field name = packetCustom.getClass().getDeclaredField("a");
+                	name.setAccessible(true);
+                	String nameStr = (String) name.get(packetCustom);
+                	Bukkit.broadcastMessage("Message : "+nameStr);
+                	Bukkit.broadcastMessage(msg+" count : "+buff.array().length + " & "+buff.arrayOffset());
+				}*/
 				
                 /*if(packet instanceof PacketPlayOutCustomSoundEffect){
                 	PacketPlayOutCustomSoundEffect packetData = (PacketPlayOutCustomSoundEffect) packet;

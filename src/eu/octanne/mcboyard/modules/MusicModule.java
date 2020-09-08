@@ -1,22 +1,16 @@
 package eu.octanne.mcboyard.modules;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ChannelPromise;
-
-import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import net.minecraft.server.v1_12_R1.SoundCategory;
-import net.minecraft.server.v1_12_R1.SoundEffect;
 
 public class MusicModule implements Module {
 
@@ -46,11 +40,26 @@ public class MusicModule implements Module {
 					}
 					sender.sendMessage("§aLancement de la musique "+args[1]+" !");
 					return true;
-				}else if(args.length > 0 && args[0].equalsIgnoreCase("stop")){
+				}else if(args.length > 1 && args[0].equalsIgnoreCase("stop")){
+					/*ByteBuf buf = Unpooled.buffer(256);
+					PacketPlayOutCustomPayload packet = new PacketPlayOutCustomPayload("MC|StopSound", new PacketDataSerializer(buf));
 					for(Player p : Bukkit.getOnlinePlayers()) {
-						p.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stopsound @a");
+						PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
+						connection.sendPacket(packet);
+						//p.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stopsound @a");
+					}*/
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						String sound = args[1];
+						if(sound.equals("all")) {
+							for(Sound soundS : Sound.values()) {
+								p.stopSound(soundS);
+							}
+							sender.sendMessage("§9Arret de tous les sons en cours !");
+						}else {
+							sender.sendMessage("§9Arret du son : §e"+sound);
+							p.stopSound(sound);
+						}
 					}
-					sender.sendMessage("§aArret des sons en cours !");
 					return true;
 				}else {
 					sender.sendMessage("§cUsage : /music <stop|start> [<music>]");
