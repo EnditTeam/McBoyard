@@ -16,6 +16,7 @@ import eu.octanne.mcboyard.modules.CounterPiece;
 import eu.octanne.mcboyard.modules.KitSystem;
 import eu.octanne.mcboyard.modules.Maitre;
 import eu.octanne.mcboyard.modules.NoChangeWeather;
+import eu.octanne.mcboyard.modules.StaffChat;
 
 public class McBoyard extends JavaPlugin{
 	
@@ -37,6 +38,7 @@ public class McBoyard extends JavaPlugin{
 	static public Maitre maitreModule;
 	static public Chairs chairsModule;
 	static public BoyardRoom boyardRoomModule;
+	static public StaffChat staffChatModule;
 	
 	@Override
 	public void onEnable() {
@@ -96,6 +98,11 @@ public class McBoyard extends JavaPlugin{
 		maitreModule = new Maitre();
 		getCommand("maitre").setExecutor(new Maitre.MaitreCommand());
 		/*
+		 * Chat Staff Module 
+		 */
+		staffChatModule = new StaffChat();
+		getCommand("staffchat").setExecutor(new StaffChat.SCCommand());
+		/*
 		 * Chairs Module
 		 */
 		chairsModule = new Chairs();
@@ -112,6 +119,7 @@ public class McBoyard extends JavaPlugin{
 		maitreModule.onDisable();
 		chairsModule.onDisable();
 		boyardRoomModule.onDisable();
+		staffChatModule.onDisable();
 	}
 	
 }

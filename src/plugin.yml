@@ -29,5 +29,8 @@ commands:
     description: Ouvrir le menu des kits.
   maitre:
     description: Cacher son pseudo ou celui du joueur précisé.
+  staffchat:
+    description: Cacher son pseudo ou celui du joueur précisé.
+    aliases: [sc]
   boyardpassword:
     description: Modifier le mot de passe de la salle à Boyard.

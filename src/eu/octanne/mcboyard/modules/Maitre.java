@@ -9,7 +9,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team.Option;
 import org.bukkit.scoreboard.Team.OptionStatus;
 
-public class Maitre {
+public class Maitre implements Module {
 	
 	static public Scoreboard scoreboard;
 	
