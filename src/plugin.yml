@@ -32,5 +32,7 @@ commands:
   staffchat:
     description: Cacher son pseudo ou celui du joueur précisé.
     aliases: [sc]
+  music:
+    description: Lancer et stopper la music
   boyardpassword:
     description: Modifier le mot de passe de la salle à Boyard.

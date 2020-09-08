@@ -20,11 +20,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import eu.octanne.mcboyard.McBoyard;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
+
 import net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMount;
 
@@ -87,8 +89,37 @@ public class Chairs implements Listener {
 			}
 			
 			@Override
-			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception{
+			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
 				//Bukkit.getServer().getConsoleSender().sendMessage("§bPacket READ : §c" + packet.toString());
+				
+                /*if(packet instanceof PacketPlayOutCustomSoundEffect){
+                	PacketPlayOutCustomSoundEffect packetData = (PacketPlayOutCustomSoundEffect) packet;
+                	
+                	//String version = "net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+                	Class<?> packetClass = packetData.getClass(); Class.forName(version+".PacketPlayOutNamedSoundEffect");
+                	
+                	Field a = packetClass.getDeclaredField("a");
+                	a.setAccessible(true);
+                	SoundEffect effect = (SoundEffect) a.get(packetData);
+                	
+                	Class<? extends SoundEffect> effectClass = effect.getClass();
+                	Field b = effectClass.getDeclaredField("b");
+                	b.setAccessible(true);
+                	
+                	MinecraftKey key = (MinecraftKey) b.get(effect);
+
+                	Class<? extends MinecraftKey> keyClass = key.getClass();
+                	Field a2 = keyClass.getDeclaredField("a");
+                	a2.setAccessible(true);
+                	Field b2 = keyClass.getDeclaredField("b");
+                	b2.setAccessible(true);
+                	String aS = (String) a2.get(key);
+                	String bS = (String) b2.get(key);
+                	
+                    Bukkit.getServer().getConsoleSender().sendMessage("Packet : a : "+aS+" b : "+bS);
+                    return;
+                }*/
+				
 				super.write(channelHandlerContext, packet, channelPromise);
 			}
 			
