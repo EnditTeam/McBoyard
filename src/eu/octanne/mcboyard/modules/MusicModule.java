@@ -1,13 +1,15 @@
 package eu.octanne.mcboyard.modules;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import io.netty.buffer.Unpooled;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import net.minecraft.server.v1_12_R1.SoundCategory;
@@ -40,21 +42,20 @@ public class MusicModule implements Module {
 					}
 					sender.sendMessage("§aLancement de la musique "+args[1]+" !");
 					return true;
-				}else if(args.length > 1 && args[0].equalsIgnoreCase("stop")){
-					/*ByteBuf buf = Unpooled.buffer(256);
-					PacketPlayOutCustomPayload packet = new PacketPlayOutCustomPayload("MC|StopSound", new PacketDataSerializer(buf));
+				}else if(args.length >= 1 && args[0].equalsIgnoreCase("stop")){
 					for(Player p : Bukkit.getOnlinePlayers()) {
-						PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
-						connection.sendPacket(packet);
-						//p.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stopsound @a");
-					}*/
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						String sound = args[1];
+						String sound = args.length > 1 ? args[1] : "all";
 						if(sound.equals("all")) {
-							for(Sound soundS : Sound.values()) {
+							Object localObject = new PacketDataSerializer(Unpooled.buffer());
+						    ((PacketDataSerializer)localObject).a("");
+						    ((PacketDataSerializer)localObject).a("");
+							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
+									new PacketPlayOutCustomPayload("MC|StopSound", (PacketDataSerializer)localObject));
+							
+							/*for(Sound soundS : Sound.values()) {
 								p.stopSound(soundS);
 							}
-							/*  CUSTOM SOUND  */
+							//  CUSTOM SOUND
 							p.stopSound("alarme");
 							p.stopSound("alive");
 							p.stopSound("generique1");
@@ -63,7 +64,7 @@ public class MusicModule implements Module {
 							p.stopSound("gong");
 							p.stopSound("herse");
 							p.stopSound("horreur");
-							p.stopSound("spectacle");
+							p.stopSound("spectacle");*/
 							sender.sendMessage("§9Arret de tous les sons en cours !");
 						}else {
 							sender.sendMessage("§9Arret du son : §e"+sound);

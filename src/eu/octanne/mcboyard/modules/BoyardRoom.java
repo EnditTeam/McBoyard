@@ -15,6 +15,7 @@ import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -28,6 +29,9 @@ import org.bukkit.util.Vector;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.BoyardRoom.SecureCode.LetterStat;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
+import net.minecraft.server.v1_12_R1.SoundCategory;
 
 public class BoyardRoom implements Listener{
 	
@@ -161,6 +165,13 @@ public class BoyardRoom implements Listener{
 			}
 			if(roomCode.checkPassword()) {
 				passwordisValidate = true;
+				// Launch HERSE SOUND
+				for(Player p : Bukkit.getOnlinePlayers()) {
+					PacketPlayOutCustomSoundEffect packet = 
+							new PacketPlayOutCustomSoundEffect("herse", SoundCategory.MASTER, 1000, 64, 1000, 500.0f, 1);
+					PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
+					connection.sendPacket(packet);
+				}
 				
 				Bukkit.getScheduler().scheduleSyncDelayedTask(McBoyard.instance, new Runnable() {
 
@@ -168,7 +179,7 @@ public class BoyardRoom implements Listener{
 					public void run() {
 						launchAnimation();
 					}
-				}, 20);
+				}, 20*14);
 			}
 		}
 	}
@@ -242,6 +253,13 @@ public class BoyardRoom implements Listener{
 				}
 			}
 		}, 75);
+		// Launch Generique2 SOUND
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			PacketPlayOutCustomSoundEffect packet = 
+					new PacketPlayOutCustomSoundEffect("generique2", SoundCategory.MASTER, 1000, 64, 1000, 500.0f, 1);
+			PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
+			connection.sendPacket(packet);
+		}
 		//Laché des Boyards
 		task2 = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 			
