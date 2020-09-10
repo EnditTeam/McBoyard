@@ -43,34 +43,22 @@ public class MusicModule implements Module {
 					sender.sendMessage("§aLancement de la musique "+args[1]+" !");
 					return true;
 				}else if(args.length >= 1 && args[0].equalsIgnoreCase("stop")){
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						String sound = args.length > 1 ? args[1] : "all";
-						if(sound.equals("all")) {
-							Object localObject = new PacketDataSerializer(Unpooled.buffer());
-						    ((PacketDataSerializer)localObject).a("");
-						    ((PacketDataSerializer)localObject).a("");
+					String sound = args.length > 1 ? args[1] : "all";
+					if(sound.equals("all")) {
+						Object localObject = new PacketDataSerializer(Unpooled.buffer());
+						((PacketDataSerializer)localObject).a("");
+						((PacketDataSerializer)localObject).a("");
+						for(Player p : Bukkit.getOnlinePlayers()) {
 							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
-									new PacketPlayOutCustomPayload("MC|StopSound", (PacketDataSerializer)localObject));
-							
-							/*for(Sound soundS : Sound.values()) {
-								p.stopSound(soundS);
-							}
-							//  CUSTOM SOUND
-							p.stopSound("alarme");
-							p.stopSound("alive");
-							p.stopSound("generique1");
-							p.stopSound("generique2");
-							p.stopSound("generique3");
-							p.stopSound("gong");
-							p.stopSound("herse");
-							p.stopSound("horreur");
-							p.stopSound("spectacle");*/
-							sender.sendMessage("§9Arret de tous les sons en cours !");
-						}else {
-							sender.sendMessage("§9Arret du son : §e"+sound);
+								new PacketPlayOutCustomPayload("MC|StopSound", (PacketDataSerializer)localObject));
+						}
+					}else {
+						sender.sendMessage("§9Arret du son : §e"+sound);
+						for(Player p : Bukkit.getOnlinePlayers()) {
 							p.stopSound(sound);
 						}
 					}
+					sender.sendMessage("§9Arret de tous les sons en cours !");
 					return true;
 				}else {
 					sender.sendMessage("§cUsage : /music <stop|start> [<music>]");
