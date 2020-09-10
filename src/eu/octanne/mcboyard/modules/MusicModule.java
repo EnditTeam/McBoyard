@@ -52,13 +52,13 @@ public class MusicModule implements Module {
 							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
 								new PacketPlayOutCustomPayload("MC|StopSound", (PacketDataSerializer)localObject));
 						}
+						sender.sendMessage("§9Arret de tous les sons en cours !");
 					}else {
 						sender.sendMessage("§9Arret du son : §e"+sound);
 						for(Player p : Bukkit.getOnlinePlayers()) {
 							p.stopSound(sound);
 						}
 					}
-					sender.sendMessage("§9Arret de tous les sons en cours !");
 					return true;
 				}else {
 					sender.sendMessage("§cUsage : /music <stop|start> [<music>]");
