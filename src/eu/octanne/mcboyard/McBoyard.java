@@ -13,6 +13,7 @@ import eu.octanne.mcboyard.modules.BoyardRoom;
 import eu.octanne.mcboyard.modules.Chairs;
 import eu.octanne.mcboyard.modules.Chrono;
 import eu.octanne.mcboyard.modules.CounterPiece;
+import eu.octanne.mcboyard.modules.CreditModule;
 import eu.octanne.mcboyard.modules.KitSystem;
 import eu.octanne.mcboyard.modules.Maitre;
 import eu.octanne.mcboyard.modules.MusicModule;
@@ -41,6 +42,7 @@ public class McBoyard extends JavaPlugin{
 	static public BoyardRoom boyardRoomModule;
 	static public StaffChat staffChatModule;
 	static public MusicModule musicModule;
+	static public CreditModule creditModule;
 	
 	@Override
 	public void onEnable() {
@@ -110,6 +112,11 @@ public class McBoyard extends JavaPlugin{
 		musicModule = new MusicModule();
 		getCommand("music").setExecutor(new MusicModule.MusicCommand());
 		/*
+		 * Credit Module
+		 */
+		creditModule = new CreditModule();
+		getCommand("credit").setExecutor(new CreditModule.CreditCommand());
+		/*
 		 * Chairs Module
 		 */
 		chairsModule = new Chairs();
@@ -128,6 +135,7 @@ public class McBoyard extends JavaPlugin{
 		boyardRoomModule.onDisable();
 		staffChatModule.onDisable();
 		musicModule.onDisable();
+		creditModule.onDisable();
 	}
 	
 }

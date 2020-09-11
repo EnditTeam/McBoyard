@@ -5,6 +5,8 @@ author: Octanne
 version: 1.0
 softdepend: [WorldGuard]
 commands:
+  credit:
+    description: afficher les credits a un joueur
   resetcounter:
     description: Réinitialiser le compteur de boyard.
     permission: boyardcounter
