@@ -45,10 +45,10 @@ public class MusicModule implements Module {
 				}else if(args.length >= 1 && args[0].equalsIgnoreCase("stop")){
 					String sound = args.length > 1 ? args[1] : "all";
 					if(sound.equals("all")) {
-						Object localObject = new PacketDataSerializer(Unpooled.buffer());
-						((PacketDataSerializer)localObject).a("");
-						((PacketDataSerializer)localObject).a("");
 						for(Player p : Bukkit.getOnlinePlayers()) {
+							Object localObject = new PacketDataSerializer(Unpooled.buffer());
+							((PacketDataSerializer)localObject).a("");
+							((PacketDataSerializer)localObject).a("");
 							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
 								new PacketPlayOutCustomPayload("MC|StopSound", (PacketDataSerializer)localObject));
 						}
