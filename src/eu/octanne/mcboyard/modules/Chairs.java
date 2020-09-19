@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import eu.octanne.bataillenavale.entity.ChairEntity;
 import eu.octanne.mcboyard.McBoyard;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -89,58 +89,6 @@ public class Chairs implements Listener {
 			@Override
 			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
 				//Bukkit.getServer().getConsoleSender().sendMessage("§bPacket READ : §c" + packet.toString());
-				
-				/*if(packet instanceof PacketPlayOutCustomPayload) {
-					PacketPlayOutCustomPayload packetCustom = (PacketPlayOutCustomPayload) packet;
-					
-                	Field b = packetCustom.getClass().getDeclaredField("b");
-                	b.setAccessible(true);
-                	PacketDataSerializer serial = (PacketDataSerializer) b.get(packetCustom);
-                	
-                	Field a = serial.getClass().getDeclaredField("a");
-                	a.setAccessible(true);
-                	ByteBuf buff = (ByteBuf) a.get(serial);
-                	
-                	String msg = "";
-                	for(Byte bit : buff.array()) {
-                		msg+=bit+" ";
-                	}
-                	
-                	Field name = packetCustom.getClass().getDeclaredField("a");
-                	name.setAccessible(true);
-                	String nameStr = (String) name.get(packetCustom);
-                	Bukkit.broadcastMessage("Message : "+nameStr);
-                	Bukkit.broadcastMessage(msg+" count : "+buff.array().length + " & "+buff.arrayOffset());
-				}*/
-				
-                /*if(packet instanceof PacketPlayOutCustomSoundEffect){
-                	PacketPlayOutCustomSoundEffect packetData = (PacketPlayOutCustomSoundEffect) packet;
-                	
-                	//String version = "net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-                	Class<?> packetClass = packetData.getClass(); Class.forName(version+".PacketPlayOutNamedSoundEffect");
-                	
-                	Field a = packetClass.getDeclaredField("a");
-                	a.setAccessible(true);
-                	SoundEffect effect = (SoundEffect) a.get(packetData);
-                	
-                	Class<? extends SoundEffect> effectClass = effect.getClass();
-                	Field b = effectClass.getDeclaredField("b");
-                	b.setAccessible(true);
-                	
-                	MinecraftKey key = (MinecraftKey) b.get(effect);
-
-                	Class<? extends MinecraftKey> keyClass = key.getClass();
-                	Field a2 = keyClass.getDeclaredField("a");
-                	a2.setAccessible(true);
-                	Field b2 = keyClass.getDeclaredField("b");
-                	b2.setAccessible(true);
-                	String aS = (String) a2.get(key);
-                	String bS = (String) b2.get(key);
-                	
-                    Bukkit.getServer().getConsoleSender().sendMessage("Packet : a : "+aS+" b : "+bS);
-                    return;
-                }*/
-				
 				super.write(channelHandlerContext, packet, channelPromise);
 			}
 			
@@ -175,7 +123,7 @@ public class Chairs implements Listener {
 	public void onArrowDeath(EntityDeathEvent e) {
 		if(e.getEntityType().equals(EntityType.ARMOR_STAND)) {
 			for(Chair chair : playerOnChairs) {
-				if(chair.armorstand.getEntityId() == e.getEntity().getEntityId()) {
+				if(chair.armorstand.getBukkitEntity().getEntityId() == e.getEntity().getEntityId()) {
 					chair.destroy();
 					playerOnChairs.remove(chair);
 					return;
@@ -222,15 +170,14 @@ public class Chairs implements Listener {
 	
 	public class Chair {
 		
-		ArmorStand armorstand;
+		ChairEntity armorstand;
 		Player playerOnChair;
 		//Coord
 		int x,y,z;
 		Location locEnter;
 		
-		@SuppressWarnings("deprecation")
 		public Chair(Player p, Location loc) {
-			locEnter = p.getLocation();
+			locEnter = p.getLocation().clone();
 			x = loc.getBlockX(); y = loc.getBlockY(); z = loc.getBlockZ();
 			playerOnChair = p;
 			loc.setZ(loc.getZ()+0.5);
@@ -238,7 +185,12 @@ public class Chairs implements Listener {
 			loc.setY(loc.getY()-0.4);
 			//loc.setYaw(0.0f);
 			//loc.setPitch(-90.0f);
-			armorstand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+			
+			armorstand = new ChairEntity(loc.getWorld());
+			eu.octanne.bataillenavale.entity.EntityType.spawnEntity(armorstand, loc);
+			//ArmorStand armorstand = (ArmorStand) armorstandBase;
+			
+			/*armorstand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
 			armorstand.setVisible(false);
 			armorstand.setSmall(true);
 			armorstand.setInvulnerable(true);
@@ -247,7 +199,7 @@ public class Chairs implements Listener {
 			armorstand.setHealth(2.0);
 			armorstand.setMaxHealth(2.0);
 			armorstand.setCollidable(false);
-			armorstand.setGravity(false);
+			armorstand.setGravity(false);*/
 			
 			//PACKET
 			for(Player pS : Bukkit.getOnlinePlayers()) {
@@ -259,7 +211,7 @@ public class Chairs implements Listener {
 				    Field field = npc.getClass().getDeclaredField("a");
 				    field.setAccessible(true);// allows us to access the field
 				 
-				    field.setInt(npc, armorstand.getEntityId());// sets the field to an integer
+				    field.setInt(npc, armorstand.getBukkitEntity().getEntityId());// sets the field to an integer
 				    field.setAccessible(!field.isAccessible());//we want to stop accessing this now
 				    
 				    Field field2 = npc.getClass().getDeclaredField("b");
@@ -276,15 +228,13 @@ public class Chairs implements Listener {
 				//now comes the sending
 				pC.getHandle().playerConnection.sendPacket(npc);
 			}
-			armorstand.addPassenger((CraftPlayer)p);
+			armorstand.getBukkitEntity().addPassenger((CraftPlayer)p);
 		}
 		
 		public void destroy() {
 			playerOnChair.leaveVehicle();
-			Location loc = playerOnChair.getLocation().clone();
-			loc.setY(loc.getY()+1);
-			playerOnChair.teleport(loc);
-			armorstand.remove();
+			playerOnChair.teleport(locEnter);
+			armorstand.getBukkitEntity().remove();
 		}
 	}
 }
