@@ -1,4 +1,4 @@
-package eu.octanne.bataillenavale.entity;
+package eu.octanne.mcboyard.entity;
 
 import java.lang.reflect.Field;
 import java.util.List;

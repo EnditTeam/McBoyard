@@ -18,8 +18,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import eu.octanne.bataillenavale.entity.ChairEntity;
 import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.entity.ChairEntity;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -66,6 +66,7 @@ public class Chairs implements Listener {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception{
 				if(packet.toString().contains("net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle")) {
+					super.channelRead(channelHandlerContext, packet);
 					PacketPlayInSteerVehicle packetReadable = (PacketPlayInSteerVehicle) packet;
 					//Dismount
 					Field field4 = packetReadable.getClass().getDeclaredField("d");
@@ -81,9 +82,10 @@ public class Chairs implements Listener {
 						}
 					}
 					if(chairD != null)playerOnChairs.remove(chairD);
+				}else {
+					super.channelRead(channelHandlerContext, packet);
 				}
 				//Bukkit.getServer().getConsoleSender().sendMessage("§ePacket READ : §c" + packet.toString());
-				super.channelRead(channelHandlerContext, packet);
 			}
 			
 			@Override
@@ -91,7 +93,6 @@ public class Chairs implements Listener {
 				//Bukkit.getServer().getConsoleSender().sendMessage("§bPacket READ : §c" + packet.toString());
 				super.write(channelHandlerContext, packet, channelPromise);
 			}
-			
 			
 		};
 		
@@ -172,7 +173,7 @@ public class Chairs implements Listener {
 		
 		ChairEntity armorstand;
 		Player playerOnChair;
-		//Coord
+		// Coordonate
 		int x,y,z;
 		Location locEnter;
 		
@@ -187,10 +188,11 @@ public class Chairs implements Listener {
 			//loc.setPitch(-90.0f);
 			
 			armorstand = new ChairEntity(loc.getWorld());
-			eu.octanne.bataillenavale.entity.EntityType.spawnEntity(armorstand, loc);
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(armorstand, loc);
 			//ArmorStand armorstand = (ArmorStand) armorstandBase;
 			
-			/*armorstand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+			/*
+			armorstand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
 			armorstand.setVisible(false);
 			armorstand.setSmall(true);
 			armorstand.setInvulnerable(true);
@@ -199,7 +201,8 @@ public class Chairs implements Listener {
 			armorstand.setHealth(2.0);
 			armorstand.setMaxHealth(2.0);
 			armorstand.setCollidable(false);
-			armorstand.setGravity(false);*/
+			armorstand.setGravity(false);
+			*/
 			
 			//PACKET
 			for(Player pS : Bukkit.getOnlinePlayers()) {
@@ -228,12 +231,12 @@ public class Chairs implements Listener {
 				//now comes the sending
 				pC.getHandle().playerConnection.sendPacket(npc);
 			}
-			armorstand.getBukkitEntity().addPassenger((CraftPlayer)p);
+			//armorstand.getBukkitEntity().addPassenger((CraftPlayer)p);
 		}
 		
 		public void destroy() {
-			playerOnChair.leaveVehicle();
-			playerOnChair.teleport(locEnter);
+			//playerOnChair.leaveVehicle();
+			//playerOnChair.teleport(locEnter);
 			armorstand.getBukkitEntity().remove();
 		}
 	}

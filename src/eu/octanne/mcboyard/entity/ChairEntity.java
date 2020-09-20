@@ -1,4 +1,4 @@
-package eu.octanne.bataillenavale.entity;
+package eu.octanne.mcboyard.entity;
 
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
