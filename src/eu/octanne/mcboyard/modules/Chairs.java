@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -167,6 +169,9 @@ public class Chairs implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		//PACKET SYSTEM
 		injectPlayer(e.getPlayer());
+		
+		// DELETE COOLDOWN
+		e.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(50);
 	}
 	
 	public class Chair {
