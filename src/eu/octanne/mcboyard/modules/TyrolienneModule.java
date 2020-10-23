@@ -11,11 +11,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -115,10 +117,17 @@ public class TyrolienneModule implements Listener {
 	}
 	
 	@EventHandler
+	public void onUnleash(EntityUnleashEvent e) {
+		if(e.getEntity() instanceof TyroEntity) {
+			Bukkit.broadcastMessage("Reason :" + e.getReason().name());
+		}
+	}
+	
+	@EventHandler
 	public void onCreatorMove(PlayerMoveEvent e) {
 		if(TyroTemp.isOnCreation(e.getPlayer())) {
 			TyroTemp tt = TyroTemp.getPCreation(e.getPlayer());
-			if(tt.getLastArmor().getBukkitEntity().getLocation().distance(e.getPlayer().getLocation()) >= 1) {
+			if(tt.getLastArmor().getBukkitEntity().getLocation().distance(e.getPlayer().getLocation()) >= 0.2) {
 				tt.getLastArmor().getBukkitEntity().teleport(e.getPlayer());
 			}
 		}
@@ -146,7 +155,7 @@ public class TyrolienneModule implements Listener {
 			TyroEntity armor = new TyroEntity(p.getWorld());
 			eu.octanne.mcboyard.entity.EntityType.spawnEntity(armor, p.getLocation());
 			armorStd.add(armor);
-			((ArmorStand)armor.getBukkitEntity()).setLeashHolder(leashE);
+			((LivingEntity)armor.getBukkitEntity()).setLeashHolder(leashE);
 		}
 		
 		public TyroEntity getLastArmor() {

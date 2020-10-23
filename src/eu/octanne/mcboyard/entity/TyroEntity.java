@@ -17,7 +17,7 @@ public class TyroEntity extends EntityArmorStand {
 		this.setSmall(true);
 		this.setInvulnerable(true);
 		this.setBasePlate(false);
-		this.setInvisible(true);
+		this.setInvisible(false); // TODO
 		this.setHealth(0.5f);
 		this.collides = false;
 		this.setNoGravity(true);
