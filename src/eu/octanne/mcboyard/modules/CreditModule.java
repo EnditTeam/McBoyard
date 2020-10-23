@@ -6,23 +6,25 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import net.minecraft.server.v1_12_R1.PacketPlayOutGameStateChange;
 
-public class CreditModule {
-	public CreditModule() {
-		onEnable();
+public class CreditModule extends Module {
+
+	public CreditModule(JavaPlugin instance) {
+		super(instance);
 	}
 
 	public void onEnable() {
-
+		pl.getCommand("credit").setExecutor(new CreditCommand());
 	}
 
 	public void onDisable() {
 
 	}
 
-	static public class CreditCommand implements CommandExecutor {
+	class CreditCommand implements CommandExecutor {
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

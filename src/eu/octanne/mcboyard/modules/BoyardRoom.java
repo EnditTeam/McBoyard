@@ -21,10 +21,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import eu.octanne.mcboyard.McBoyard;
@@ -33,22 +35,25 @@ import net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import net.minecraft.server.v1_12_R1.SoundCategory;
 
-public class BoyardRoom implements Listener{
+public class BoyardRoom extends Module implements Listener{
 	
-	private HashMap<String, String> digiCodeCorrespondence = new HashMap<String, String>();
+	public BoyardRoom(JavaPlugin instance) {
+		super(instance);
+	}
+
+	private HashMap<String, String> digiCodeCorrespondence;
 	
 	protected int task, task2;
 	
-	protected boolean passwordisValidate = false;
+	protected boolean passwordisValidate;
 	
 	protected SecureCode roomCode;
 	
-	public BoyardRoom() {
-		onEnable();
-		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
-	}
-	
 	public void onEnable() {
+		
+		digiCodeCorrespondence = new HashMap<String, String>();
+		passwordisValidate = false;
+		
 		digiCodeMapCorrespondence();
 		if(!McBoyard.config.isSet("BoyardRoom.boyardPassword"))McBoyard.config.set("BoyardRoom.boyardPassword", "ABCDE");
 		try {
@@ -57,10 +62,12 @@ public class BoyardRoom implements Listener{
 			e.printStackTrace();
 		}
 		roomCode = new SecureCode(McBoyard.config.getString("BoyardRoom.boyardPassword", "ABCDE"));
+		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
+		pl.getCommand("boyardpassword").setExecutor(new BoyardPasswordConfigCommand());
 	}
 	
 	public void onDisable() {
-		
+		HandlerList.unregisterAll(this);
 	}
 	
 	public void changePassword(String password) {
@@ -330,7 +337,7 @@ public class BoyardRoom implements Listener{
 		digiCodeCorrespondence.put("Y", "159:11"); digiCodeCorrespondence.put("Z", "159:10");
 	}
 	
-	static public class BoyardPasswordConfigCommand implements CommandExecutor {
+	class BoyardPasswordConfigCommand implements CommandExecutor {
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

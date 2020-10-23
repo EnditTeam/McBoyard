@@ -16,9 +16,11 @@ import eu.octanne.mcboyard.modules.CounterPiece;
 import eu.octanne.mcboyard.modules.CreditModule;
 import eu.octanne.mcboyard.modules.KitSystem;
 import eu.octanne.mcboyard.modules.Maitre;
+import eu.octanne.mcboyard.modules.Module;
 import eu.octanne.mcboyard.modules.MusicModule;
 import eu.octanne.mcboyard.modules.NoChangeWeather;
 import eu.octanne.mcboyard.modules.StaffChat;
+import eu.octanne.mcboyard.modules.TyrolienneModule;
 
 public class McBoyard extends JavaPlugin{
 	
@@ -43,6 +45,7 @@ public class McBoyard extends JavaPlugin{
 	static public StaffChat staffChatModule;
 	static public MusicModule musicModule;
 	static public CreditModule creditModule;
+	static public TyrolienneModule tyroModule;
 	
 	@Override
 	public void onEnable() {
@@ -55,7 +58,7 @@ public class McBoyard extends JavaPlugin{
 				e.printStackTrace();
 			}
 		}
-		loadModules();
+		instanceModules();
 	}
 	
 	@Override
@@ -63,79 +66,34 @@ public class McBoyard extends JavaPlugin{
 		unloadModules();
 	}
 	
+	public void instanceModules() {
+		counterPieceModule = new CounterPiece(this);
+		chronoModule = new Chrono(this);
+		kitModule = new KitSystem(this);
+		noChangeWeatherModule = new NoChangeWeather(this);
+		autoMessageModule = new AutoMessage(this);
+		maitreModule = new Maitre(this);
+		staffChatModule = new StaffChat(this);
+		musicModule = new MusicModule(this);
+		creditModule = new CreditModule(this);
+		chairsModule = new Chairs(this);
+		boyardRoomModule = new BoyardRoom(this);
+		tyroModule = new TyrolienneModule(this);
+	}
+	
 	/*
 	 * MODULES
 	 * LOAD / UNLOAD
 	 */
 	public void loadModules() {
-		/*
-		 * Counter Piece Module
-		 */
-		counterPieceModule = new CounterPiece();
-		getCommand("resetcounter").setExecutor(new CounterPiece.ResetBoyardCommand());
-		/*
-		 * Chrono Module
-		 */
-		chronoModule = new Chrono();
-		getCommand("chrono").setExecutor(new Chrono.ChronoCommand());
-		getCommand("pchrono").setExecutor(new Chrono.ChronoPersoCommand());
-		getCommand("chronostop").setExecutor(new Chrono.ChronoStopCommand());
-		/*
-		 * Kits Module
-		 */
-		kitModule = new KitSystem();
-		getCommand("kitreload").setExecutor(new KitSystem.KitReloadCommand());
-		getCommand("kitcreate").setExecutor(new KitSystem.KitCreateCommand());
-		getCommand("kit").setExecutor(new KitSystem.KitCommand());
-		/*
-		 * No Change Weather Module
-		 */
-		noChangeWeatherModule = new NoChangeWeather();
-		/*
-		 * Auto Message Module
-		 */
-		autoMessageModule = new AutoMessage();
-		getCommand("amsgreload").setExecutor(new AutoMessage.ReloadCommand());
-		/*
-		 * Maitre Module
-		 */
-		maitreModule = new Maitre();
-		getCommand("maitre").setExecutor(new Maitre.MaitreCommand());
-		/*
-		 * Chat Staff Module 
-		 */
-		staffChatModule = new StaffChat();
-		getCommand("staffchat").setExecutor(new StaffChat.SCCommand());
-		/*
-		 * Music Module
-		 */
-		musicModule = new MusicModule();
-		getCommand("music").setExecutor(new MusicModule.MusicCommand());
-		/*
-		 * Credit Module
-		 */
-		creditModule = new CreditModule();
-		getCommand("credit").setExecutor(new CreditModule.CreditCommand());
-		/*
-		 * Chairs Module
-		 */
-		chairsModule = new Chairs();
-		/*
-		 * BoyardRoom Module
-		 */
-		boyardRoomModule = new BoyardRoom();
-		getCommand("boyardpassword").setExecutor(new BoyardRoom.BoyardPasswordConfigCommand());
+		for (Module mod : Module.modules) {
+			mod.onEnable();
+		}
 	}
 	public void unloadModules() {
-		counterPieceModule.onDisable();
-		chronoModule.onDisable();
-		kitModule.onDisable();
-		maitreModule.onDisable();
-		chairsModule.onDisable();
-		boyardRoomModule.onDisable();
-		staffChatModule.onDisable();
-		musicModule.onDisable();
-		creditModule.onDisable();
+		for (Module mod : Module.modules) {
+			mod.onDisable();
+		}
 	}
 	
 }

@@ -5,22 +5,23 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public class StaffChat implements Module {
+public class StaffChat extends Module {
 	
-	public StaffChat() {
-		onEnable();
+	public StaffChat(JavaPlugin instance) {
+		super(instance);
 	}
-	
+
 	public void onEnable() {
-		
+		pl.getCommand("staffchat").setExecutor(new SCCommand());
 	}
 	
 	public void onDisable() {
 		
 	}
 	
-	static public class SCCommand implements CommandExecutor {
+	class SCCommand implements CommandExecutor {
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

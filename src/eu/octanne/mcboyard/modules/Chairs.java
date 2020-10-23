@@ -7,11 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -19,6 +19,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.entity.ChairEntity;
@@ -30,19 +31,22 @@ import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMount;
 
-public class Chairs implements Listener {
+public class Chairs extends Module implements Listener {
 	
-	public ArrayList<Chair> playerOnChairs = new ArrayList<Chair>();
-	
-	public Chairs() {
-		onEnable();
-		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
+	public Chairs(JavaPlugin instance) {
+		super(instance);
 	}
+
+	public ArrayList<Chair> playerOnChairs;
 	
 	public void onEnable() {
+		
+		playerOnChairs = new ArrayList<Chair>();
+		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			injectPlayer(player);
 		}
+		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
 	}
 	
 	public void onDisable() {
@@ -52,6 +56,7 @@ public class Chairs implements Listener {
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			removePlayer(player);
 		}
+		HandlerList.unregisterAll(this);
 	}
 	
 	private void removePlayer(Player player) {

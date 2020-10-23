@@ -16,24 +16,30 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 import eu.octanne.mcboyard.McBoyard;
 
-public class CounterPiece implements Listener {
+public class CounterPiece extends Module implements Listener  {
+
+	public CounterPiece(JavaPlugin instance) {
+		super(instance);
+	}
 
 	/*
 	 * INIT VAR
 	 */
-	protected int task, seconds = 65, piece = 0, secondsInit = 65;
-	protected boolean isEnable = false;
+	protected int task, seconds, piece, secondsInit;
+	protected boolean isEnable;
 	protected ArmorStand holoCounter;
 	protected ArmorStand holoTitle;
 	protected Location locTitle;
@@ -56,15 +62,11 @@ public class CounterPiece implements Listener {
 		return getWorldGuard().getRegionManager(Bukkit.getWorld("world"));
 	}
 	
-	/*
-	 * CONTRUCTOR
-	 */
-	public CounterPiece() {
-		onEnable();
-		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
-	}
-	
 	public void onEnable() {
+		
+		seconds = 65; piece = 0; secondsInit = 65;
+		isEnable = false;
+		
 		//CREATE DEFAULT CONFIG
 		if(!McBoyard.config.isSet("CounterPiece.counterLocation"))McBoyard.config.set("CounterPiece.counterLocation", new Location(Bukkit.getWorlds().get(0), 0, 64, 0));
 		if(!McBoyard.config.isSet("CounterPiece.cooldown"))McBoyard.config.set("CounterPiece.cooldown", 65);
@@ -99,12 +101,18 @@ public class CounterPiece implements Listener {
 		holoCounter.setVisible(false);
 		holoCounter.setBasePlate(false);
 		holoCounter.setSmall(true);
+		
+		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
+		pl.getCommand("resetcounter").setExecutor(new ResetBoyardCommand());
 	}
+	
 	public void onDisable() {
 		holoCounter.remove();
 		holoTitle.remove();
 		holoTitle.setHealth(0);
 		holoCounter.setHealth(0);
+		
+		HandlerList.unregisterAll(this);
 	}
 	
 	public void changeHoloCooldown(String string) {
@@ -211,7 +219,7 @@ public class CounterPiece implements Listener {
 	/*
 	 * COMMAND RSTBOYARD
 	 */
-	static public class ResetBoyardCommand implements CommandExecutor{
+	class ResetBoyardCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

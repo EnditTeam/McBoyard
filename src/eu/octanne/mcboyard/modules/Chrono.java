@@ -9,27 +9,39 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.McBoyard;
 
-public class Chrono {
+public class Chrono extends Module{
+	
+	public Chrono(JavaPlugin instance) {
+		super(instance);
+	}
 	
 	protected BossBar bossBar;
 	
-	protected boolean cancel = false;
-	protected boolean isStart = false;
+	protected boolean cancel;
+	protected boolean isStart;
 	protected int task;
-	protected double sec = 0;
-	protected int sec2 = 0;
-	protected int min = 0;
-	protected float prctArround = 0;
-	
-	public Chrono() {
-		onEnable();
-	}
+	protected double sec;
+	protected int sec2;
+	protected int min;
+	protected float prctArround;
 	
 	public void onEnable() {
+		cancel = false;
+		isStart = false;
+		sec = 0;
+		sec2 = 0;
+		min = 0;
+		prctArround = 0;
+		
 		bossBar = Bukkit.createBossBar("Chronomètre", BarColor.YELLOW, BarStyle.SEGMENTED_10);
+		
+		pl.getCommand("chrono").setExecutor(new ChronoCommand());
+		pl.getCommand("pchrono").setExecutor(new ChronoPersoCommand());
+		pl.getCommand("chronostop").setExecutor(new ChronoStopCommand());
 	}
 	public void onDisable() {
 		bossBar.removeAll();
@@ -72,7 +84,7 @@ public class Chrono {
 	/*
 	 * COMMANDS
 	 */
-	static public class ChronoStopCommand implements CommandExecutor{
+	class ChronoStopCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -86,7 +98,7 @@ public class Chrono {
 			}		
 		}
 	}
-	static public class ChronoCommand implements CommandExecutor{
+	class ChronoCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -111,7 +123,7 @@ public class Chrono {
 			}
 		}
 	}
-	static public class ChronoPersoCommand implements CommandExecutor{
+	class ChronoPersoCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

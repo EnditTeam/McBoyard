@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_12_R1.PacketDataSerializer;
@@ -14,21 +15,21 @@ import net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import net.minecraft.server.v1_12_R1.SoundCategory;
 
-public class MusicModule implements Module {
+public class MusicModule extends Module {
 
-	public MusicModule() {
-		onEnable();
+	public MusicModule(JavaPlugin instance) {
+		super(instance);
 	}
 
 	public void onEnable() {
-
+		pl.getCommand("music").setExecutor(new MusicCommand());
 	}
 
 	public void onDisable() {
 
 	}
 
-	static public class MusicCommand implements CommandExecutor {
+	class MusicCommand implements CommandExecutor {
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

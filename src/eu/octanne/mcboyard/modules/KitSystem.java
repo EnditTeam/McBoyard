@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -23,13 +24,19 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 import eu.octanne.mcboyard.McBoyard;
 
-public class KitSystem {
+public class KitSystem extends Module {
+	
+	public KitSystem(JavaPlugin instance) {
+		super(instance);
+	}
+
 	public static WorldGuardPlugin getWorldGuard() {
 	    Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
 	 
@@ -46,16 +53,18 @@ public class KitSystem {
 	}
 	
 	static int task;
-	static ArrayList<Kit> kits = new ArrayList<Kit>();
-	static ArrayList<KPlayer> kPlayers = new ArrayList<KPlayer>();
-	
-	public KitSystem() {
-		onEnable();
-	}
+	static ArrayList<Kit> kits;
+	static ArrayList<KPlayer> kPlayers;
+	static Listener listener;
 	
 	public void onEnable() {
+		
+		kits = new ArrayList<Kit>();
+		kPlayers = new ArrayList<KPlayer>();
+		
 		kits = Kit.load();
-		Bukkit.getPluginManager().registerEvents(new KitListener(), McBoyard.instance);
+		listener = new KitListener();
+		Bukkit.getPluginManager().registerEvents(listener, McBoyard.instance);
 		for(OfflinePlayer op : Bukkit.getOfflinePlayers()) {
 			kPlayers.add(new KPlayer(op));
 		}
@@ -63,11 +72,17 @@ public class KitSystem {
 		getWorldGuard();
 		//FONCTIONNEMENT DU COOLDOWN
 		launchCooldowns();
+		
+		pl.getCommand("kitreload").setExecutor(new KitReloadCommand());
+		pl.getCommand("kitcreate").setExecutor(new KitCreateCommand());
+		pl.getCommand("kit").setExecutor(new KitCommand());
 	}
 	
 	public void onDisable() {
 		Kit.save();
 		KPlayer.save();
+		
+		HandlerList.unregisterAll(listener);
 	}
 	
 	private void launchCooldowns() {
@@ -91,7 +106,7 @@ public class KitSystem {
 	/*
 	 * COMMANDS
 	 */
-	static public class KitCommand implements CommandExecutor{
+	class KitCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -107,7 +122,7 @@ public class KitSystem {
 		}
 
 	}
-	static public class KitCreateCommand implements CommandExecutor{
+	class KitCreateCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -147,7 +162,7 @@ public class KitSystem {
 		}
 
 	}
-	static public class KitReloadCommand implements CommandExecutor{
+	class KitReloadCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

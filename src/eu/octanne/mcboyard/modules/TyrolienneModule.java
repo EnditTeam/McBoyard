@@ -1,0 +1,199 @@
+package eu.octanne.mcboyard.modules;
+
+import java.util.ArrayList;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LeashHitch;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.Utils;
+import eu.octanne.mcboyard.entity.TyroEntity;
+import net.minecraft.server.v1_12_R1.BlockFence;
+
+public class TyrolienneModule implements Listener {
+
+	private ArrayList<Tyrolienne> loadedTyros = new ArrayList<Tyrolienne>();
+	
+	static ItemStack wandItem = Utils.createItemStack("§6Tyrolienne Wrench", Material.STICK, 1, null, 0, true, false); 
+	
+	JavaPlugin pl;
+	
+	public TyrolienneModule(JavaPlugin pl) {
+		this.pl = pl;
+		onEnable();
+	}
+	
+	public void onEnable() {
+		Bukkit.getPluginManager().registerEvents(this, pl);
+		pl.getCommand("tyro").setExecutor(new TyrolienneCommand());
+	}
+	
+	public void onDisable() {
+		HandlerList.unregisterAll(this);
+	}
+	
+	private class Tyrolienne {
+		
+		Location end, start;
+		
+		ArmorStand endA, startA;
+		
+		public Tyrolienne() {
+			
+		}
+		
+	}
+	
+	private class TyrolienneCommand implements CommandExecutor {
+
+		@Override
+		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+			if(sender.hasPermission("tyrolienne.wrench") && sender instanceof Player) {
+				if(args.length > 0) {
+					if(args[0].equalsIgnoreCase("wrench")) {
+						((Player) sender).getInventory().addItem(wandItem);
+						return true;
+					}
+					if(args[0].equalsIgnoreCase("help")) {
+						
+					}
+					
+					// TODO
+					return false;
+				}else {
+					sender.sendMessage("§9Tyro §8|§c Usage : §e/tyro <subcmd> [args] §c- §b/tyro help §cpour l'aide.");
+					return false;
+				}
+			}else {
+				sender.sendMessage("Vous n'avez pas la permission pour ça.");
+				return false;
+			}
+		}
+		
+	}
+	
+	@EventHandler
+	public void onUseWand(PlayerInteractEvent e) {
+		if(e.getItem() != null && e.getItem().equals(wandItem)) {
+			String matName = e.getClickedBlock() == null ? "" : e.getClickedBlock().getType().name();
+			if(e.getClickedBlock() != null && matName.contains("FENCE") && !matName.contains("FENCE_GATE")) {
+				// Ajouter un point
+				if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					if(TyroTemp.isOnCreation(e.getPlayer())) {
+						// TODO ADD POINT
+						TyroTemp.getPCreation(e.getPlayer()).addPoint(e.getClickedBlock());
+					}else {
+						// TODO ADD first POINT
+						TyroTemp.startNewCreation(e.getPlayer(), e.getClickedBlock());
+					}
+				}
+				// Arreter Construction
+				if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+					if(TyroTemp.isOnCreation(e.getPlayer())) {
+						// VALIDATE CREATION
+						TyroTemp.getPCreation(e.getPlayer()).validateCreation();
+					}
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onCreatorMove(PlayerMoveEvent e) {
+		if(TyroTemp.isOnCreation(e.getPlayer())) {
+			TyroTemp tt = TyroTemp.getPCreation(e.getPlayer());
+			if(tt.getLastArmor().getBukkitEntity().getLocation().distance(e.getPlayer().getLocation()) >= 1) {
+				tt.getLastArmor().getBukkitEntity().teleport(e.getPlayer());
+			}
+		}
+	}
+	
+	static class TyroTemp {
+		
+		private static ArrayList<TyroTemp> instances = new ArrayList<>();
+		
+		private ArrayList<TyroEntity> armorStd = new ArrayList<>();
+		private ArrayList<Location> fenceBlock = new ArrayList<>();
+		private ArrayList<LeashHitch> leashHitch = new ArrayList<>();
+		
+		private Player creator;
+		
+		public TyroTemp(Player p, Block fceBlockStrt) {
+			instances.add(this);
+			
+			creator = p;
+			
+			fenceBlock.add(fceBlockStrt.getLocation());
+			LeashHitch leashE = (LeashHitch) p.getWorld().spawnEntity(fceBlockStrt.getLocation(), EntityType.LEASH_HITCH);
+			leashHitch.add(leashE);
+			
+			TyroEntity armor = new TyroEntity(p.getWorld());
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(armor, p.getLocation());
+			armorStd.add(armor);
+			((ArmorStand)armor.getBukkitEntity()).setLeashHolder(leashE);
+		}
+		
+		public TyroEntity getLastArmor() {
+			return armorStd.get(armorStd.size()-1);
+		}
+		
+		public boolean addPoint(Block b) {
+			// TODO
+			
+			// CREATE NEW HITCH
+			fenceBlock.add(b.getLocation());
+			LeashHitch leashE = (LeashHitch) b.getWorld().spawnEntity(b.getLocation(), EntityType.LEASH_HITCH);
+			leashHitch.add(leashE);
+			
+			// CREATE NEW ARMOR
+			TyroEntity armor = new TyroEntity(creator.getWorld());
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(armor, creator.getLocation());
+			armorStd.add(armor);
+			((ArmorStand)armor.getBukkitEntity()).setLeashHolder(leashE);
+			
+			// TP OLD ARMOR ON HITCH
+			armorStd.get(armorStd.size()-2).getBukkitEntity().teleport(leashE);
+			
+			return false;
+		}
+		
+		public boolean validateCreation() {
+			// TODO
+			return false;
+		}
+		
+		public static TyroTemp startNewCreation(Player p, Block fceBlockStrt) {
+			return new TyroTemp(p, fceBlockStrt);
+		}
+		
+		public static boolean isOnCreation(Player p) {
+			for	(TyroTemp tt : instances) {
+				if (tt.creator.equals(p)) return true;
+			}
+			return false;
+		}
+		
+		public static TyroTemp getPCreation(Player p) {
+			for	(TyroTemp tt : instances) {
+				if (tt.creator.equals(p)) return tt;
+			}
+			return null;
+		}
+	}
+}

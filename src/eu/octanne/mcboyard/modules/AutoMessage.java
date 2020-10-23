@@ -14,26 +14,33 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.McBoyard;
 
-public class AutoMessage implements Listener {
-	
-	protected File fileMessage = new File(McBoyard.folderPath+"/message.yml");
+public class AutoMessage extends Module implements Listener {
+
+	protected File fileMessage;
 	protected static YamlConfiguration configMsg;
 	
-	public static ArrayList<String> messages = new ArrayList<String>();
-	public static int interval = 300;
-	public static int minPlayers = 8;
+	public static ArrayList<String> messages;
+	public static int interval;
+	public static int minPlayers;
 	
 	static protected int task;
 	
-	public AutoMessage() {
-		onEnable();
+	public AutoMessage(JavaPlugin instance) {
+		super(instance);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void onEnable() {
+		
+		minPlayers = 8;
+		interval = 300;
+		messages = new ArrayList<String>();
+		fileMessage = new File(McBoyard.folderPath+"/message.yml");
+		
 		/*
 		 * GET MESSAGE ON FILE
 		 */
@@ -63,6 +70,8 @@ public class AutoMessage implements Listener {
 		if(Bukkit.getOnlinePlayers().size() >= minPlayers && !Bukkit.getScheduler().isCurrentlyRunning(task)) {
 			launchMessageScheduler();
 		}
+		
+		pl.getCommand("amsgreload").setExecutor(new ReloadCommand());
 	}
 	public void onDisable() {
 		
@@ -123,7 +132,7 @@ public class AutoMessage implements Listener {
 	/*
 	 * COMMANDS
 	 */
-	static public class ReloadCommand implements CommandExecutor{
+	class ReloadCommand implements CommandExecutor{
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 			reloadMessage();

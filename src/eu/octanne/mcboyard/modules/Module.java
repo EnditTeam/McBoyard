@@ -1,12 +1,26 @@
 package eu.octanne.mcboyard.modules;
 
-public interface Module {
+import java.util.ArrayList;
+
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class Module {
 	
-	public default void onEnable() {
+	JavaPlugin pl;
+	
+	public static ArrayList<Module> modules = new ArrayList<>();
+	
+	public Module(JavaPlugin instance) {
+		this.pl = instance;
+		modules.add(this);
+		onEnable();
+	}
+	
+	public void onEnable() {
 		
 	}
 	
-	public default void onDisable() {
+	public void onDisable() {
 		
 	}
 }

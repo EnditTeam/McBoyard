@@ -5,8 +5,10 @@ author: Octanne
 version: 1.0
 softdepend: [WorldGuard]
 commands:
+  tyro:
+    description: système de tyro.
   credit:
-    description: afficher les credits a un joueur
+    description: afficher les credits a un joueur.
   resetcounter:
     description: Réinitialiser le compteur de boyard.
     permission: boyardcounter
