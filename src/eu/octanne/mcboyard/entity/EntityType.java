@@ -15,7 +15,7 @@ import net.minecraft.server.v1_12_R1.RegistryMaterials;
 public enum EntityType {
 	//NAME("Entity name", Entity ID, yourcustomclass.class);
 	CHAIR("chair", 399, ChairEntity.class, "Chair"), //You can add as many as you want.
-	TYRO("tyro", 400, TyroEntity.class, "Tyro");
+	TYRO("tyro_poles", 402, TyroEntity.class, "Tyro Poles");
 	
 	
 	private EntityType(String name, int id, Class<? extends Entity> custom, String str2)

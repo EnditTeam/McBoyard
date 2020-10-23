@@ -8,7 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.LivingEntity;
@@ -23,14 +23,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.Utils;
 import eu.octanne.mcboyard.entity.TyroEntity;
-import net.minecraft.server.v1_12_R1.BlockFence;
+import net.minecraft.server.v1_12_R1.Entity;
 
 public class TyrolienneModule implements Listener {
-
-	private ArrayList<Tyrolienne> loadedTyros = new ArrayList<Tyrolienne>();
 	
 	static ItemStack wandItem = Utils.createItemStack("§6Tyrolienne Wrench", Material.STICK, 1, null, 0, true, false); 
 	
@@ -50,15 +47,10 @@ public class TyrolienneModule implements Listener {
 		HandlerList.unregisterAll(this);
 	}
 	
-	private class Tyrolienne {
+	static private class Tyrolienne {
 		
-		Location end, start;
+		static private ArrayList<Tyrolienne> loadedTyros = new ArrayList<Tyrolienne>();
 		
-		ArmorStand endA, startA;
-		
-		public Tyrolienne() {
-			
-		}
 		
 	}
 	
@@ -127,8 +119,8 @@ public class TyrolienneModule implements Listener {
 	public void onCreatorMove(PlayerMoveEvent e) {
 		if(TyroTemp.isOnCreation(e.getPlayer())) {
 			TyroTemp tt = TyroTemp.getPCreation(e.getPlayer());
-			if(tt.getLastArmor().getBukkitEntity().getLocation().distance(e.getPlayer().getLocation()) >= 0.2) {
-				tt.getLastArmor().getBukkitEntity().teleport(e.getPlayer());
+			if(tt.getLastTyroEntity().getBukkitEntity().getLocation().distance(e.getPlayer().getLocation()) >= 0.2) {
+				tt.getLastTyroEntity().getBukkitEntity().teleport(e.getPlayer());
 			}
 		}
 	}
@@ -137,7 +129,7 @@ public class TyrolienneModule implements Listener {
 		
 		private static ArrayList<TyroTemp> instances = new ArrayList<>();
 		
-		private ArrayList<TyroEntity> armorStd = new ArrayList<>();
+		private ArrayList<TyroEntity> tyroEntities = new ArrayList<>();
 		private ArrayList<Location> fenceBlock = new ArrayList<>();
 		private ArrayList<LeashHitch> leashHitch = new ArrayList<>();
 		
@@ -152,14 +144,15 @@ public class TyrolienneModule implements Listener {
 			LeashHitch leashE = (LeashHitch) p.getWorld().spawnEntity(fceBlockStrt.getLocation(), EntityType.LEASH_HITCH);
 			leashHitch.add(leashE);
 			
-			TyroEntity armor = new TyroEntity(p.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(armor, p.getLocation());
-			armorStd.add(armor);
-			((LivingEntity)armor.getBukkitEntity()).setLeashHolder(leashE);
+			TyroEntity tyroEn = new TyroEntity(p.getWorld());
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, p.getLocation());
+			tyroEntities.add(tyroEn);
+			//tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
+			((LivingEntity)tyroEn.getBukkitEntity()).setLeashHolder(leashE);
 		}
 		
-		public TyroEntity getLastArmor() {
-			return armorStd.get(armorStd.size()-1);
+		public TyroEntity getLastTyroEntity() {
+			return tyroEntities.get(tyroEntities.size()-1);
 		}
 		
 		public boolean addPoint(Block b) {
@@ -171,13 +164,14 @@ public class TyrolienneModule implements Listener {
 			leashHitch.add(leashE);
 			
 			// CREATE NEW ARMOR
-			TyroEntity armor = new TyroEntity(creator.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(armor, creator.getLocation());
-			armorStd.add(armor);
-			((ArmorStand)armor.getBukkitEntity()).setLeashHolder(leashE);
+			TyroEntity tyroEn = new TyroEntity(creator.getWorld());
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation());
+			tyroEntities.add(tyroEn);
+			//tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
+			((LivingEntity)tyroEn.getBukkitEntity()).setLeashHolder(leashE);
 			
 			// TP OLD ARMOR ON HITCH
-			armorStd.get(armorStd.size()-2).getBukkitEntity().teleport(leashE);
+			tyroEntities.get(tyroEntities.size()-2).getBukkitEntity().teleport(leashE);
 			
 			return false;
 		}
