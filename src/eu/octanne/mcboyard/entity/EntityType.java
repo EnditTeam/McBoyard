@@ -15,7 +15,7 @@ import net.minecraft.server.v1_12_R1.RegistryMaterials;
 public enum EntityType {
 	//NAME("Entity name", Entity ID, yourcustomclass.class);
 	CHAIR("chair", 399, ChairEntity.class, "Chair"), //You can add as many as you want.
-	TYRO("tyro_poles", 402, TyroEntity.class, "Tyro Poles");
+	TYRO("tyro", 65, TyroEntity.class, "Tyro Poles");
 	
 	
 	private EntityType(String name, int id, Class<? extends Entity> custom, String str2)
@@ -26,11 +26,12 @@ public enum EntityType {
 	public static void spawnEntity(Entity entity, Location loc)
 	{
 		entity.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+		//entity.spawnIn(((CraftWorld) loc.getWorld()).getHandle());
 		((CraftWorld) loc.getWorld()).getHandle().addEntity(entity);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void addToMaps(Class<?> clazz, String name, int id, String str2)
+	private static void addToMaps(Class<? extends Entity> clazz, String name, int id, String str2)
 	{
 		MinecraftKey key = new MinecraftKey(name);
 		((RegistryMaterials<MinecraftKey, Class<? extends Entity>>)getPrivateField("b", EntityTypes.class, null)).a(id, key, (Class<? extends Entity>) clazz);

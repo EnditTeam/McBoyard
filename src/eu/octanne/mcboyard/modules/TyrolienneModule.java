@@ -11,7 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -25,7 +24,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.Utils;
 import eu.octanne.mcboyard.entity.TyroEntity;
-import net.minecraft.server.v1_12_R1.Entity;
 
 public class TyrolienneModule implements Listener {
 	
@@ -47,12 +45,12 @@ public class TyrolienneModule implements Listener {
 		HandlerList.unregisterAll(this);
 	}
 	
-	static private class Tyrolienne {
+	/*static private class Tyrolienne {
 		
 		static private ArrayList<Tyrolienne> loadedTyros = new ArrayList<Tyrolienne>();
 		
 		
-	}
+	}*/
 	
 	private class TyrolienneCommand implements CommandExecutor {
 
@@ -101,7 +99,7 @@ public class TyrolienneModule implements Listener {
 				if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
 					if(TyroTemp.isOnCreation(e.getPlayer())) {
 						// VALIDATE CREATION
-						TyroTemp.getPCreation(e.getPlayer()).validateCreation();
+						TyroTemp.getPCreation(e.getPlayer()).validateCreation(e.getClickedBlock());
 					}
 				}
 			}
@@ -121,6 +119,7 @@ public class TyrolienneModule implements Listener {
 			TyroTemp tt = TyroTemp.getPCreation(e.getPlayer());
 			if(tt.getLastTyroEntity().getBukkitEntity().getLocation().distance(e.getPlayer().getLocation()) >= 0.2) {
 				tt.getLastTyroEntity().getBukkitEntity().teleport(e.getPlayer());
+				
 			}
 		}
 	}
@@ -135,6 +134,7 @@ public class TyrolienneModule implements Listener {
 		
 		private Player creator;
 		
+		
 		public TyroTemp(Player p, Block fceBlockStrt) {
 			instances.add(this);
 			
@@ -145,10 +145,9 @@ public class TyrolienneModule implements Listener {
 			leashHitch.add(leashE);
 			
 			TyroEntity tyroEn = new TyroEntity(p.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, p.getLocation());
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation().subtract(0, -2, 0));
 			tyroEntities.add(tyroEn);
-			//tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
-			((LivingEntity)tyroEn.getBukkitEntity()).setLeashHolder(leashE);
+			tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
 		}
 		
 		public TyroEntity getLastTyroEntity() {
@@ -165,20 +164,25 @@ public class TyrolienneModule implements Listener {
 			
 			// CREATE NEW ARMOR
 			TyroEntity tyroEn = new TyroEntity(creator.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation());
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation().subtract(0, -2, 0));
 			tyroEntities.add(tyroEn);
-			//tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
-			((LivingEntity)tyroEn.getBukkitEntity()).setLeashHolder(leashE);
+			tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
 			
 			// TP OLD ARMOR ON HITCH
 			tyroEntities.get(tyroEntities.size()-2).getBukkitEntity().teleport(leashE);
 			
-			return false;
+			return true;
 		}
 		
-		public boolean validateCreation() {
+		public boolean validateCreation(Block b) {
 			// TODO
-			return false;
+			
+			// TP OLD ARMOR ON HITCH
+			getLastTyroEntity().getBukkitEntity().teleport(b.getLocation());
+			creator = null;
+			
+			
+			return true;
 		}
 		
 		public static TyroTemp startNewCreation(Player p, Block fceBlockStrt) {

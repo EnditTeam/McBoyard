@@ -3,24 +3,28 @@ package eu.octanne.mcboyard.entity;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 
-import net.minecraft.server.v1_12_R1.EntityZombie;
+import net.minecraft.server.v1_12_R1.EntityBat;
 
-public class TyroEntity extends EntityZombie {
+public class TyroEntity extends EntityBat {
 
 	public TyroEntity(World world) {
-		super(((CraftWorld)world).getHandle());
-		
-		this.setCustomNameVisible(false);
-		this.setCustomName("Tyro Poles");
+		super(((CraftWorld) world).getHandle());
+		createEntity();
+	}
+	
+	public TyroEntity(net.minecraft.server.v1_12_R1.World world) {
+		super(world);
+		createEntity();
+	}
+	
+	private void createEntity() {
 		this.setInvulnerable(true);
-		this.setInvisible(false); // TODO
+		this.setInvisible(true); // TODO
 		this.collides = false;
-		this.setBaby(true);
 		this.setNoGravity(true);
 		this.canPickUpLoot = false;
 		this.setSilent(true);
 		this.setNoAI(true);
-
 	}
 	
 	/*public CraftEntity getBukkitEntity() {
@@ -28,3 +32,4 @@ public class TyroEntity extends EntityZombie {
 	}*/
 	
 }
+
