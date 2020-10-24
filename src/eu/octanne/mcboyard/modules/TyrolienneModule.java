@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -21,6 +22,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import eu.octanne.mcboyard.Utils;
 import eu.octanne.mcboyard.entity.TyroEntity;
@@ -145,7 +148,10 @@ public class TyrolienneModule implements Listener {
 			leashHitch.add(leashE);
 			
 			TyroEntity tyroEn = new TyroEntity(p.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation().subtract(0, -2, 0));
+			/*((LivingEntity)tyroEn).addPotionEffect(
+					new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));*/
+			Location loc = creator.getLocation().clone(); loc.setY(loc.getY()-1.2);
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, loc);
 			tyroEntities.add(tyroEn);
 			tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
 		}
@@ -164,7 +170,10 @@ public class TyrolienneModule implements Listener {
 			
 			// CREATE NEW ARMOR
 			TyroEntity tyroEn = new TyroEntity(creator.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation().subtract(0, -2, 0));
+			/*((LivingEntity)tyroEn).addPotionEffect(
+					new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));*/
+			Location loc = creator.getLocation().clone(); loc.setY(loc.getY()-1.2);
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, loc);
 			tyroEntities.add(tyroEn);
 			tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
 			

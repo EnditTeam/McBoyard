@@ -19,10 +19,8 @@ public class TyroEntity extends EntityBat {
 	
 	private void createEntity() {
 		this.setInvulnerable(true);
-		this.setInvisible(true); // TODO
 		this.collides = false;
 		this.setNoGravity(true);
-		this.canPickUpLoot = false;
 		this.setSilent(true);
 		this.setNoAI(true);
 	}
