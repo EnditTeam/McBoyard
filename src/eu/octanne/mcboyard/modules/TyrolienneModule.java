@@ -8,10 +8,8 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -22,8 +20,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import eu.octanne.mcboyard.Utils;
 import eu.octanne.mcboyard.entity.TyroEntity;
@@ -143,17 +139,19 @@ public class TyrolienneModule implements Listener {
 			
 			creator = p;
 			
+			// CREATE FIRST HITCH
 			fenceBlock.add(fceBlockStrt.getLocation());
 			LeashHitch leashE = (LeashHitch) p.getWorld().spawnEntity(fceBlockStrt.getLocation(), EntityType.LEASH_HITCH);
 			leashHitch.add(leashE);
 			
+			// CREATE FIRST ARMOR
 			TyroEntity tyroEn = new TyroEntity(p.getWorld());
 			/*((LivingEntity)tyroEn).addPotionEffect(
 					new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));*/
 			Location loc = creator.getLocation().clone(); loc.setY(loc.getY()-1.2);
 			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, loc);
+			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
-			tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
 		}
 		
 		public TyroEntity getLastTyroEntity() {
@@ -161,8 +159,6 @@ public class TyrolienneModule implements Listener {
 		}
 		
 		public boolean addPoint(Block b) {
-			// TODO
-			
 			// CREATE NEW HITCH
 			fenceBlock.add(b.getLocation());
 			LeashHitch leashE = (LeashHitch) b.getWorld().spawnEntity(b.getLocation(), EntityType.LEASH_HITCH);
@@ -174,10 +170,10 @@ public class TyrolienneModule implements Listener {
 					new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));*/
 			Location loc = creator.getLocation().clone(); loc.setY(loc.getY()-1.2);
 			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, loc);
+			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
-			tyroEn.setLeashHolder(((CraftEntity) leashE).getHandle(), true);
 			
-			// TP OLD ARMOR ON HITCH
+			// TP OLD ARMOR ON NEW HITCH
 			tyroEntities.get(tyroEntities.size()-2).getBukkitEntity().teleport(leashE);
 			
 			return true;
@@ -186,10 +182,14 @@ public class TyrolienneModule implements Listener {
 		public boolean validateCreation(Block b) {
 			// TODO
 			
-			// TP OLD ARMOR ON HITCH
+			// CREATE LAST HITCH
+			fenceBlock.add(b.getLocation());
+			LeashHitch leashE = (LeashHitch) b.getWorld().spawnEntity(b.getLocation(), EntityType.LEASH_HITCH);
+			leashHitch.add(leashE);
+			
+			// TP LAST ARMOR ON LAST HITCH
 			getLastTyroEntity().getBukkitEntity().teleport(b.getLocation());
 			creator = null;
-			
 			
 			return true;
 		}
