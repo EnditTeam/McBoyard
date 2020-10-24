@@ -99,6 +99,7 @@ public class TyrolienneModule implements Listener {
 					if(TyroTemp.isOnCreation(e.getPlayer())) {
 						// VALIDATE CREATION
 						TyroTemp.getPCreation(e.getPlayer()).validateCreation(e.getClickedBlock());
+						e.setCancelled(true);
 					}
 				}
 			}
@@ -146,10 +147,7 @@ public class TyrolienneModule implements Listener {
 			
 			// CREATE FIRST ARMOR
 			TyroEntity tyroEn = new TyroEntity(p.getWorld());
-			/*((LivingEntity)tyroEn).addPotionEffect(
-					new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));*/
-			Location loc = creator.getLocation().clone(); loc.setY(loc.getY()-1.2);
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, loc);
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, p.getLocation());
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
 		}
@@ -166,15 +164,13 @@ public class TyrolienneModule implements Listener {
 			
 			// CREATE NEW ARMOR
 			TyroEntity tyroEn = new TyroEntity(creator.getWorld());
-			/*((LivingEntity)tyroEn).addPotionEffect(
-					new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));*/
-			Location loc = creator.getLocation().clone(); loc.setY(loc.getY()-1.2);
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, loc);
+			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation());
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
 			
 			// TP OLD ARMOR ON NEW HITCH
-			tyroEntities.get(tyroEntities.size()-2).getBukkitEntity().teleport(leashE);
+			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-0.1);
+			tyroEntities.get(tyroEntities.size()-2).getBukkitEntity().teleport(loc);
 			
 			return true;
 		}
@@ -188,7 +184,8 @@ public class TyrolienneModule implements Listener {
 			leashHitch.add(leashE);
 			
 			// TP LAST ARMOR ON LAST HITCH
-			getLastTyroEntity().getBukkitEntity().teleport(b.getLocation());
+			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-0.1);
+			tyroEntities.get(tyroEntities.size()-1).getBukkitEntity().teleport(loc);
 			creator = null;
 			
 			return true;
@@ -200,14 +197,14 @@ public class TyrolienneModule implements Listener {
 		
 		public static boolean isOnCreation(Player p) {
 			for	(TyroTemp tt : instances) {
-				if (tt.creator.equals(p)) return true;
+				if (tt.creator != null && tt.creator.equals(p)) return true;
 			}
 			return false;
 		}
 		
 		public static TyroTemp getPCreation(Player p) {
 			for	(TyroTemp tt : instances) {
-				if (tt.creator.equals(p)) return tt;
+				if (tt.creator != null && tt.creator.equals(p)) return tt;
 			}
 			return null;
 		}
