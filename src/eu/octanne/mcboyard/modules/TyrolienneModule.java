@@ -10,7 +10,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -21,9 +20,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import eu.octanne.mcboyard.Utils;
 import eu.octanne.mcboyard.entity.EntityCustom;
 import eu.octanne.mcboyard.entity.TyroEntity;
@@ -91,10 +87,10 @@ public class TyrolienneModule implements Listener {
 				// Ajouter un point
 				if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					if(TyroTemp.isOnCreation(e.getPlayer())) {
-						// TODO ADD POINT
+						// ADD POINT
 						TyroTemp.getPCreation(e.getPlayer()).addPoint(e.getClickedBlock());
 					}else {
-						// TODO ADD first POINT
+						// ADD first POINT
 						TyroTemp.startNewCreation(e.getPlayer(), e.getClickedBlock());
 					}
 				}
@@ -123,7 +119,6 @@ public class TyrolienneModule implements Listener {
 			TyroTemp tt = TyroTemp.getPCreation(e.getPlayer());
 			if(tt.getLastTyroEntity().getBukkitEntity().getLocation().distance(e.getPlayer().getLocation()) >= 0.2) {
 				tt.getLastTyroEntity().getBukkitEntity().teleport(e.getPlayer());
-				
 			}
 		}
 	}
@@ -138,7 +133,6 @@ public class TyrolienneModule implements Listener {
 		
 		private Player creator;
 		
-		
 		public TyroTemp(Player p, Block fceBlockStrt) {
 			instances.add(this);
 			
@@ -152,7 +146,6 @@ public class TyrolienneModule implements Listener {
 			// CREATE FIRST ARMOR
 			TyroEntity tyroEn = new TyroEntity(p.getWorld());
 			EntityCustom.spawnEntity(tyroEn, p.getLocation());
-			((LivingEntity) tyroEn.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));
 			
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
@@ -171,7 +164,6 @@ public class TyrolienneModule implements Listener {
 			// CREATE NEW ARMOR
 			TyroEntity tyroEn = new TyroEntity(creator.getWorld());
 			EntityCustom.spawnEntity(tyroEn, creator.getLocation());
-			((LivingEntity) tyroEn.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));
 			
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
