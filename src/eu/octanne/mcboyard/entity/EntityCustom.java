@@ -26,7 +26,7 @@ public enum EntityCustom {
 	public static void spawnEntity(Entity entity, Location loc)
 	{
 		entity.setPosition(loc.getX(), loc.getY(), loc.getZ());
-		//entity.spawnIn(((CraftWorld) loc.getWorld()).getHandle());
+		entity.spawnIn(((CraftWorld) loc.getWorld()).getHandle());
 		((CraftWorld) loc.getWorld()).getHandle().addEntity(entity);
 	}
 
