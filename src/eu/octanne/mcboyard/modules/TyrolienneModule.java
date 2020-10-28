@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.Utils;
+import eu.octanne.mcboyard.entity.EntityCustom;
 import eu.octanne.mcboyard.entity.TyroEntity;
 
 public class TyrolienneModule implements Listener {
@@ -147,7 +148,7 @@ public class TyrolienneModule implements Listener {
 			
 			// CREATE FIRST ARMOR
 			TyroEntity tyroEn = new TyroEntity(p.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, p.getLocation());
+			EntityCustom.spawnEntity(tyroEn, p.getLocation());
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
 		}
@@ -164,12 +165,12 @@ public class TyrolienneModule implements Listener {
 			
 			// CREATE NEW ARMOR
 			TyroEntity tyroEn = new TyroEntity(creator.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(tyroEn, creator.getLocation());
+			EntityCustom.spawnEntity(tyroEn, creator.getLocation());
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
 			
 			// TP OLD ARMOR ON NEW HITCH
-			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-0.1);
+			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-1.0);
 			tyroEntities.get(tyroEntities.size()-2).getBukkitEntity().teleport(loc);
 			
 			return true;
@@ -184,7 +185,7 @@ public class TyrolienneModule implements Listener {
 			leashHitch.add(leashE);
 			
 			// TP LAST ARMOR ON LAST HITCH
-			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-0.1);
+			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-1.0);
 			tyroEntities.get(tyroEntities.size()-1).getBukkitEntity().teleport(loc);
 			creator = null;
 			

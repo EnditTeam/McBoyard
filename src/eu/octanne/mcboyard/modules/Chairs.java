@@ -23,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.entity.ChairEntity;
+import eu.octanne.mcboyard.entity.EntityCustom;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -70,6 +71,7 @@ public class Chairs extends Module implements Listener {
 	private void injectPlayer(Player player) {
 		ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
 			
+			@SuppressWarnings("deprecation")
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception{
 				if(packet.toString().contains("net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle")) {
@@ -187,6 +189,7 @@ public class Chairs extends Module implements Listener {
 		int x,y,z;
 		Location locEnter;
 		
+		@SuppressWarnings("deprecation")
 		public Chair(Player p, Location loc) {
 			locEnter = p.getLocation().clone();
 			x = loc.getBlockX(); y = loc.getBlockY(); z = loc.getBlockZ();
@@ -198,7 +201,7 @@ public class Chairs extends Module implements Listener {
 			//loc.setPitch(-90.0f);
 			
 			armorstand = new ChairEntity(loc.getWorld());
-			eu.octanne.mcboyard.entity.EntityType.spawnEntity(armorstand, loc);
+			EntityCustom.spawnEntity(armorstand, loc);
 			//ArmorStand armorstand = (ArmorStand) armorstandBase;
 			
 			/*

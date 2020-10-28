@@ -12,12 +12,13 @@ import net.minecraft.server.v1_12_R1.EntityTypes;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.RegistryMaterials;
 
-public enum EntityType {
+public enum EntityCustom {
+	
 	//NAME("Entity name", Entity ID, yourcustomclass.class);
 	CHAIR("chair", 399, ChairEntity.class, "Chair"), //You can add as many as you want.
-	TYRO_TAIL("tyro_tail", 201, TyroEntity.class, "TyroTail");
+	TYRO_TAIL("tyro_tail", 55, TyroEntity.class, "TyroTail");
 	
-	private EntityType(String name, int id, Class<? extends Entity> custom, String str2)
+	private EntityCustom(String name, int id, Class<? extends Entity> custom, String str2)
 	{
 		addToMaps(custom, name, id, str2);
 	}
