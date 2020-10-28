@@ -53,8 +53,8 @@ public class TyroEntity extends EntitySlime {
 	
 	public void Y() {
 		if(firstRound == true) {
-			((LivingEntity) this.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));
 			world.scoreboard.addPlayerToTeam(this.bn(),"Tyro");
+			((LivingEntity) this.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));
 			firstRound = false;
 		}
 	}

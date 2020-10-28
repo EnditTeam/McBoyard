@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -20,6 +21,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import eu.octanne.mcboyard.Utils;
 import eu.octanne.mcboyard.entity.EntityCustom;
@@ -149,6 +152,8 @@ public class TyrolienneModule implements Listener {
 			// CREATE FIRST ARMOR
 			TyroEntity tyroEn = new TyroEntity(p.getWorld());
 			EntityCustom.spawnEntity(tyroEn, p.getLocation());
+			((LivingEntity) tyroEn.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));
+			
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
 		}
@@ -166,11 +171,13 @@ public class TyrolienneModule implements Listener {
 			// CREATE NEW ARMOR
 			TyroEntity tyroEn = new TyroEntity(creator.getWorld());
 			EntityCustom.spawnEntity(tyroEn, creator.getLocation());
+			((LivingEntity) tyroEn.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));
+			
 			tyroEn.leashedTo(leashE);
 			tyroEntities.add(tyroEn);
 			
 			// TP OLD ARMOR ON NEW HITCH
-			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-1.0);
+			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-1.05);
 			tyroEntities.get(tyroEntities.size()-2).getBukkitEntity().teleport(loc);
 			
 			return true;
@@ -185,7 +192,7 @@ public class TyrolienneModule implements Listener {
 			leashHitch.add(leashE);
 			
 			// TP LAST ARMOR ON LAST HITCH
-			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-1.0);
+			Location loc = leashE.getLocation().clone(); loc.setY(loc.getY()-1.05);
 			tyroEntities.get(tyroEntities.size()-1).getBukkitEntity().teleport(loc);
 			creator = null;
 			
