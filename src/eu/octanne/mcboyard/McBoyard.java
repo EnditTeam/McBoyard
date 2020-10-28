@@ -28,6 +28,7 @@ public class McBoyard extends JavaPlugin{
 	static public Plugin instance;
 	
 	static public EntityCustom entityTyro = EntityCustom.TYRO_TAIL;
+	static public EntityCustom entityTyroHitch = EntityCustom.TYRO_HITCH;
 	
 	//FOLDER PATH
 	static public String folderPath = "plugins/McBoyard";

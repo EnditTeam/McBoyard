@@ -16,7 +16,8 @@ public enum EntityCustom {
 	
 	//NAME("Entity name", Entity ID, yourcustomclass.class);
 	CHAIR("chair", 399, ChairEntity.class, "Chair"), //You can add as many as you want.
-	TYRO_TAIL("tyro_tail", 55, TyroEntity.class, "Slime");
+	TYRO_TAIL("tyro_tail", 55, TyroEntity.class, "Slime"),
+	TYRO_HITCH("tyro_hitch", 398, TyroLeashEntity.class, "TyroHitch");
 	
 	private EntityCustom(String name, int id, Class<? extends Entity> custom, String str2)
 	{

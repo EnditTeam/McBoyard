@@ -1,14 +1,12 @@
 package eu.octanne.mcboyard.entity;
 
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import net.minecraft.server.v1_12_R1.DamageSource;
 import net.minecraft.server.v1_12_R1.EntitySlime;
-import net.minecraft.server.v1_12_R1.Item;
 import net.minecraft.server.v1_12_R1.ScoreboardTeam;
 import net.minecraft.server.v1_12_R1.ScoreboardTeamBase.EnumTeamPush;
 import net.minecraft.server.v1_12_R1.World;
@@ -18,11 +16,6 @@ public class TyroEntity extends EntitySlime {
 	private ScoreboardTeam tm = null;
 
 	private boolean firstRound = true;
-	
-	/*
-	private ArrayList<Player> playerNear = new ArrayList<>();
-	private ArrayList<Player> playerAlready = new ArrayList<>();
-	*/
 	
 	private void initTeam() {
 		if(world.scoreboard.getTeam("Tyro") == null) {
@@ -42,7 +35,6 @@ public class TyroEntity extends EntitySlime {
 	}
 
 	private void createEntity() {
-		
 		this.setInvulnerable(true);
 		this.setNoGravity(true);
 		this.setNoAI(true);
@@ -50,7 +42,6 @@ public class TyroEntity extends EntitySlime {
 		this.setSize(1, false);
 		
 		if(tm == null) initTeam();
-		
 	}
 	
 	public void Y() {
@@ -70,14 +61,9 @@ public class TyroEntity extends EntitySlime {
 		super.die(source);
 	}
 	
-	public void leashedTo(Entity en) {
-		((LivingEntity)this.bukkitEntity).setLeashHolder(en);
+	public void leashedTo(net.minecraft.server.v1_12_R1.Entity en) {
+		((LivingEntity)this.bukkitEntity).setLeashHolder(en.getBukkitEntity());
 	}
 	
-	/*
-	public CraftEntity getBukkitEntity() {
-		return this.bukkitEntity;
-	}
-	*/
 }
 
