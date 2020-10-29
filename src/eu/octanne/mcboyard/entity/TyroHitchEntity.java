@@ -42,9 +42,9 @@ public class TyroHitchEntity extends EntityLeash {
 		super.Y();
 	}
 
-	public void die() {
+	/*public void die() {
 		//super.die();
-	}
+	}*/
 
 	public void B_() {
 		this.lastX = this.locX;

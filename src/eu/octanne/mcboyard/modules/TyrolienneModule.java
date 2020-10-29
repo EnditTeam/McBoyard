@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -108,6 +109,7 @@ public class TyrolienneModule implements Listener {
 			for(Tyrolienne tp : loadedInstances) {
 				tp.removeEntities();
 			}
+			loadedInstances.clear();
 		}
 		
 		public static void createTyro(TyroTemp temp) {
@@ -139,7 +141,7 @@ public class TyrolienneModule implements Listener {
 		public void removeTyro() {
 			this.removeEntities();
 			File file = new File(McBoyard.folderPath+"/tyros/"+id+".yml");
-			file.deleteOnExit();
+			if(file.exists()) file.delete();
 			this.hitchEntities.clear();
 			this.tailEntities.clear();
 			this.tailEntities = null;
@@ -172,23 +174,26 @@ public class TyrolienneModule implements Listener {
 	}
 	
 	private class TyrolienneTabCompleter implements TabCompleter {
-
 		@Override
 		public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-			if(args.length == 2 && args[0].equalsIgnoreCase("remove")) {
+			if(args.length == 2 && (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("info"))) {
 				List<String> tab = new ArrayList<>();
 				for(Tyrolienne tyro : Tyrolienne.loadedInstances) {
 					tab.add(tyro.getID().toString());
 				}
 				return tab;
+			} else if(args.length == 1) {
+				List<String> tab = new ArrayList<>();
+				tab.add("help"); tab.add("list");
+				tab.add("remove"); tab.add("info");
+				tab.add("wrench"); tab.add("reload");
+				return tab;
 			}
 			return null;
 		}
-		
 	}
 	
 	private class TyrolienneCommand implements CommandExecutor {
-
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 			if(sender.hasPermission("tyrolienne.wrench") && sender instanceof Player) {
@@ -222,7 +227,7 @@ public class TyrolienneModule implements Listener {
 						if(args.length > 1) {
 							Tyrolienne tyro = Tyrolienne.getTyro(UUID.fromString(args[1]));
 							if(tyro != null) {
-								sender.sendMessage("§9Tyro §8|§a La tyro (ID) : §9"+tyro.getID()+"  §a, est supprimé!");
+								sender.sendMessage("§9Tyro §8|§a La tyro (ID) : §9"+tyro.getID()+"§a, est supprimé!");
 								tyro.removeTyro();
 								return true;
 							} else {
@@ -296,6 +301,13 @@ public class TyrolienneModule implements Listener {
 	@EventHandler
 	public void onClick(PlayerInteractAtEntityEvent e) {
 		if(((CraftEntity) e.getRightClicked()).getHandle() instanceof TyroHitchEntity) {
+			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onClick(EntityDamageEvent e) {
+		if(((CraftEntity) e.getEntity()).getHandle() instanceof TyroHitchEntity) {
 			e.setCancelled(true);
 		}
 	}
