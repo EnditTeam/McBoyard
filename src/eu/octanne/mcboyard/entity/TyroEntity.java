@@ -15,6 +15,8 @@ public class TyroEntity extends EntitySlime {
 	
 	private ScoreboardTeam tm = null;
 
+	public boolean needToDie = false;
+	
 	private boolean firstRound = true;
 	
 	private void initTeam() {
@@ -54,7 +56,8 @@ public class TyroEntity extends EntitySlime {
 	}
 	
 	public void die() {
-		super.die();
+		if(needToDie)
+			super.die();
 	}
 	
 	public void die(DamageSource source) {

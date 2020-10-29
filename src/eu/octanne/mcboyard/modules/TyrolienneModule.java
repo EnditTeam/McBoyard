@@ -98,9 +98,11 @@ public class TyrolienneModule implements Listener {
 		
 		public void removeEntities() {
 			for(Entity en : tailEntities) {
+				((TyroEntity)en).needToDie = true;
 				en.getBukkitEntity().remove();
 			}
 			for(Entity en : hitchEntities) {
+				((TyroHitchEntity)en).needToDie = true;
 				en.getBukkitEntity().remove();
 			}
 		}
@@ -140,8 +142,8 @@ public class TyrolienneModule implements Listener {
 		
 		public void removeTyro() {
 			this.removeEntities();
-			File file = new File(McBoyard.folderPath+"/tyros/"+id+".yml");
-			if(file.exists()) file.delete();
+			File file = new File(McBoyard.folderPath+"/tyros/"+id.toString()+".yml");
+			file.delete();
 			this.hitchEntities.clear();
 			this.tailEntities.clear();
 			this.tailEntities = null;
@@ -434,7 +436,7 @@ public class TyrolienneModule implements Listener {
 
 		private void saveTyolienne() {
 			// SAVE DATA IN FILE
-			File file = new File(McBoyard.folderPath+"/tyros/"+id+".yml");
+			File file = new File(McBoyard.folderPath+"/tyros/"+id.toString()+".yml");
 			new File(McBoyard.folderPath+"/tyros").mkdirs();
 			if(!file.exists()) {
 				try {

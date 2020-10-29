@@ -19,6 +19,8 @@ public class TyroHitchEntity extends EntityLeash {
 
 	private boolean firstRound = true;
 
+	public boolean needToDie = false;
+	
 	public TyroHitchEntity(World world) {
 		super(world);
 		createEntity();
@@ -42,9 +44,10 @@ public class TyroHitchEntity extends EntityLeash {
 		super.Y();
 	}
 
-	/*public void die() {
-		//super.die();
-	}*/
+	public void die() {
+		if(needToDie)
+			super.die();
+	}
 
 	public void B_() {
 		this.lastX = this.locX;
