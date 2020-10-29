@@ -3,6 +3,7 @@ package eu.octanne.mcboyard.modules;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -12,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Player;
@@ -23,7 +25,6 @@ import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,6 +49,7 @@ public class TyrolienneModule implements Listener {
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, pl);
 		pl.getCommand("tyro").setExecutor(new TyrolienneCommand());
+		pl.getCommand("tyro").setTabCompleter(new TyrolienneTabCompleter());
 		Tyrolienne.loadTyros();
 	}
 
@@ -131,22 +133,57 @@ public class TyrolienneModule implements Listener {
 
 		public void useTyro(Player p) {
 			// TODO MAKE USABLE THE TYRO
-
-		}
-		
-		public void removeTyro(UUID id) {
-			this.removeEntities();
-			// TODO Remove Tyro File
 			
 		}
 		
-		public ArrayList<Tyrolienne> getTyros() {
+		public void removeTyro() {
+			this.removeEntities();
+			File file = new File(McBoyard.folderPath+"/tyros/"+id+".yml");
+			file.deleteOnExit();
+			this.hitchEntities.clear();
+			this.tailEntities.clear();
+			this.tailEntities = null;
+			this.hitchEntities = null;
+			loadedInstances.remove(this);
+		}
+		
+		public static Tyrolienne getTyro(UUID id) {
+			for(Tyrolienne tyro : loadedInstances) {
+				if(tyro.id == id) return tyro;
+			}
+			return null;
+		}
+		
+		public static ArrayList<Tyrolienne> getTyros() {
 			return loadedInstances;
 		}
-	}
 
-	@EventHandler
-	public void onLoadMap(WorldLoadEvent e) {
+		public String getStartLocStr() {
+			Location loc = hitchEntities.get(0).getBukkitEntity().getLocation();
+			String locStr = "X : " + loc.getBlockX() + " Y : " + loc.getBlockY() + " Z : " + loc.getBlockZ() + " (" + loc.getWorld().getName() + ")";
+			return locStr;
+		}
+		
+		public String getEndLocStr() {
+			Location loc = hitchEntities.get(hitchEntities.size()-1).getBukkitEntity().getLocation();
+			String locStr = "X : " + loc.getBlockX() + " Y : " + loc.getBlockY() + " Z : " + loc.getBlockZ() + " (" + loc.getWorld().getName() + ")";
+			return locStr;
+		}
+	}
+	
+	private class TyrolienneTabCompleter implements TabCompleter {
+
+		@Override
+		public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+			if(args.length == 2 && args[0].equalsIgnoreCase("remove")) {
+				List<String> tab = new ArrayList<>();
+				for(Tyrolienne tyro : Tyrolienne.loadedInstances) {
+					tab.add(tyro.getID().toString());
+				}
+				return tab;
+			}
+			return null;
+		}
 		
 	}
 	
@@ -159,35 +196,74 @@ public class TyrolienneModule implements Listener {
 					if(args[0].equalsIgnoreCase("wrench")) {
 						((Player) sender).getInventory().addItem(wandItem);
 						return true;
-					}
-					if(args[0].equalsIgnoreCase("reload")) {
-						sender.sendMessage("§8[§cTyro§8] §aRechargement des tyroliennes...");
+					} else if(args[0].equalsIgnoreCase("reload")) {
+						sender.sendMessage("§9Tyro §8|§a Rechargement des tyroliennes...");
 						McBoyard.tyroModule.onDisable();
 						McBoyard.tyroModule.onEnable();
-						sender.sendMessage("§8[§cTyro§8] §aRechargement terminé!");
+						sender.sendMessage("§9Tyro §8|§a Rechargement terminé!");
 						return true;
+					} else if(args[0].equalsIgnoreCase("help")) {
+						sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aPage d'aide §8-->");
+						sender.sendMessage("§8- §9/tyro help §8: §baffiche cette aide.");
+						sender.sendMessage("§8- §9/tyro reload §8: §brecharge le module.");
+						sender.sendMessage("§8- §9/tyro wrench §8: §bdonne la wrench de pose.");
+						sender.sendMessage("§8- §9/tyro list §8: §baffiche la listes des tyros.");
+						sender.sendMessage("§8- §9/tyro remove <ID> §8: §bsupprime la tyrolienne.");
+						sender.sendMessage("§8- §9/tyro info <ID> §8: §baffiche les spécificitées de la tyro.");
+						return true;
+					} else if(args[0].equalsIgnoreCase("list")) {
+						sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aListe des Tyros §8-->");
+						for(Tyrolienne tyro : Tyrolienne.getTyros()) {
+							sender.sendMessage("§8- §aID §8: §9"+tyro.getID());
+							sender.sendMessage("  §aLoc : §e"+tyro.getStartLocStr());
+						}
+						return true;
+					} else if(args[0].equalsIgnoreCase("remove")) {
+						if(args.length > 1) {
+							Tyrolienne tyro = Tyrolienne.getTyro(UUID.fromString(args[1]));
+							if(tyro != null) {
+								sender.sendMessage("§9Tyro §8|§a La tyro (ID) : §9"+tyro.getID()+"  §a, est supprimé!");
+								tyro.removeTyro();
+								return true;
+							} else {
+								sender.sendMessage("§9Tyro §8|§c Erreur : L'ID spécifié n'a pas été reconnu.");
+								return false;
+							}
+						} else {
+							sender.sendMessage("§9Tyro §8|§c Usage : §e/tyro remove <ID>");
+							return false;
+						}
+					} else if(args[0].equalsIgnoreCase("info")) {
+						if(args.length > 1) {
+							Tyrolienne tyro = Tyrolienne.getTyro(UUID.fromString(args[1]));
+							if(tyro != null) {
+								sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aInfo Tyro §8-->");
+								sender.sendMessage("§8- §aID §8: §9"+tyro.getID());
+								sender.sendMessage("§8- §aLocation Begin : §e"+tyro.getStartLocStr());
+								sender.sendMessage("§8- §aLocation End : §e"+tyro.getEndLocStr());
+								sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aInfo Tyro §8-->");
+								return true;
+							} else {
+								sender.sendMessage("§9Tyro §8|§c Erreur : L'ID spécifié n'a pas été reconnu.");
+								return false;
+							}
+						} else {
+							sender.sendMessage("§9Tyro §8|§c Usage : §e/tyro info <ID>");
+							return false;
+						}
+					} else {
+						sender.sendMessage("§9Tyro §8|§c Usage : §e/tyro <subcmd> [args] §c- §b/tyro help §cpour l'aide.");
+						return false;
 					}
-					if(args[0].equalsIgnoreCase("help")) {
-						
-					}
-					if(args[0].equalsIgnoreCase("list")) {
-						
-					}
-					if(args[0].equalsIgnoreCase("remove")) {
-						
-					}
-					// TODO FINISH COMMAND
-					return false;
-				}else {
+				} else {
 					sender.sendMessage("§9Tyro §8|§c Usage : §e/tyro <subcmd> [args] §c- §b/tyro help §cpour l'aide.");
 					return false;
 				}
-			}else {
-				sender.sendMessage("Vous n'avez pas la permission pour ça.");
+			} else {
+				sender.sendMessage("Vous n'avez pas la permission pour cette commande.");
 				return false;
 			}
 		}
-
 	}
 
 	@EventHandler
