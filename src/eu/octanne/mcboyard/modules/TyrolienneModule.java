@@ -149,7 +149,7 @@ public class TyrolienneModule implements Listener {
 		
 		public static Tyrolienne getTyro(UUID id) {
 			for(Tyrolienne tyro : loadedInstances) {
-				if(tyro.id == id) return tyro;
+				if(tyro.id.equals(id)) return tyro;
 			}
 			return null;
 		}
