@@ -15,16 +15,16 @@ import net.minecraft.server.v1_12_R1.EnumHand;
 import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
 import net.minecraft.server.v1_12_R1.World;
 
-public class TyroLeashEntity extends EntityLeash {
+public class TyroHitchEntity extends EntityLeash {
 
 	private boolean firstRound = true;
 
-	public TyroLeashEntity(World world) {
+	public TyroHitchEntity(World world) {
 		super(world);
 		createEntity();
 	}
 
-	public TyroLeashEntity(org.bukkit.World world) {
+	public TyroHitchEntity(org.bukkit.World world) {
 		super(((CraftWorld) world).getHandle());
 		createEntity();
 	}
@@ -43,13 +43,17 @@ public class TyroLeashEntity extends EntityLeash {
 	}
 
 	public void die() {
-		super.die();
+		//super.die();
 	}
 
 	public void B_() {
 		this.lastX = this.locX;
 		this.lastY = this.locY;
 		this.lastZ = this.locZ;
+	}
+
+	public boolean survives() {
+		return true;
 	}
 
 	public boolean b(EntityHuman entityhuman, EnumHand enumhand) {
@@ -69,5 +73,12 @@ public class TyroLeashEntity extends EntityLeash {
 		}
 		return true;
 	}
+
+	/*
+	public final String getSaveID() {
+		MinecraftKey minecraftkey = EntityTypes.a(new EntityLeash(world));
+		return (minecraftkey == null) ? null : minecraftkey.toString();
+	}
+	*/
 }
 
