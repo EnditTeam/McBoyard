@@ -9,12 +9,14 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityUnleashEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -45,12 +47,19 @@ public class TyrolienneModule implements Listener {
 		HandlerList.unregisterAll(this);
 	}
 	
-	/*static private class Tyrolienne {
+	static class Tyrolienne {
 		
-		static private ArrayList<Tyrolienne> loadedTyros = new ArrayList<Tyrolienne>();
+		static private ArrayList<Tyrolienne> loadedInstances = new ArrayList<Tyrolienne>();
 		
+		public Tyrolienne(TyroTemp temp) {
+			
+			
+			
+			loadedInstances.add(this);
+		}
 		
-	}*/
+		// TODO
+	}
 	
 	private class TyrolienneCommand implements CommandExecutor {
 
@@ -104,6 +113,13 @@ public class TyrolienneModule implements Listener {
 					}
 				}
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onClick(PlayerInteractAtEntityEvent e) {
+		if(((CraftEntity) e.getRightClicked()).getHandle() instanceof TyroLeashEntity) {
+			e.setCancelled(true);
 		}
 	}
 	
@@ -181,7 +197,6 @@ public class TyrolienneModule implements Listener {
 		}
 		
 		public boolean validateCreation(Block b) {
-			// TODO
 			
 			// CREATE LAST HITCH
 			TyroLeashEntity leashE = new TyroLeashEntity(creator.getWorld());
@@ -193,7 +208,19 @@ public class TyrolienneModule implements Listener {
 			tyroEntities.get(tyroEntities.size()-1).getBukkitEntity().teleport(loc);
 			creator = null;
 			
+			saveTyolienne();
+			
+			instances.remove(this);
+			
 			return true;
+		}
+		
+		private void saveTyolienne() {
+			// TODO Auto-generated method stub
+			
+			// SAVE DATA IN FILE
+			
+			// CREATE TYROLIENNE OBJECT
 		}
 		
 		public static TyroTemp startNewCreation(Player p, Block fceBlockStrt) {

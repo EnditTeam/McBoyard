@@ -37,7 +37,6 @@ public class TyroLeashEntity extends EntityLeash {
 
 	public void Y() {
 		if(firstRound == true) {
-			
 			firstRound = false;
 		}
 		super.Y();
@@ -45,6 +44,12 @@ public class TyroLeashEntity extends EntityLeash {
 
 	public void die() {
 		super.die();
+	}
+
+	public void B_() {
+		this.lastX = this.locX;
+		this.lastY = this.locY;
+		this.lastZ = this.locZ;
 	}
 
 	public boolean b(EntityHuman entityhuman, EnumHand enumhand) {

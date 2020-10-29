@@ -8,7 +8,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.octanne.mcboyard.entity.EntityCustom;
 import eu.octanne.mcboyard.modules.AutoMessage;
 import eu.octanne.mcboyard.modules.BoyardRoom;
 import eu.octanne.mcboyard.modules.Chairs;
@@ -23,12 +22,9 @@ import eu.octanne.mcboyard.modules.NoChangeWeather;
 import eu.octanne.mcboyard.modules.StaffChat;
 import eu.octanne.mcboyard.modules.TyrolienneModule;
 
-public class McBoyard extends JavaPlugin{
+public class McBoyard extends JavaPlugin {
 	
 	static public Plugin instance;
-	
-	static public EntityCustom entityTyro = EntityCustom.TYRO_TAIL;
-	static public EntityCustom entityTyroHitch = EntityCustom.TYRO_HITCH;
 	
 	//FOLDER PATH
 	static public String folderPath = "plugins/McBoyard";
