@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -47,21 +48,24 @@ public class TyrolienneModule implements Listener {
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, pl);
 		pl.getCommand("tyro").setExecutor(new TyrolienneCommand());
+		Tyrolienne.loadTyros();
 	}
 
 	public void onDisable() {
 		HandlerList.unregisterAll(this);
+		TyroTemp.unloadTyros();
+		Tyrolienne.unloadTyros();
 	}
 
 	static class Tyrolienne {
 
-		static private ArrayList<Tyrolienne> loadedInstances = new ArrayList<Tyrolienne>();
+		static private ArrayList<Tyrolienne> loadedInstances = new ArrayList<>();
 
 		private UUID id;
 
-		private ArrayList<TyroHitchEntity> hitchEntities;
-		private ArrayList<TyroEntity> tailEntities;
-
+		private ArrayList<TyroHitchEntity> hitchEntities = new ArrayList<>();
+		private ArrayList<TyroEntity> tailEntities = new ArrayList<>();
+		
 		private Tyrolienne(TyroTemp temp) {
 			this.hitchEntities = temp.leashHitch;
 			this.tailEntities = temp.tyroEntities;
@@ -78,25 +82,46 @@ public class TyrolienneModule implements Listener {
 				EntityCustom.spawnEntity(leashE, hitchEntities.get(i));
 
 				// CREATE TAIL
-				TyroEntity tyroEn = new TyroEntity(tailEntities.get(i).getWorld());
-				this.tailEntities.add(tyroEn);
-				EntityCustom.spawnEntity(tyroEn, tailEntities.get(i));
-				tyroEn.leashedTo(leashE);
+				if(i < tailEntities.size()) {
+					TyroEntity tyroEn = new TyroEntity(tailEntities.get(i).getWorld());
+					this.tailEntities.add(tyroEn);
+					EntityCustom.spawnEntity(tyroEn, tailEntities.get(i));
+					tyroEn.leashedTo(leashE);
+				}
 
 				TyroTemp.fenceBlock.add(hitchEntities.get(i).getBlock().getLocation());
 			}
 		}
-
+		
+		public void removeEntities() {
+			for(Entity en : tailEntities) {
+				en.getBukkitEntity().remove();
+			}
+			for(Entity en : hitchEntities) {
+				en.getBukkitEntity().remove();
+			}
+		}
+		
+		public static void unloadTyros() {
+			for(Tyrolienne tp : loadedInstances) {
+				tp.removeEntities();
+			}
+		}
+		
 		public static void createTyro(TyroTemp temp) {
 			loadedInstances.add(new Tyrolienne(temp));
 		}
 
 		@SuppressWarnings("unchecked")
 		public static void loadTyros() {
-			for(File file : new File(McBoyard.folderPath+"/tyros").listFiles()) {
-				YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-				loadedInstances.add(new Tyrolienne(UUID.fromString(file.getName().split(".")[0]), 
-						(ArrayList<Location>)config.get("Hitch"), (ArrayList<Location>)config.get("Tail")));
+			File fileP = new File(McBoyard.folderPath+"/tyros");
+			if(fileP.exists()) {
+				for(File file : new File(McBoyard.folderPath+"/tyros").listFiles()) {
+					YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+					loadedInstances.add(new Tyrolienne(UUID.fromString(file.getName().substring(0,file.getName().length()-5)), 
+							(ArrayList<Location>)config.get("Hitch"), 
+							(ArrayList<Location>)config.get("Tail")));
+				}
 			}
 		}
 
@@ -108,9 +133,23 @@ public class TyrolienneModule implements Listener {
 			// TODO MAKE USABLE THE TYRO
 
 		}
-
+		
+		public void removeTyro(UUID id) {
+			this.removeEntities();
+			// TODO Remove Tyro File
+			
+		}
+		
+		public void getTyro(Location loc) {
+			// TODO GET TYRO WITH LOC
+		}
 	}
 
+	@EventHandler
+	public void onLoadMap(WorldLoadEvent e) {
+		
+	}
+	
 	private class TyrolienneCommand implements CommandExecutor {
 
 		@Override
@@ -122,7 +161,7 @@ public class TyrolienneModule implements Listener {
 						return true;
 					}
 					if(args[0].equalsIgnoreCase("help")) {
-
+						
 					}
 					// TODO FINISH COMMAND
 					return false;
@@ -272,6 +311,21 @@ public class TyrolienneModule implements Listener {
 			}else return false;
 		}
 
+		public void removeEntities() {
+			for(Entity en : leashHitch) {
+				en.getBukkitEntity().remove();
+			}
+			for(Entity en : tyroEntities) {
+				en.getBukkitEntity().remove();
+			}
+		}
+		
+		public static void unloadTyros() {
+			for(TyroTemp tp : instances) {
+				tp.removeEntities();
+			}
+		}
+		
 		private static boolean isCorrect(Location loc) {
 			if(fenceBlock.contains(loc)) return false;
 			else return true;
@@ -280,6 +334,7 @@ public class TyrolienneModule implements Listener {
 		private void saveTyolienne() {
 			// SAVE DATA IN FILE
 			File file = new File(McBoyard.folderPath+"/tyros/"+id+".yml");
+			new File(McBoyard.folderPath+"/tyros").mkdirs();
 			if(!file.exists()) {
 				try {
 					file.createNewFile();
