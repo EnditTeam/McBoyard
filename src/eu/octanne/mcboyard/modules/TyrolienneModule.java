@@ -160,7 +160,20 @@ public class TyrolienneModule implements Listener {
 						((Player) sender).getInventory().addItem(wandItem);
 						return true;
 					}
+					if(args[0].equalsIgnoreCase("reload")) {
+						sender.sendMessage("§8[§cTyro§8] §aRechargement des tyroliennes...");
+						McBoyard.tyroModule.onDisable();
+						McBoyard.tyroModule.onEnable();
+						sender.sendMessage("§8[§cTyro§8] §aRechargement terminé!");
+						return true;
+					}
 					if(args[0].equalsIgnoreCase("help")) {
+						
+					}
+					if(args[0].equalsIgnoreCase("list")) {
+						
+					}
+					if(args[0].equalsIgnoreCase("remove")) {
 						
 					}
 					// TODO FINISH COMMAND
