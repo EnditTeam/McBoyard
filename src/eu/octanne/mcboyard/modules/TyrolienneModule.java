@@ -140,8 +140,8 @@ public class TyrolienneModule implements Listener {
 			
 		}
 		
-		public void getTyro(Location loc) {
-			// TODO GET TYRO WITH LOC
+		public ArrayList<Tyrolienne> getTyros() {
+			return loadedInstances;
 		}
 	}
 
