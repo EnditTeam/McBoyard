@@ -57,6 +57,7 @@ public class TyrolienneModule implements Listener {
 	public void onDisable() {
 		HandlerList.unregisterAll(this);
 		TyroTemp.unloadTyros();
+		TyroTemp.fenceBlock.clear();
 		Tyrolienne.unloadTyros();
 	}
 
@@ -104,6 +105,7 @@ public class TyrolienneModule implements Listener {
 			for(Entity en : hitchEntities) {
 				((TyroHitchEntity)en).needToDie = true;
 				en.getBukkitEntity().remove();
+				TyroTemp.fenceBlock.remove(en.getBukkitEntity().getLocation());
 			}
 		}
 		
