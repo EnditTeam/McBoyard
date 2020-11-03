@@ -199,7 +199,12 @@ public class TyrolienneModule implements Listener {
 		}
 
 		public void useTyro(Player p) {
-			// TODO MAKE USABLE THE TYRO
+			
+			// TODO TP LE JOUEUR OU VOIR 
+			// TODO JOUER SON DURANT LA DESCENTE (EYLTRA FLYING)
+			
+			// TODO JOUER SON D'ARRIVE (ZOMBIE ATTACK IRON DOOR)
+			// TODO Descendre le joueur
 			
 		}
 		
