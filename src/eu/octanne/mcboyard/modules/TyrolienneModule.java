@@ -2,6 +2,7 @@ package eu.octanne.mcboyard.modules;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -25,7 +27,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -34,7 +38,13 @@ import eu.octanne.mcboyard.Utils;
 import eu.octanne.mcboyard.entity.EntityCustom;
 import eu.octanne.mcboyard.entity.TyroEntity;
 import eu.octanne.mcboyard.entity.TyroHitchEntity;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_12_R1.Entity;
+import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
 
 public class TyrolienneModule implements Listener {
 
@@ -61,6 +71,57 @@ public class TyrolienneModule implements Listener {
 		Tyrolienne.unloadTyros();
 	}
 
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		injectPlayer(e.getPlayer());
+	}
+	
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		removePlayer(e.getPlayer());
+	}
+	
+	private void removePlayer(Player player) {
+		Channel channel = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
+		channel.eventLoop().submit(()->{
+			channel.pipeline().remove(player.getName()+"-3");
+			return null;
+		});
+	}
+	
+	private void injectPlayer(Player player) {
+		ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
+			
+			@Override
+			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
+				super.channelRead(channelHandlerContext, packet);
+				//Bukkit.getServer().getConsoleSender().sendMessage("§ePacket READ : §c" + packet.toString());
+			}
+			
+			@Override
+			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
+				super.write(channelHandlerContext, packet, channelPromise);
+				if(packet.toString().contains("PacketPlayOutSpawnEntity") || packet.toString().contains("PacketPlayOutSpawnEntityLiving")) {
+					Field aF = packet.getClass().getDeclaredField("b");
+					aF.setAccessible(true);
+					UUID id = (UUID) aF.get(packet);
+					TyroEntity it = TyroEntity.getTyroEntity(id);
+					if(it != null) {
+						// SEND PACKET TO ATTACH
+						PacketPlayOutAttachEntity packetS = new PacketPlayOutAttachEntity(it, it.getLeashHolder());
+						((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetS);
+					}
+				}
+				//Bukkit.getServer().getConsoleSender().sendMessage("§bPacket READ : §c" + packet.toString());
+			}
+			
+		};
+		
+		ChannelPipeline pipeline = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel.pipeline();
+		pipeline.addBefore("packet_handler", player.getName()+"-3", channelDuplexHandler);
+	}
+	
+	
 	static class Tyrolienne {
 
 		static private ArrayList<Tyrolienne> loadedInstances = new ArrayList<>();

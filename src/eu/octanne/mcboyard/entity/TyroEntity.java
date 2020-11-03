@@ -1,5 +1,8 @@
 package eu.octanne.mcboyard.entity;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -12,6 +15,8 @@ import net.minecraft.server.v1_12_R1.ScoreboardTeamBase.EnumTeamPush;
 import net.minecraft.server.v1_12_R1.World;
 
 public class TyroEntity extends EntitySlime {
+	
+	static private ArrayList<TyroEntity> instances = new ArrayList<>(); 
 	
 	private ScoreboardTeam tm = null;
 
@@ -44,6 +49,8 @@ public class TyroEntity extends EntitySlime {
 		this.setSize(1, false);
 		
 		if(tm == null) initTeam();
+		
+		instances.add(this);
 	}
 	
 	public void Y() {
@@ -56,16 +63,30 @@ public class TyroEntity extends EntitySlime {
 	}
 	
 	public void die() {
-		if(needToDie)
+		if(needToDie) {
+			instances.remove(this);
 			super.die();
+		}
+			
 	}
 	
 	public void die(DamageSource source) {
-		super.die(source);
+		if(needToDie) {
+			instances.remove(this);
+			super.die(source);
+		}
+			
 	}
 	
 	public void leashedTo(net.minecraft.server.v1_12_R1.Entity en) {
 		((LivingEntity)this.bukkitEntity).setLeashHolder(en.getBukkitEntity());
+	}
+
+	static public TyroEntity getTyroEntity(UUID id) {
+		for(TyroEntity it : instances) {
+			if(it.uniqueID.equals(id)) return it;
+		}
+		return null;
 	}
 	
 }
