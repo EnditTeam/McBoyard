@@ -237,7 +237,7 @@ public class TyrolienneModule implements Listener {
 			if(!p.getScoreboardTags().contains("onTyro")) {
 				p.addScoreboardTag("onTyro");
 				TyroSeatEntity en = new TyroSeatEntity(p.getWorld());
-				EntityCustom.spawnEntity(en, this.hitchEntities.get(0).getBukkitEntity().getLocation());
+				EntityCustom.spawnEntity(en, rectifyLoc(this.hitchEntities.get(0).getBukkitEntity().getLocation()));
 				en.putOnSeat(p);
 				Tyrolienne tyroS = this;
 				
@@ -251,7 +251,7 @@ public class TyrolienneModule implements Listener {
 					
 					Tyrolienne tyro = tyroS;
 					
-					Location locStart = tyro.hitchEntities.get(0).getBukkitEntity().getLocation();
+					Location locStart = rectifyLoc(tyro.hitchEntities.get(0).getBukkitEntity().getLocation());
 					Location locArrive = tyro.hitchEntities.get(1).getBukkitEntity().getLocation();
 
 					VectResult vec = modifyVect(Utils.calcVect(locStart, locArrive));
@@ -270,7 +270,7 @@ public class TyrolienneModule implements Listener {
 							if(idxTyro < tyro.hitchEntities.size()-2) {
 								idxTyro++;
 								locStart = en.getBukkitEntity().getLocation();
-								locArrive = tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation();
+								locArrive = (tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation());
 								vec = modifyVect(Utils.calcVect(locStart, locArrive));
 								idx = 0;
 							}else {
@@ -285,11 +285,17 @@ public class TyrolienneModule implements Listener {
 							}
 						}
 					}
+
 				};
 				task.startTask();
 			}
 		}
 
+		private Location rectifyLoc(Location location) {
+			location.setY(location.getY()-2);
+			return location;
+		}
+		
 		public void removeTyro() {
 			this.removeEntities();
 			this.hitchEntities.clear();
