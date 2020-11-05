@@ -269,7 +269,7 @@ public class TyrolienneModule implements Listener {
 						}else {
 							if(idxTyro < tyro.hitchEntities.size()-2) {
 								idxTyro++;
-								locStart = tyro.hitchEntities.get(idxTyro).getBukkitEntity().getLocation();
+								locStart = en.getBukkitEntity().getLocation();
 								locArrive = tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation();
 								vec = modifyVect(Utils.calcVect(locStart, locArrive));
 								idx = 0;
