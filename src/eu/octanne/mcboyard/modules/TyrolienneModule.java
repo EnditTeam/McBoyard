@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,18 +34,22 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.Utils;
+import eu.octanne.mcboyard.Utils.SchedulerTask;
 import eu.octanne.mcboyard.entity.EntityCustom;
 import eu.octanne.mcboyard.entity.TyroEntity;
 import eu.octanne.mcboyard.entity.TyroHitchEntity;
+import eu.octanne.mcboyard.entity.TyroSeatEntity;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_12_R1.Entity;
+import net.minecraft.server.v1_12_R1.EnumMoveType;
 import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
 
 public class TyrolienneModule implements Listener {
@@ -74,13 +80,16 @@ public class TyrolienneModule implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		injectPlayer(e.getPlayer());
+		if(e.getPlayer().getScoreboardTags().contains("onTyro")) {
+			e.getPlayer().getScoreboardTags().remove("onTyro");
+		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		removePlayer(e.getPlayer());
 	}
-	
+
 	private void removePlayer(Player player) {
 		Channel channel = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
 		channel.eventLoop().submit(()->{
@@ -88,16 +97,16 @@ public class TyrolienneModule implements Listener {
 			return null;
 		});
 	}
-	
+
 	private void injectPlayer(Player player) {
 		ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-			
+
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
 				super.channelRead(channelHandlerContext, packet);
 				//Bukkit.getServer().getConsoleSender().sendMessage("§ePacket READ : §c" + packet.toString());
 			}
-			
+
 			@Override
 			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
 				super.write(channelHandlerContext, packet, channelPromise);
@@ -105,23 +114,27 @@ public class TyrolienneModule implements Listener {
 					Field aF = packet.getClass().getDeclaredField("b");
 					aF.setAccessible(true);
 					UUID id = (UUID) aF.get(packet);
-					TyroEntity it = TyroEntity.getTyroEntity(id);
-					if(it != null) {
-						// SEND PACKET TO ATTACH
-						PacketPlayOutAttachEntity packetS = new PacketPlayOutAttachEntity(it, it.getLeashHolder());
-						((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetS);
+					try{
+						TyroEntity it = TyroEntity.getTyroEntity(id);
+						if(it != null) {
+							// SEND PACKET TO ATTACH
+							PacketPlayOutAttachEntity packetS = new PacketPlayOutAttachEntity(it, it.getLeashHolder());
+							((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetS);
+						}
+					}catch (ConcurrentModificationException e){
+						return;
 					}
 				}
 				//Bukkit.getServer().getConsoleSender().sendMessage("§bPacket READ : §c" + packet.toString());
 			}
-			
+
 		};
-		
+
 		ChannelPipeline pipeline = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel.pipeline();
 		pipeline.addBefore("packet_handler", player.getName()+"-3", channelDuplexHandler);
 	}
-	
-	
+
+
 	static class Tyrolienne {
 
 		static private ArrayList<Tyrolienne> loadedInstances = new ArrayList<>();
@@ -130,7 +143,7 @@ public class TyrolienneModule implements Listener {
 
 		private ArrayList<TyroHitchEntity> hitchEntities = new ArrayList<>();
 		private ArrayList<TyroEntity> tailEntities = new ArrayList<>();
-		
+
 		private Tyrolienne(TyroTemp temp) {
 			this.hitchEntities = temp.leashHitch;
 			this.tailEntities = temp.tyroEntities;
@@ -157,7 +170,7 @@ public class TyrolienneModule implements Listener {
 				TyroTemp.fenceBlock.add(hitchEntities.get(i).getBlock().getLocation());
 			}
 		}
-		
+
 		public void removeEntities() {
 			for(Entity en : tailEntities) {
 				((TyroEntity)en).needToDie = true;
@@ -165,18 +178,18 @@ public class TyrolienneModule implements Listener {
 			}
 			for(Entity en : hitchEntities) {
 				((TyroHitchEntity)en).needToDie = true;
+				TyroTemp.removeLocBlock(en.getBukkitEntity().getLocation().getBlock());
 				en.getBukkitEntity().remove();
-				TyroTemp.fenceBlock.remove(en.getBukkitEntity().getLocation());
 			}
 		}
-		
+
 		public static void unloadTyros() {
 			for(Tyrolienne tp : loadedInstances) {
 				tp.removeEntities();
 			}
 			loadedInstances.clear();
 		}
-		
+
 		public static void createTyro(TyroTemp temp) {
 			loadedInstances.add(new Tyrolienne(temp));
 		}
@@ -197,35 +210,98 @@ public class TyrolienneModule implements Listener {
 		public UUID getID() {
 			return id;
 		}
-
-		public void useTyro(Player p) {
+		
+		private class VectResult {
 			
-			// TODO TP LE JOUEUR OU VOIR 
-			// TODO JOUER SON DURANT LA DESCENTE (EYLTRA FLYING)
+			Vector vect;
+			int nbItr;
 			
-			// TODO JOUER SON D'ARRIVE (ZOMBIE ATTACK IRON DOOR)
-			// TODO Descendre le joueur
+			public VectResult(Vector v,int nbItr) {
+				this.vect = v;
+				this.nbItr = nbItr;
+			}
 			
 		}
 		
+		private VectResult modifyVect(Vector vec) {
+			int nbTurn = 1;
+			while(vec.length() > 0.35) {
+				Bukkit.broadcastMessage("length="+vec.length());
+				vec = Utils.divideVect(vec, 2);
+				nbTurn *=2;
+			}
+			return new VectResult(vec,nbTurn);
+		}
+		
+		public void useTyro(Player p) {
+			if(!p.getScoreboardTags().contains("onTyro")) {
+				p.addScoreboardTag("onTyro");
+				TyroSeatEntity en = new TyroSeatEntity(p.getWorld());
+				EntityCustom.spawnEntity(en, this.hitchEntities.get(0).getBukkitEntity().getLocation());
+				en.putOnSeat(p);
+				Tyrolienne tyroS = this;
+				
+				// JOUER SON DURANT LA DESCENTE (EYLTRA FLYING)
+				p.playSound(p.getLocation(), Sound.ITEM_ELYTRA_FLYING, 0.5f, 1.0f);
+
+				// en.getBukkitEntity().getLocation().distance(loc2) > 0.5
+				SchedulerTask task = new SchedulerTask(0,1){
+
+					int idxTyro = 0;
+					
+					Tyrolienne tyro = tyroS;
+					
+					Location locStart = tyro.hitchEntities.get(0).getBukkitEntity().getLocation();
+					Location locArrive = tyro.hitchEntities.get(1).getBukkitEntity().getLocation();
+
+					VectResult vec = modifyVect(Utils.calcVect(locStart, locArrive));
+					int idx = 0;
+					
+					@Override
+					public void run() {
+						if(idx < vec.nbItr) {
+							Bukkit.broadcastMessage("Vector : "+vec.vect.toString()+" id= "+idx);
+							en.move(EnumMoveType.SELF, vec.vect.getX(), vec.vect.getY(), vec.vect.getZ());
+							idx++;
+						}else {
+							if(idxTyro < tyro.hitchEntities.size()-2) {
+								idxTyro++;
+								locStart = tyro.hitchEntities.get(idxTyro).getBukkitEntity().getLocation();
+								locArrive = tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation();
+								vec = modifyVect(Utils.calcVect(locStart, locArrive));
+								idx = 0;
+							}else {
+								// ACTION DE FIN DE COURSE
+								if(p != null){
+									p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.0f);
+									p.getScoreboardTags().remove("onTyro");
+								}
+								en.needToDie = true;
+								en.killEntity();
+								cancelTask();
+							}
+						}
+					}
+				};
+				task.startTask();
+			}
+		}
+
 		public void removeTyro() {
 			this.removeEntities();
-			File file = new File(McBoyard.folderPath+"/tyros/"+id.toString()+".yml");
-			file.delete();
 			this.hitchEntities.clear();
 			this.tailEntities.clear();
-			this.tailEntities = null;
-			this.hitchEntities = null;
+			new File(McBoyard.folderPath+"/tyros/"+this.id.toString()+".yml").delete();
 			loadedInstances.remove(this);
 		}
-		
+
 		public static Tyrolienne getTyro(UUID id) {
 			for(Tyrolienne tyro : loadedInstances) {
 				if(tyro.id.equals(id)) return tyro;
 			}
 			return null;
 		}
-		
+
 		public static ArrayList<Tyrolienne> getTyros() {
 			return loadedInstances;
 		}
@@ -235,14 +311,18 @@ public class TyrolienneModule implements Listener {
 			String locStr = "X : " + loc.getBlockX() + " Y : " + loc.getBlockY() + " Z : " + loc.getBlockZ() + " (" + loc.getWorld().getName() + ")";
 			return locStr;
 		}
-		
+
+		public TyroHitchEntity getFirstTyroEntity() {
+			return hitchEntities.get(0);
+		}
+
 		public String getEndLocStr() {
 			Location loc = hitchEntities.get(hitchEntities.size()-1).getBukkitEntity().getLocation();
 			String locStr = "X : " + loc.getBlockX() + " Y : " + loc.getBlockY() + " Z : " + loc.getBlockZ() + " (" + loc.getWorld().getName() + ")";
 			return locStr;
 		}
 	}
-	
+
 	private class TyrolienneTabCompleter implements TabCompleter {
 		@Override
 		public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
@@ -262,7 +342,7 @@ public class TyrolienneModule implements Listener {
 			return null;
 		}
 	}
-	
+
 	private class TyrolienneCommand implements CommandExecutor {
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -295,12 +375,17 @@ public class TyrolienneModule implements Listener {
 						return true;
 					} else if(args[0].equalsIgnoreCase("remove")) {
 						if(args.length > 1) {
-							Tyrolienne tyro = Tyrolienne.getTyro(UUID.fromString(args[1]));
-							if(tyro != null) {
-								sender.sendMessage("§9Tyro §8|§a La tyro (ID) : §9"+tyro.getID()+"§a, est supprimé!");
-								tyro.removeTyro();
-								return true;
-							} else {
+							try{
+								Tyrolienne tyro = Tyrolienne.getTyro(UUID.fromString(args[1]));
+								if(tyro != null) {
+									sender.sendMessage("§9Tyro §8|§a La tyro (ID) : §9"+tyro.getID()+"§a, est supprimé!");
+									tyro.removeTyro();
+									return true;
+								} else {
+									sender.sendMessage("§9Tyro §8|§c Erreur : L'ID spécifié n'a pas été reconnu.");
+									return false;
+								}
+							}catch(IllegalArgumentException e) {
 								sender.sendMessage("§9Tyro §8|§c Erreur : L'ID spécifié n'a pas été reconnu.");
 								return false;
 							}
@@ -310,15 +395,20 @@ public class TyrolienneModule implements Listener {
 						}
 					} else if(args[0].equalsIgnoreCase("info")) {
 						if(args.length > 1) {
-							Tyrolienne tyro = Tyrolienne.getTyro(UUID.fromString(args[1]));
-							if(tyro != null) {
-								sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aInfo Tyro §8-->");
-								sender.sendMessage("§8- §aID §8: §9"+tyro.getID());
-								sender.sendMessage("§8- §aLocation Begin : §e"+tyro.getStartLocStr());
-								sender.sendMessage("§8- §aLocation End : §e"+tyro.getEndLocStr());
-								sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aInfo Tyro §8-->");
-								return true;
-							} else {
+							try {
+								Tyrolienne tyro = Tyrolienne.getTyro(UUID.fromString(args[1]));
+								if(tyro != null) {
+									sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aInfo Tyro §8-->");
+									sender.sendMessage("§8- §aID §8: §9"+tyro.getID());
+									sender.sendMessage("§8- §aLocation Begin : §e"+tyro.getStartLocStr());
+									sender.sendMessage("§8- §aLocation End : §e"+tyro.getEndLocStr());
+									sender.sendMessage("§8<-- §cModule Tyrolienne §8- §aInfo Tyro §8-->");
+									return true;
+								} else {
+									sender.sendMessage("§9Tyro §8|§c Erreur : L'ID spécifié n'a pas été reconnu.");
+									return false;
+								}
+							}catch(IllegalArgumentException e) {
 								sender.sendMessage("§9Tyro §8|§c Erreur : L'ID spécifié n'a pas été reconnu.");
 								return false;
 							}
@@ -371,10 +461,15 @@ public class TyrolienneModule implements Listener {
 	@EventHandler
 	public void onClick(PlayerInteractAtEntityEvent e) {
 		if(((CraftEntity) e.getRightClicked()).getHandle() instanceof TyroHitchEntity) {
+			for(Tyrolienne tyro : Tyrolienne.getTyros()) {
+				if(tyro.getFirstTyroEntity().getUniqueID().equals(e.getRightClicked().getUniqueId())) {
+					tyro.useTyro(e.getPlayer());
+				}
+			}
 			e.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onClick(EntityDamageEvent e) {
 		if(((CraftEntity) e.getEntity()).getHandle() instanceof TyroHitchEntity) {
@@ -430,6 +525,16 @@ public class TyrolienneModule implements Listener {
 			EntityCustom.spawnEntity(tyroEn, p.getLocation());
 			tyroEntities.add(tyroEn);
 			tyroEn.leashedTo(leashE);
+		}
+
+		public static void removeLocBlock(Block block) {
+			Location locS = null;
+			for(Location loc1 : fenceBlock) {
+				if(loc1.getBlock().equals(block))
+					locS = loc1;
+			}
+			if(locS != null)
+				fenceBlock.remove(locS);
 		}
 
 		public TyroEntity getLastTyroEntity() {
@@ -490,16 +595,19 @@ public class TyrolienneModule implements Listener {
 				en.getBukkitEntity().remove();
 			}
 		}
-		
+
 		public static void unloadTyros() {
 			for(TyroTemp tp : instances) {
 				tp.removeEntities();
 			}
 		}
-		
+
 		private static boolean isCorrect(Location loc) {
-			if(fenceBlock.contains(loc)) return false;
-			else return true;
+			for(Location loc1 : fenceBlock) {
+				if(loc1.getBlock().equals(loc.getBlock()))
+					return false;
+			}
+			return true;
 		}
 
 		private void saveTyolienne() {

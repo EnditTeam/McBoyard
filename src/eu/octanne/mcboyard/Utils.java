@@ -3,6 +3,7 @@ package eu.octanne.mcboyard;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.enchantments.Enchantment;
@@ -10,13 +11,88 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.util.Vector;
 
 public class Utils {
 
+	// en.getBukkitEntity().getLocation().distance(loc2) > 0.5
+	/*SchedulerTask task = new SchedulerTask(0,1){
+
+		int maxItr = 10;
+		int idx = 0;
+
+		Vector vecLoc = vec.multiply(0.1);
+
+		@Override
+		public void run() {
+			if(idx < maxItr) {
+				idx++;
+				Bukkit.broadcastMessage("Vector : "+vecLoc.toString()+" idx = "+idx);
+				en.move(EnumMoveType.SELF, vecLoc.getX(), vecLoc.getY(), vecLoc.getZ());
+			}
+			if(idx == maxItr-1) {
+				// ACTION DE FIN DE COURSE
+				if(p != null){
+					p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.0f);
+					p.getScoreboardTags().remove("onTyro");
+				}
+				en.needToDie = true;
+				en.killEntity();
+				cancelTask();
+			}
+		}
+	};
+	task.startTask();*/
+	
+	public static class SchedulerTask implements Runnable {
+		
+		private int id;
+		private long delay;
+		private long repeatDelay;
+		
+		public SchedulerTask(long delay, long repeatDelay) {
+			this.delay = delay;
+			this.repeatDelay = repeatDelay;
+		}
+		
+		public int getId() {
+			return id;
+		}
+		
+		public void setId(int id) {
+			this.id = id;
+		}
+		
+		public void cancelTask() {
+			Bukkit.getScheduler().cancelTask(id);
+		}
+		
+		public void startTask() {
+			id = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, this, delay, repeatDelay);
+		}
+		
+		@Override
+		public void run() {
+			
+		}
+	}
+
+	static public Vector calcVect(Location loc1, Location loc2) {
+		return new Vector(loc2.getX()-loc1.getX(),
+				loc2.getY()-loc1.getY()-2,loc2.getZ()-loc1.getZ());
+	}
+	
+	static public Vector divideVect(Vector vect,int divisor) {
+		vect.setX(vect.getX()/divisor); 
+		vect.setY(vect.getY()/divisor);
+		vect.setZ(vect.getZ()/divisor);
+		return vect;
+	}
+	
 	static public double round(double number) {
 		return Math.round(number*1000000.0)/1000000.0;
 	}
-	
+
 	static public String getDirection(float yaw) {
 		// YAW IN DEGREE
 		double rotation = (yaw - 90.0F) % 360.0F;
@@ -39,14 +115,14 @@ public class Utils {
 		}
 		return null;
 	}
-	
+
 	// CREATE ITEM WITH DATA
 	@SuppressWarnings("deprecation")
 	static public ItemStack createItemStack(String DisplayName, Material id, int QteItem, ArrayList<String> Lore,
 			int data, boolean Glowing, boolean unbreakable) {
 
 		if(Lore == null) Lore = new ArrayList<>();
-		
+
 		ItemStack item = new ItemStack(id, QteItem, (short) 0, (byte) data);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(DisplayName);
@@ -70,7 +146,7 @@ public class Utils {
 			int data, ItemMeta meta, boolean unbreakable) {
 
 		if(Lore == null) Lore = new ArrayList<>();
-		
+
 		ItemStack item = new ItemStack(id, QteItem, (short) 0, (byte) data);
 		ItemMeta itemmeta = meta;
 		itemmeta.setDisplayName(DisplayName);
@@ -86,7 +162,7 @@ public class Utils {
 			boolean Glowing) {
 
 		if(Lore == null) Lore = new ArrayList<>();
-		
+
 		ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) Type.ordinal());
 		SkullMeta itemmeta = (SkullMeta) item.getItemMeta();
 		itemmeta.setLore(Lore);
@@ -104,5 +180,5 @@ public class Utils {
 		item.setItemMeta(itemmeta);
 		return item;
 	}
-	
+
 }

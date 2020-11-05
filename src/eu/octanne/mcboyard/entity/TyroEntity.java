@@ -56,7 +56,7 @@ public class TyroEntity extends EntitySlime {
 	public void Y() {
 		if(firstRound == true) {
 			world.scoreboard.addPlayerToTeam(this.bn(),"Tyro");
-			((LivingEntity) this.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, false, false));
+			((LivingEntity) this.getBukkitEntity()).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 10000000, 1, false, false));
 			firstRound = false;
 		}
 		super.Y();
@@ -66,8 +66,7 @@ public class TyroEntity extends EntitySlime {
 		if(needToDie) {
 			instances.remove(this);
 			super.die();
-		}
-			
+		}	
 	}
 	
 	public void die(DamageSource source) {
@@ -75,7 +74,11 @@ public class TyroEntity extends EntitySlime {
 			instances.remove(this);
 			super.die(source);
 		}
-			
+	}
+	
+	public void killEntity() {
+		if(needToDie)
+			super.killEntity();
 	}
 	
 	public void leashedTo(net.minecraft.server.v1_12_R1.Entity en) {
