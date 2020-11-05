@@ -225,8 +225,8 @@ public class TyrolienneModule implements Listener {
 		
 		private VectResult modifyVect(Vector vec) {
 			int nbTurn = 1;
-			while(vec.length() > 0.35) {
-				Bukkit.broadcastMessage("length="+vec.length());
+			while(vec.length() > 0.30) {
+				//Bukkit.broadcastMessage("length="+vec.length());
 				vec = Utils.divideVect(vec, 2);
 				nbTurn *=2;
 			}
@@ -259,10 +259,13 @@ public class TyrolienneModule implements Listener {
 					
 					@Override
 					public void run() {
-						if(idx < vec.nbItr) {
-							Bukkit.broadcastMessage("Vector : "+vec.vect.toString()+" id= "+idx);
+						if(idx < vec.nbItr && en.getBukkitEntity().getLocation().distance(locArrive) > vec.vect.length()) {
+							//Bukkit.broadcastMessage("Vector : "+vec.vect.toString()+" id= "+idx);
 							en.move(EnumMoveType.SELF, vec.vect.getX(), vec.vect.getY(), vec.vect.getZ());
 							idx++;
+						}else if(idx < vec.nbItr) {
+							vec = modifyVect(Utils.calcVect(locStart, locArrive));
+							idx = 0;
 						}else {
 							if(idxTyro < tyro.hitchEntities.size()-2) {
 								idxTyro++;
