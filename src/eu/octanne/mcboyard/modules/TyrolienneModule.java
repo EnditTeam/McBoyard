@@ -225,7 +225,7 @@ public class TyrolienneModule implements Listener {
 		
 		private VectResult modifyVect(Vector vec) {
 			int nbTurn = 1;
-			while(vec.length() > 0.30) {
+			while(vec.length() > 0.35) {
 				//Bukkit.broadcastMessage("length="+vec.length());
 				vec = Utils.divideVect(vec, 2);
 				nbTurn *=2;
@@ -292,7 +292,7 @@ public class TyrolienneModule implements Listener {
 		}
 
 		private Location rectifyLoc(Location location) {
-			location.setY(location.getY()-2);
+			location.setY(location.getY()-2.35);
 			return location;
 		}
 		
