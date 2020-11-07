@@ -52,15 +52,14 @@ import net.minecraft.server.v1_12_R1.Entity;
 import net.minecraft.server.v1_12_R1.EnumMoveType;
 import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
 
-public class TyrolienneModule implements Listener {
+public class TyrolienneModule extends Module implements Listener {
 
 	static ItemStack wandItem = Utils.createItemStack("§6Tyrolienne Wrench", Material.STICK, 1, null, 0, true, false); 
 
 	JavaPlugin pl;
 
 	public TyrolienneModule(JavaPlugin pl) {
-		this.pl = pl;
-		onEnable();
+		super(pl);
 	}
 
 	public void onEnable() {
@@ -103,6 +102,14 @@ public class TyrolienneModule implements Listener {
 
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
+				if(packet.toString().contains("PacketPlayInSteerVehicle")) {
+					Field field4 = packet.getClass().getDeclaredField("d");
+					field4.setAccessible(true);// allows us to access the field
+					boolean dismount = field4.getBoolean(packet);
+					if(player.getScoreboardTags().contains("onTyro") && dismount) {
+						return;
+					}
+				}
 				super.channelRead(channelHandlerContext, packet);
 				//Bukkit.getServer().getConsoleSender().sendMessage("§ePacket READ : §c" + packet.toString());
 			}
@@ -110,10 +117,11 @@ public class TyrolienneModule implements Listener {
 			@Override
 			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
 				super.write(channelHandlerContext, packet, channelPromise);
-				if(packet.toString().contains("PacketPlayOutSpawnEntity") || packet.toString().contains("PacketPlayOutSpawnEntityLiving")) {
+				if(packet.toString().contains("PacketPlayOutSpawnEntity")) {
 					Field aF = packet.getClass().getDeclaredField("b");
 					aF.setAccessible(true);
 					UUID id = (UUID) aF.get(packet);
+					
 					try{
 						TyroEntity it = TyroEntity.getTyroEntity(id);
 						if(it != null) {
@@ -122,6 +130,7 @@ public class TyrolienneModule implements Listener {
 							((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetS);
 						}
 					}catch (ConcurrentModificationException e){
+						Bukkit.broadcastMessage("ConcurrentModif");
 						return;
 					}
 				}
@@ -174,12 +183,12 @@ public class TyrolienneModule implements Listener {
 		public void removeEntities() {
 			for(Entity en : tailEntities) {
 				((TyroEntity)en).needToDie = true;
-				en.getBukkitEntity().remove();
+				en.die();
 			}
 			for(Entity en : hitchEntities) {
 				((TyroHitchEntity)en).needToDie = true;
 				TyroTemp.removeLocBlock(en.getBukkitEntity().getLocation().getBlock());
-				en.getBukkitEntity().remove();
+				en.die();
 			}
 		}
 
@@ -237,7 +246,7 @@ public class TyrolienneModule implements Listener {
 			if(!p.getScoreboardTags().contains("onTyro")) {
 				p.addScoreboardTag("onTyro");
 				TyroSeatEntity en = new TyroSeatEntity(p.getWorld());
-				EntityCustom.spawnEntity(en, rectifyLoc(this.hitchEntities.get(0).getBukkitEntity().getLocation(), 3.75));
+				EntityCustom.spawnEntity(en, rectifyLoc(this.hitchEntities.get(0).getBukkitEntity().getLocation(), 2.35));
 				en.putOnSeat(p);
 				Tyrolienne tyroS = this;
 				
@@ -251,7 +260,7 @@ public class TyrolienneModule implements Listener {
 					Tyrolienne tyro = tyroS;
 					
 					Location locStart = rectifyLoc(tyro.hitchEntities.get(0).getBukkitEntity().getLocation(), 2.35);
-					Location locArrive = rectifyLoc(tyro.hitchEntities.get(1).getBukkitEntity().getLocation(), 2.35);
+					Location locArrive = rectifyLoc(tyro.hitchEntities.get(1).getBukkitEntity().getLocation(), 0);
 
 					VectResult vec = modifyVect(Utils.calcVect(locStart, locArrive));
 					int idx = 0;
@@ -268,7 +277,7 @@ public class TyrolienneModule implements Listener {
 						}else {
 							if(idxTyro < tyro.hitchEntities.size()-2) {
 								idxTyro++;
-								locStart = rectifyLoc(en.getBukkitEntity().getLocation(), 2.35);
+								locStart = rectifyLoc(en.getBukkitEntity().getLocation(), 0);
 								locArrive = rectifyLoc(tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation(), 0);
 								vec = modifyVect(Utils.calcVect(locStart, locArrive));
 								idx = 0;

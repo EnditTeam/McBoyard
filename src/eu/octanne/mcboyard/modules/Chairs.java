@@ -72,8 +72,8 @@ public class Chairs extends Module implements Listener {
 		ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
 			
 			@Override
-			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception{
-				if(packet.toString().contains("net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle")) {
+			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
+				if(packet.toString().contains("PacketPlayInSteerVehicle")) {
 					super.channelRead(channelHandlerContext, packet);
 					PacketPlayInSteerVehicle packetReadable = (PacketPlayInSteerVehicle) packet;
 					//Dismount

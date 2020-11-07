@@ -1,15 +1,20 @@
 package eu.octanne.mcboyard.entity;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import net.minecraft.server.v1_12_R1.DamageSource;
 import net.minecraft.server.v1_12_R1.EntitySlime;
+import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
 import net.minecraft.server.v1_12_R1.ScoreboardTeam;
 import net.minecraft.server.v1_12_R1.ScoreboardTeamBase.EnumTeamPush;
 import net.minecraft.server.v1_12_R1.World;
@@ -83,6 +88,13 @@ public class TyroEntity extends EntitySlime {
 	
 	public void leashedTo(net.minecraft.server.v1_12_R1.Entity en) {
 		((LivingEntity)this.bukkitEntity).setLeashHolder(en.getBukkitEntity());
+		List<Entity> nearbies = this.bukkitEntity.getNearbyEntities(locX, locY, locZ);
+		for(Entity p : nearbies) {
+			if(p instanceof Player) {
+				PacketPlayOutAttachEntity packetS = new PacketPlayOutAttachEntity(this, this.getLeashHolder());
+				((CraftPlayer) p).getHandle().playerConnection.sendPacket(packetS);
+			}
+		}
 	}
 
 	static public TyroEntity getTyroEntity(UUID id) {
