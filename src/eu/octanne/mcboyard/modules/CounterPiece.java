@@ -21,11 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 
 import eu.octanne.mcboyard.McBoyard;
 
@@ -48,7 +44,7 @@ public class CounterPiece extends Module implements Listener  {
 	/*
 	 * WORLDGUARD AND REGIOMANAGER
 	 */
-	public WorldGuardPlugin getWorldGuard() {
+	/*public WorldGuardPlugin getWorldGuard() {
 	    Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
 	 
 	    // WorldGuard may not be loaded
@@ -60,7 +56,7 @@ public class CounterPiece extends Module implements Listener  {
 	}
 	public RegionManager getRegionManager() {
 		return getWorldGuard().getRegionManager(Bukkit.getWorld("world"));
-	}
+	}*/
 	
 	public void onEnable() {
 		
@@ -102,8 +98,8 @@ public class CounterPiece extends Module implements Listener  {
 		holoCounter.setBasePlate(false);
 		holoCounter.setSmall(true);
 		
-		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
 		pl.getCommand("resetcounter").setExecutor(new ResetBoyardCommand());
+		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
 	}
 	
 	public void onDisable() {

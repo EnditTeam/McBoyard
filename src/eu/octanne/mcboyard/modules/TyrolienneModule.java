@@ -56,14 +56,12 @@ public class TyrolienneModule extends Module implements Listener {
 
 	static ItemStack wandItem = Utils.createItemStack("§6Tyrolienne Wrench", Material.STICK, 1, null, 0, true, false); 
 
-	JavaPlugin pl;
-
 	public TyrolienneModule(JavaPlugin pl) {
 		super(pl);
 	}
 
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(this, pl);
+		Bukkit.getPluginManager().registerEvents(this, super.pl);
 		pl.getCommand("tyro").setExecutor(new TyrolienneCommand());
 		pl.getCommand("tyro").setTabCompleter(new TyrolienneTabCompleter());
 		Tyrolienne.loadTyros();
@@ -117,7 +115,7 @@ public class TyrolienneModule extends Module implements Listener {
 			@Override
 			public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
 				super.write(channelHandlerContext, packet, channelPromise);
-				if(packet.toString().contains("PacketPlayOutSpawnEntity")) {
+				if(packet.toString().contains("PacketPlayOutSpawnEntity") || packet.toString().contains("PacketPlayOutSpawnEntity")) {
 					Field aF = packet.getClass().getDeclaredField("b");
 					aF.setAccessible(true);
 					UUID id = (UUID) aF.get(packet);
@@ -130,7 +128,7 @@ public class TyrolienneModule extends Module implements Listener {
 							((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetS);
 						}
 					}catch (ConcurrentModificationException e){
-						Bukkit.broadcastMessage("ConcurrentModif");
+						System.out.println("ConcurrentModif on TyroEntity attachEntity");
 						return;
 					}
 				}
