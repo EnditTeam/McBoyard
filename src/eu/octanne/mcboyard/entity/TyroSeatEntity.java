@@ -41,14 +41,12 @@ public class TyroSeatEntity extends EntityArmorStand {
 		    field.setAccessible(true);// allows us to access the field
 		 
 		    field.setInt(npc, this.getBukkitEntity().getEntityId());// sets the field to an integer
-		    field.setAccessible(!field.isAccessible());//we want to stop accessing this now
 		    
 		    Field field2 = npc.getClass().getDeclaredField("b");
 		    field2.setAccessible(true);// allows us to access the field
 			 
 		    int[] passengerList = {p.getEntityId()};
 		    field2.set(npc, passengerList);// sets the field to an integer
-		    field2.setAccessible(!field.isAccessible());//we want to stop accessing this now
 		} catch(Exception x) {
 		    x.printStackTrace();
 		}

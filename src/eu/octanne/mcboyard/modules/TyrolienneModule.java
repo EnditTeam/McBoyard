@@ -225,7 +225,7 @@ public class TyrolienneModule implements Listener {
 		
 		private VectResult modifyVect(Vector vec) {
 			int nbTurn = 1;
-			while(vec.length() > 0.35) {
+			while(vec.length() > 0.70 /* 0.35 */) {
 				//Bukkit.broadcastMessage("length="+vec.length());
 				vec = Utils.divideVect(vec, 2);
 				nbTurn *=2;
@@ -237,13 +237,12 @@ public class TyrolienneModule implements Listener {
 			if(!p.getScoreboardTags().contains("onTyro")) {
 				p.addScoreboardTag("onTyro");
 				TyroSeatEntity en = new TyroSeatEntity(p.getWorld());
-				EntityCustom.spawnEntity(en, rectifyLoc(this.hitchEntities.get(0).getBukkitEntity().getLocation()));
+				EntityCustom.spawnEntity(en, rectifyLoc(this.hitchEntities.get(0).getBukkitEntity().getLocation(), 3.75));
 				en.putOnSeat(p);
 				Tyrolienne tyroS = this;
 				
 				// JOUER SON DURANT LA DESCENTE (EYLTRA FLYING)
-				p.playSound(p.getLocation(), Sound.ITEM_ELYTRA_FLYING, 0.5f, 1.0f);
-
+				p.playSound(p.getLocation(), Sound.ITEM_ELYTRA_FLYING, 0.8f, 1.0f);
 				// en.getBukkitEntity().getLocation().distance(loc2) > 0.5
 				SchedulerTask task = new SchedulerTask(0,1){
 
@@ -251,8 +250,8 @@ public class TyrolienneModule implements Listener {
 					
 					Tyrolienne tyro = tyroS;
 					
-					Location locStart = rectifyLoc(tyro.hitchEntities.get(0).getBukkitEntity().getLocation());
-					Location locArrive = tyro.hitchEntities.get(1).getBukkitEntity().getLocation();
+					Location locStart = rectifyLoc(tyro.hitchEntities.get(0).getBukkitEntity().getLocation(), 2.35);
+					Location locArrive = rectifyLoc(tyro.hitchEntities.get(1).getBukkitEntity().getLocation(), 2.35);
 
 					VectResult vec = modifyVect(Utils.calcVect(locStart, locArrive));
 					int idx = 0;
@@ -269,13 +268,14 @@ public class TyrolienneModule implements Listener {
 						}else {
 							if(idxTyro < tyro.hitchEntities.size()-2) {
 								idxTyro++;
-								locStart = en.getBukkitEntity().getLocation();
-								locArrive = (tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation());
+								locStart = rectifyLoc(en.getBukkitEntity().getLocation(), 2.35);
+								locArrive = rectifyLoc(tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation(), 0);
 								vec = modifyVect(Utils.calcVect(locStart, locArrive));
 								idx = 0;
 							}else {
 								// ACTION DE FIN DE COURSE
 								if(p != null){
+									p.stopSound(Sound.ITEM_ELYTRA_FLYING);
 									p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.0f);
 									p.getScoreboardTags().remove("onTyro");
 								}
@@ -291,8 +291,8 @@ public class TyrolienneModule implements Listener {
 			}
 		}
 
-		private Location rectifyLoc(Location location) {
-			location.setY(location.getY()-2.35);
+		private Location rectifyLoc(Location location, double yMin) {
+			location.setY(location.getY()-yMin);
 			return location;
 		}
 		

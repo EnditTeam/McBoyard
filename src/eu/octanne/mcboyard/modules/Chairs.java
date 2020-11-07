@@ -80,7 +80,6 @@ public class Chairs extends Module implements Listener {
 					Field field4 = packetReadable.getClass().getDeclaredField("d");
 					field4.setAccessible(true);// allows us to access the field
 					boolean dismount = field4.getBoolean(packetReadable);
-					field4.setAccessible(!field4.isAccessible());
 
 					Chair chairD = null;
 					for(Chair chair : playerOnChairs) {
@@ -226,14 +225,12 @@ public class Chairs extends Module implements Listener {
 				    field.setAccessible(true);// allows us to access the field
 				 
 				    field.setInt(npc, armorstand.getBukkitEntity().getEntityId());// sets the field to an integer
-				    field.setAccessible(!field.isAccessible());//we want to stop accessing this now
 				    
 				    Field field2 = npc.getClass().getDeclaredField("b");
 				    field2.setAccessible(true);// allows us to access the field
 					 
 				    int[] passengerList = {playerOnChair.getEntityId()};
 				    field2.set(npc, passengerList);// sets the field to an integer
-				    field2.setAccessible(!field.isAccessible());//we want to stop accessing this now
 				    
 				} catch(Exception x) {
 				    x.printStackTrace();
