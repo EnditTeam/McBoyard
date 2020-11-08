@@ -79,7 +79,7 @@ public class Utils {
 
 	static public Vector calcVect(Location loc1, Location loc2) {
 		return new Vector(loc2.getX()-loc1.getX(),
-				loc2.getY()-loc1.getY()-2,loc2.getZ()-loc1.getZ());
+				loc2.getY()-loc1.getY(),loc2.getZ()-loc1.getZ());
 	}
 	
 	static public Vector divideVect(Vector vect,int divisor) {

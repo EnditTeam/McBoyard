@@ -56,6 +56,8 @@ public class TyrolienneModule extends Module implements Listener {
 
 	static ItemStack wandItem = Utils.createItemStack("§6Tyrolienne Wrench", Material.STICK, 1, null, 0, true, false); 
 
+	static private boolean debug = true;
+
 	public TyrolienneModule(JavaPlugin pl) {
 		super(pl);
 	}
@@ -72,6 +74,8 @@ public class TyrolienneModule extends Module implements Listener {
 		TyroTemp.unloadTyros();
 		TyroTemp.fenceBlock.clear();
 		Tyrolienne.unloadTyros();
+
+		TyroSeatEntity.killAll();
 	}
 
 	@EventHandler
@@ -85,6 +89,10 @@ public class TyrolienneModule extends Module implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		removePlayer(e.getPlayer());
+		if(e.getPlayer().getScoreboardTags().contains("onTyro")) {
+			e.getPlayer().getScoreboardTags().remove("onTyro");
+			e.getPlayer().leaveVehicle();
+		}
 	}
 
 	private void removePlayer(Player player) {
@@ -119,7 +127,7 @@ public class TyrolienneModule extends Module implements Listener {
 					Field aF = packet.getClass().getDeclaredField("b");
 					aF.setAccessible(true);
 					UUID id = (UUID) aF.get(packet);
-					
+
 					try{
 						TyroEntity it = TyroEntity.getTyroEntity(id);
 						if(it != null) {
@@ -217,84 +225,76 @@ public class TyrolienneModule extends Module implements Listener {
 		public UUID getID() {
 			return id;
 		}
-		
-		private class VectResult {
-			
+
+		/*private class VectResult {
+
 			Vector vect;
 			int nbItr;
-			
+
 			public VectResult(Vector v,int nbItr) {
 				this.vect = v;
 				this.nbItr = nbItr;
 			}
-			
+
 		}
-		
+
 		private VectResult modifyVect(Vector vec) {
 			int nbTurn = 1;
-			while(vec.length() > 0.70 /* 0.35 */) {
+			while(vec.length() > 0.70 0.35) {
 				//Bukkit.broadcastMessage("length="+vec.length());
 				vec = Utils.divideVect(vec, 2);
 				nbTurn *=2;
 			}
 			return new VectResult(vec,nbTurn);
-		}
-		
-		public void useTyro(Player p) {
-			if(!p.getScoreboardTags().contains("onTyro")) {
-				p.addScoreboardTag("onTyro");
-				TyroSeatEntity en = new TyroSeatEntity(p.getWorld());
-				EntityCustom.spawnEntity(en, rectifyLoc(this.hitchEntities.get(0).getBukkitEntity().getLocation(), 2.35));
-				en.putOnSeat(p);
-				Tyrolienne tyroS = this;
-				
-				// JOUER SON DURANT LA DESCENTE (EYLTRA FLYING)
-				p.playSound(p.getLocation(), Sound.ITEM_ELYTRA_FLYING, 0.8f, 1.0f);
-				// en.getBukkitEntity().getLocation().distance(loc2) > 0.5
-				SchedulerTask task = new SchedulerTask(0,1){
+		}*/
 
-					int idxTyro = 0;
-					
-					Tyrolienne tyro = tyroS;
-					
-					Location locStart = rectifyLoc(tyro.hitchEntities.get(0).getBukkitEntity().getLocation(), 2.35);
-					Location locArrive = rectifyLoc(tyro.hitchEntities.get(1).getBukkitEntity().getLocation(), 0);
+		private class PolyCable {
 
-					VectResult vec = modifyVect(Utils.calcVect(locStart, locArrive));
-					int idx = 0;
-					
-					@Override
-					public void run() {
-						if(idx < vec.nbItr && en.getBukkitEntity().getLocation().distance(locArrive) > vec.vect.length()) {
-							//Bukkit.broadcastMessage("Vector : "+vec.vect.toString()+" id= "+idx);
-							en.move(EnumMoveType.SELF, vec.vect.getX(), vec.vect.getY(), vec.vect.getZ());
-							idx++;
-						}else if(idx < vec.nbItr) {
-							vec = modifyVect(Utils.calcVect(locStart, locArrive));
-							idx = 0;
-						}else {
-							if(idxTyro < tyro.hitchEntities.size()-2) {
-								idxTyro++;
-								locStart = rectifyLoc(en.getBukkitEntity().getLocation(), 0);
-								locArrive = rectifyLoc(tyro.hitchEntities.get(idxTyro+1).getBukkitEntity().getLocation(), 0);
-								vec = modifyVect(Utils.calcVect(locStart, locArrive));
-								idx = 0;
-							}else {
-								// ACTION DE FIN DE COURSE
-								if(p != null){
-									p.stopSound(Sound.ITEM_ELYTRA_FLYING);
-									p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.0f);
-									p.getScoreboardTags().remove("onTyro");
-								}
-								en.needToDie = true;
-								en.killEntity();
-								cancelTask();
-							}
-						}
-					}
+			private double a,b,c,tMax;
+			private double deltaX, deltaZ;
 
-				};
-				task.startTask();
+			private static final double pas = 0.2;
+
+			private Location locStart;
+			private Location locArrive;
+
+			public PolyCable(Location locStart, Location locArrive) {
+				deltaX = locArrive.getX()-locStart.getX();
+				deltaZ = locArrive.getZ()-locStart.getZ();
+
+				this.locStart = locStart;
+				this.locArrive = locArrive;
+
+				double xB = Math.sqrt(deltaX*deltaX+deltaZ*deltaZ); // Point 2D d'arrivé (MAX)
+				double yB = locArrive.getY()-locStart.getY();
+
+				tMax = xB;
+
+				double deltaC = Math.log10(Math.sqrt(xB*xB+yB*yB)); // Coef rectif position yC suivant la droite
+
+				//double xC = xB/2; // Point 2D du milieu
+				double yC = yB/2d-deltaC;
+
+				a = 2d*(yB-2d*yC)/(xB*xB);
+				b = (yB-a*(xB*xB))/xB;
+				c = 0;
+			}
+
+			public Vector getVector(double t) {
+				Vector vec = Utils.calcVect(getLoc(t), getLoc(t+pas));
+				//Vector vec = new Vector((pas*deltaX)/tMax,-(getY2D(t+pas)-getY2D(t)),(pas*deltaZ)/tMax);
+				return vec;
+			}
+
+			private double getY2D(double x) {
+				return a*(x*x)+b*x+c;
+			}
+
+			private Location getLoc(double t) {
+				double x = locStart.getX()+t/tMax*(locArrive.getX()-locStart.getX());
+				double y = getY2D(t)+locStart.getY();
+				double z = locStart.getZ()+t/tMax*(locArrive.getZ()-locStart.getZ());
+				return new Location(locStart.getWorld(),x,y,z);
 			}
 		}
 
@@ -302,7 +302,77 @@ public class TyrolienneModule extends Module implements Listener {
 			location.setY(location.getY()-yMin);
 			return location;
 		}
-		
+
+		private Location getLocLeash(int i) {
+			return rectifyLoc(this.hitchEntities.get(i).getLoc(),1.9);
+		}
+
+		public void useTyro(Player p) {
+			if(!p.getScoreboardTags().contains("onTyro")) {
+				p.addScoreboardTag("onTyro");
+				TyroSeatEntity en = new TyroSeatEntity(p.getWorld());
+				EntityCustom.spawnEntity(en, getLocLeash(0)); // 3.35 // 2.35
+				en.putOnSeat(p);
+				Tyrolienne tyroS = this;
+
+				// JOUER SON DURANT LA DESCENTE (EYLTRA FLYING)
+				p.playSound(p.getLocation(), Sound.ITEM_ELYTRA_FLYING, 0.8f, 1.0f);
+				SchedulerTask task = new SchedulerTask(0,1){
+
+					int idxTyro = -1;
+
+					Tyrolienne tyro = tyroS;
+
+					Location locStart; // 3.35 // 2.35
+					Location locArrive; // 5.35 // 0
+
+					PolyCable poly;
+
+					double idx = 0;
+
+					@Override
+					public void run() {
+						if(p == null || en.getBukkitEntity().getPassenger() == null || !en.getBukkitEntity().getPassenger().equals(p)) {
+							if(p != null) p.getScoreboardTags().remove("onTyro");
+							en.needToDie = true;
+							en.die();
+							cancelTask();
+							return;
+						}
+						if((idxTyro == -1) || idx >= poly.tMax) {
+							if(idxTyro < tyro.hitchEntities.size()-2) {
+								idxTyro++;
+								idx = 0;
+
+								locStart = getLocLeash(idxTyro); // 3.35 // 0
+								locArrive = getLocLeash(idxTyro+1); // 5.35 // 0
+								poly = new PolyCable(locStart, locArrive);
+
+								if(debug) {
+									Bukkit.broadcastMessage("Poteau : "+idxTyro+" passé");
+									Bukkit.broadcastMessage("locStart :"+locStart.toString());
+									Bukkit.broadcastMessage("locArrive :"+locArrive.toString());
+								}
+							}else {
+								// ACTION DE FIN DE COURSE
+								p.stopSound(Sound.ITEM_ELYTRA_FLYING);
+								p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.0f);
+								p.getScoreboardTags().remove("onTyro");
+								en.needToDie = true;
+								en.die();
+								cancelTask();
+							}
+						}else {
+							Vector vec = poly.getVector(idx);
+							en.move(EnumMoveType.SELF, vec.getX(), vec.getY(), vec.getZ());
+							idx += PolyCable.pas;
+						}
+					}
+				};
+				task.startTask();
+			}
+		}
+
 		public void removeTyro() {
 			this.removeEntities();
 			this.hitchEntities.clear();

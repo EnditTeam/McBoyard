@@ -1,6 +1,7 @@
 package eu.octanne.mcboyard.entity;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -17,6 +18,8 @@ public class TyroSeatEntity extends EntityArmorStand {
 	
 	public boolean needToDie = false;
 	
+	public static ArrayList<TyroSeatEntity> instances = new ArrayList<>();
+	
 	public TyroSeatEntity(World world) {
 		super(((CraftWorld)world).getHandle());
 		
@@ -30,6 +33,7 @@ public class TyroSeatEntity extends EntityArmorStand {
 		this.collides = false;
 		this.setNoGravity(true);
 		this.getAttributeInstance(GenericAttributes.maxHealth).setValue(0.5f);
+		instances.add(this);
 	}
 	
 	public void putOnSeat(Player p) {
@@ -60,12 +64,21 @@ public class TyroSeatEntity extends EntityArmorStand {
 	public void die() {
 		if(needToDie) {
 			super.die();
+			instances.remove(this);
+		}
+	}
+	
+	public static void killAll() {
+		for(TyroSeatEntity en: instances) {
+			en.needToDie = true;
+			en.die();
 		}
 	}
 	
 	public void die(DamageSource source) {
 		if(needToDie) {
 			super.die(source);
+			instances.remove(this);
 		}
 			
 	}

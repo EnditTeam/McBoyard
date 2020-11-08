@@ -3,6 +3,7 @@ package eu.octanne.mcboyard.entity;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.event.CraftEventFactory;
 
@@ -77,6 +78,10 @@ public class TyroHitchEntity extends EntityLeash {
 		return true;
 	}
 
+	public Location getLoc() {
+		return super.bukkitEntity.getLocation();
+	}
+	
 	/*
 	public final String getSaveID() {
 		MinecraftKey minecraftkey = EntityTypes.a(new EntityLeash(world));
