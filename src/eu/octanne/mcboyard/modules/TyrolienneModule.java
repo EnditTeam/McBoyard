@@ -56,7 +56,7 @@ public class TyrolienneModule extends Module implements Listener {
 
 	static ItemStack wandItem = Utils.createItemStack("§6Tyrolienne Wrench", Material.STICK, 1, null, 0, true, false); 
 
-	static private boolean debug = true;
+	static private boolean debug = false;
 
 	public TyrolienneModule(JavaPlugin pl) {
 		super(pl);
@@ -253,7 +253,7 @@ public class TyrolienneModule extends Module implements Listener {
 			private double a,b,c,tMax;
 			private double deltaX, deltaZ;
 
-			private static final double pas = 0.2;
+			//private static final double pas = 0.5;
 
 			private Location locStart;
 			private Location locArrive;
@@ -270,7 +270,7 @@ public class TyrolienneModule extends Module implements Listener {
 
 				tMax = xB;
 
-				double deltaC = Math.log10(Math.sqrt(xB*xB+yB*yB)); // Coef rectif position yC suivant la droite
+				double deltaC = Math.log10(Math.sqrt(xB*xB+yB*yB))*2; // Coef rectif position yC suivant la droite
 
 				//double xC = xB/2; // Point 2D du milieu
 				double yC = yB/2d-deltaC;
@@ -280,12 +280,16 @@ public class TyrolienneModule extends Module implements Listener {
 				c = 0;
 			}
 
-			public Vector getVector(double t) {
-				Vector vec = Utils.calcVect(getLoc(t), getLoc(t+pas));
+			public Vector getVector(double t, double delta) {
+				Vector vec = Utils.calcVect(getLoc(t), getLoc(t+delta));
 				//Vector vec = new Vector((pas*deltaX)/tMax,-(getY2D(t+pas)-getY2D(t)),(pas*deltaZ)/tMax);
 				return vec;
 			}
-
+			
+            public double getDeriveeAt(double t) {
+                return 2*a*t + b;
+            }
+			
 			private double getY2D(double x) {
 				return a*(x*x)+b*x+c;
 			}
@@ -304,7 +308,7 @@ public class TyrolienneModule extends Module implements Listener {
 		}
 
 		private Location getLocLeash(int i) {
-			return rectifyLoc(this.hitchEntities.get(i).getLoc(),1.9);
+			return rectifyLoc(this.hitchEntities.get(i).getLoc(),2.65);
 		}
 
 		public void useTyro(Player p) {
@@ -320,7 +324,9 @@ public class TyrolienneModule extends Module implements Listener {
 				SchedulerTask task = new SchedulerTask(0,1){
 
 					int idxTyro = -1;
-
+					double idx = 0;
+					double motion = 0.5;
+					
 					Tyrolienne tyro = tyroS;
 
 					Location locStart; // 3.35 // 2.35
@@ -328,8 +334,7 @@ public class TyrolienneModule extends Module implements Listener {
 
 					PolyCable poly;
 
-					double idx = 0;
-
+					
 					@Override
 					public void run() {
 						if(p == null || en.getBukkitEntity().getPassenger() == null || !en.getBukkitEntity().getPassenger().equals(p)) {
@@ -347,7 +352,11 @@ public class TyrolienneModule extends Module implements Listener {
 								locStart = getLocLeash(idxTyro); // 3.35 // 0
 								locArrive = getLocLeash(idxTyro+1); // 5.35 // 0
 								poly = new PolyCable(locStart, locArrive);
-
+								
+								
+								Vector toLocStart = Utils.calcVect(en.getBukkitEntity().getLocation(), locStart);
+								en.move(EnumMoveType.SELF, toLocStart.getX(), toLocStart.getY(), toLocStart.getZ());
+								
 								if(debug) {
 									Bukkit.broadcastMessage("Poteau : "+idxTyro+" passé");
 									Bukkit.broadcastMessage("locStart :"+locStart.toString());
@@ -356,16 +365,25 @@ public class TyrolienneModule extends Module implements Listener {
 							}else {
 								// ACTION DE FIN DE COURSE
 								p.stopSound(Sound.ITEM_ELYTRA_FLYING);
-								p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.0f);
+								p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.0f);		
+								Location loc = en.getBukkitEntity().getLocation().clone();
+								loc.setY(loc.getY()-2);
+								if(!loc.getBlock().getType().equals(Material.AIR)) {
+									en.move(EnumMoveType.SELF, 0, 2, 0);
+								}
+								p.leaveVehicle();
 								p.getScoreboardTags().remove("onTyro");
 								en.needToDie = true;
 								en.die();
 								cancelTask();
 							}
 						}else {
-							Vector vec = poly.getVector(idx);
-							en.move(EnumMoveType.SELF, vec.getX(), vec.getY(), vec.getZ());
-							idx += PolyCable.pas;
+						double derive = poly.getDeriveeAt(idx);
+						motion -= 0.01*derive; //descendre == accélére
+						if (motion < 0.1) motion = 0.1;
+						Vector vec = poly.getVector(idx, motion);
+						en.move(EnumMoveType.SELF, vec.getX(), vec.getY(), vec.getZ());
+						idx += motion;
 						}
 					}
 				};

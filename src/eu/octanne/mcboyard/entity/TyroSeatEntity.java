@@ -2,6 +2,7 @@ package eu.octanne.mcboyard.entity;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -69,9 +70,13 @@ public class TyroSeatEntity extends EntityArmorStand {
 	}
 	
 	public static void killAll() {
-		for(TyroSeatEntity en: instances) {
-			en.needToDie = true;
-			en.die();
+		try {
+			for(TyroSeatEntity en: instances) {
+				en.needToDie = true;
+				en.die();
+			}
+		}catch(ConcurrentModificationException e) {
+			return;
 		}
 	}
 	
