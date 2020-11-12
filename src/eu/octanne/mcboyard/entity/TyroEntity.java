@@ -91,6 +91,11 @@ public class TyroEntity extends EntitySlime {
 		}
 	}
 
+	public boolean damageEntity(DamageSource damagesource, float f) {
+		if(needToDie) return super.damageEntity(damagesource, f);
+		else return false;
+	}
+	
 	public void killEntity() {
 		if(needToDie)
 			super.killEntity();
