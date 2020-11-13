@@ -37,7 +37,7 @@ public class MusicModule extends Module {
 				if(args.length > 1 && args[0].equalsIgnoreCase("start")) {
 					for(Player p : Bukkit.getOnlinePlayers()) {
 						PacketPlayOutCustomSoundEffect packet = 
-								new PacketPlayOutCustomSoundEffect(args[1], SoundCategory.MASTER, 1000, 64, 1000, 500.0f, 1);
+								new PacketPlayOutCustomSoundEffect(args[1], SoundCategory.VOICE, 1000, 64, 1000, 500.0f, 1);
 						PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
 						connection.sendPacket(packet);
 					}
