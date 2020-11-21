@@ -47,11 +47,12 @@ public class Chrono extends Module{
 		bossBar.removeAll();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void chrono(int secondes, boolean preventionTitle) {
 		if(isStart)return;
 		sec = secondes;
 		isStart = true;
-		task = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
+		task = Bukkit.getScheduler().scheduleAsyncRepeatingTask(McBoyard.instance, new Runnable() {
 
 			@Override
 			public void run() {
