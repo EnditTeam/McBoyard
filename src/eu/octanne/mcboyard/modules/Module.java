@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Module {
+public abstract class Module {
 	
 	JavaPlugin pl;
 	
