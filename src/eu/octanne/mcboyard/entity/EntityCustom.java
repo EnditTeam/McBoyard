@@ -36,7 +36,7 @@ public enum EntityCustom {
 	private static void addToMaps(Class<? extends Entity> clazz, String name, int id, String str2)
 	{
 		MinecraftKey key = new MinecraftKey(name);
-		((RegistryMaterials<MinecraftKey, Class<? extends Entity>>)getPrivateField("b", EntityTypes.class, null)).a(id, key, (Class<? extends Entity>) clazz);
+		((RegistryMaterials<MinecraftKey, Class<? extends Entity>>)getPrivateField("b", EntityTypes.class, null)).a(id, key, clazz);
 		((Set<MinecraftKey>) getPrivateField("d", EntityTypes.class, null)).add(key);
 		List<String> g = (List<String>) getPrivateField("g", EntityTypes.class, null);
 		while (g.size() <= id) {

@@ -270,10 +270,10 @@ public class KitSystem extends Module {
 										secondes = kp.getCooldown(kit);
 									}
 								}
-								heures = (int)secondes/3600;
-								secondes = (int)secondes%3600;
-								minutes = (int)secondes/60;
-								secondes = (int)secondes%60;
+								heures = secondes/3600;
+								secondes = secondes%3600;
+								minutes = secondes/60;
+								secondes = secondes%60;
 								
 								p.sendMessage(ChatColor.BLUE+"[Kit] "+ChatColor.RED+"Vous avez déjà récupéré ce kit, attendez "+heures+" heures "+minutes+" minutes et "+secondes+" secondes.");
 							}else if(statut.equals(StatutType.PERMISSION_DENIED)) {
