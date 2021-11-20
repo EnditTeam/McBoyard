@@ -26,6 +26,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
@@ -49,7 +50,7 @@ public class KitSystem extends Module {
 	}
 	
 	public static RegionManager getRegionManager() {
-		return getWorldGuard().getRegionManager(Bukkit.getWorld("world"));
+		return WorldGuard.getInstance().getPlatform().getRegionContainer().getLoaded().get(0);
 	}
 	
 	static int task;
