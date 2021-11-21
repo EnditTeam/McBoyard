@@ -62,15 +62,6 @@ public class McBoyard extends JavaPlugin {
 				e.printStackTrace();
 			}
 		}
-		Bukkit.getWorlds()
-			.get(0)
-			.getNearbyEntities(new Location(Bukkit.getWorlds().get(0), 0, 64, 0), 0, 1, 0)
-			.stream()
-			.filter(e -> (e.getType() == EntityType.ARMOR_STAND))
-			.forEach(e -> {
-				e.remove();
-				((ArmorStand)e).setHealth(0);
-			});
 		instanceModules();
 	}
 	

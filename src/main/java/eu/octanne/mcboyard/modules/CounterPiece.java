@@ -78,6 +78,14 @@ public class CounterPiece extends Module implements Listener  {
 		/*
 		 * ARMORSTAND
 		 */
+		locTitle.getWorld()
+			.getNearbyEntities(locTitle, 0, 1, 0)
+			.stream()
+			.filter(e -> e.getType() == EntityType.ARMOR_STAND)
+			.forEach(e -> {
+				e.remove();
+				((ArmorStand)e).setHealth(0);
+			});
 		//TITLE
 		holoTitle = (ArmorStand) locTitle.getWorld().spawnEntity(locTitle, EntityType.ARMOR_STAND);
 		holoTitle.setCustomNameVisible(true);
