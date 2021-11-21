@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -34,18 +37,18 @@ public class McBoyard extends JavaPlugin {
 	/*
 	 * MODULES
 	 */
-	static public CounterPiece counterPieceModule;
-	static public Chrono chronoModule;
-	static public KitSystem kitModule;
-	static public NoChangeWeather noChangeWeatherModule;
-	static public AutoMessage autoMessageModule;
-	static public Maitre maitreModule;
-	static public Chairs chairsModule;
-	static public BoyardRoom boyardRoomModule;
-	static public StaffChat staffChatModule;
-	static public MusicModule musicModule;
-	static public CreditModule creditModule;
-	static public TyrolienneModule tyroModule;
+	public static CounterPiece counterPieceModule;
+	public static Chrono chronoModule;
+	public static KitSystem kitModule;
+	public static NoChangeWeather noChangeWeatherModule;
+	public static AutoMessage autoMessageModule;
+	public static Maitre maitreModule;
+	public static Chairs chairsModule;
+	public static BoyardRoom boyardRoomModule;
+	public static StaffChat staffChatModule;
+	public static MusicModule musicModule;
+	public static CreditModule creditModule;
+	public static TyrolienneModule tyroModule;
 	
 	@Override
 	public void onEnable() {
@@ -59,6 +62,15 @@ public class McBoyard extends JavaPlugin {
 				e.printStackTrace();
 			}
 		}
+		Bukkit.getWorlds()
+			.get(0)
+			.getNearbyEntities(new Location(Bukkit.getWorlds().get(0), 0, 64, 0), 0, 1, 0)
+			.stream()
+			.filter(e -> (e.getType() == EntityType.ARMOR_STAND))
+			.forEach(e -> {
+				e.remove();
+				((ArmorStand)e).setHealth(0);
+			});
 		instanceModules();
 	}
 	
