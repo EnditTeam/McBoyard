@@ -4,11 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.minecraft.server.v1_12_R1.PacketPlayOutGameStateChange;
+import net.minecraft.server.v1_16_R3.PacketPlayOutGameStateChange;
 
 public class CreditModule extends Module {
 
@@ -33,7 +33,7 @@ public class CreditModule extends Module {
 					if(args[0].equalsIgnoreCase("all")) {
 						for(Player p : Bukkit.getOnlinePlayers()) {
 							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
-									new PacketPlayOutGameStateChange(4, 1));
+									new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.a, 1));
 						}
 						sender.sendMessage("§6Lancement des crédits pour tous.");
 						return true;

@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +21,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.entity.ChairEntity;
 import eu.octanne.mcboyard.entity.EntityCustom;
 import io.netty.channel.Channel;
@@ -29,8 +28,8 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-import net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle;
-import net.minecraft.server.v1_12_R1.PacketPlayOutMount;
+import net.minecraft.server.v1_16_R3.PacketPlayInSteerVehicle;
+import net.minecraft.server.v1_16_R3.PacketPlayOutMount;
 
 public class Chairs extends Module implements Listener {
 	
@@ -110,7 +109,7 @@ public class Chairs extends Module implements Listener {
 	@EventHandler
 	public void onPlayerClickOnChair(PlayerInteractEvent e) {
 		if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			if(e.getClickedBlock().getType().equals(Material.JUNGLE_WOOD_STAIRS)) {
+			if(e.getClickedBlock().getType().equals(Material.JUNGLE_STAIRS)) {
 				boolean isExist = false;
 				for(Chair chair : playerOnChairs) {
 					if(chair.x == e.getClickedBlock().getX() && chair.y == e.getClickedBlock().getY() && 
@@ -142,7 +141,7 @@ public class Chairs extends Module implements Listener {
 	
 	@EventHandler 
 	public void onChairDestroy(BlockBreakEvent e) {
-		if(e.getBlock().getType().equals(Material.JUNGLE_WOOD_STAIRS)) {
+		if(e.getBlock().getType().equals(Material.JUNGLE_STAIRS)) {
 			Chair chairD = null;
 			for(Chair chair : playerOnChairs) {
 				if(chair.x == e.getBlock().getX() && chair.y == e.getBlock().getY() && 

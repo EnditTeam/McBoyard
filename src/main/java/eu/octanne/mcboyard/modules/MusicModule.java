@@ -1,19 +1,15 @@
 package eu.octanne.mcboyard.modules;
 
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_12_R1.PacketDataSerializer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect;
-import net.minecraft.server.v1_12_R1.PlayerConnection;
-import net.minecraft.server.v1_12_R1.SoundCategory;
 
 public class MusicModule extends Module {
 
@@ -37,7 +33,7 @@ public class MusicModule extends Module {
 				if(args.length > 1 && args[0].equalsIgnoreCase("start")) {
 					for(Player p : Bukkit.getOnlinePlayers()) {
 						PacketPlayOutCustomSoundEffect packet = 
-								new PacketPlayOutCustomSoundEffect(args[1], SoundCategory.VOICE, 1000, 64, 1000, 500.0f, 1);
+								new PacketPlayOutCustomSoundEffect(new MinecraftKey(args[1]), SoundCategory.VOICE, new Vec3D(1000, 64, 1000), 500.0f, 1);
 						PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
 						connection.sendPacket(packet);
 					}
@@ -51,7 +47,7 @@ public class MusicModule extends Module {
 							((PacketDataSerializer)localObject).a("");
 							((PacketDataSerializer)localObject).a("");
 							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
-								new PacketPlayOutCustomPayload("MC|StopSound", (PacketDataSerializer)localObject));
+								new PacketPlayOutCustomPayload(new MinecraftKey("MC|StopSound"), (PacketDataSerializer)localObject));
 						}
 						sender.sendMessage("§9Arret de tous les sons en cours !");
 					}else {

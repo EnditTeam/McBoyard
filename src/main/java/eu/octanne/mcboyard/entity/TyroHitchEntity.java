@@ -3,18 +3,10 @@ package eu.octanne.mcboyard.entity;
 import java.util.Iterator;
 import java.util.List;
 
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.event.CraftEventFactory;
-
-import net.minecraft.server.v1_12_R1.AxisAlignedBB;
-import net.minecraft.server.v1_12_R1.EntityHuman;
-import net.minecraft.server.v1_12_R1.EntityInsentient;
-import net.minecraft.server.v1_12_R1.EntityLeash;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
-import net.minecraft.server.v1_12_R1.EnumHand;
-import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
-import net.minecraft.server.v1_12_R1.World;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.event.CraftEventFactory;
 
 public class TyroHitchEntity extends EntityLeash {
 
@@ -23,12 +15,12 @@ public class TyroHitchEntity extends EntityLeash {
 	public boolean needToDie = false;
 	
 	public TyroHitchEntity(World world) {
-		super(world);
+		super(EntityTypes.LEASH_KNOT, world);
 		createEntity();
 	}
 
 	public TyroHitchEntity(org.bukkit.World world) {
-		super(((CraftWorld) world).getHandle());
+		super(EntityTypes.LEASH_KNOT, ((CraftWorld) world).getHandle());
 		createEntity();
 	}
 
@@ -38,11 +30,11 @@ public class TyroHitchEntity extends EntityLeash {
 		this.setSilent(true);
 	}
 
-	public void Y() {
+	public void Y() { // TODO Retrouver le nom de la fonction
 		if(firstRound == true) {
 			firstRound = false;
 		}
-		super.Y();
+		//super.Y();
 	}
 
 	public void die() {
@@ -51,19 +43,19 @@ public class TyroHitchEntity extends EntityLeash {
 	}
 
 	public void B_() {
-		this.lastX = this.locX;
-		this.lastY = this.locY;
-		this.lastZ = this.locZ;
+		this.lastX = this.locX();
+		this.lastY = this.locY();
+		this.lastZ = this.locZ();
 	}
 
 	public boolean survives() {
 		return true;
 	}
 
-	public boolean b(EntityHuman entityhuman, EnumHand enumhand) {
+	public boolean b(EntityHuman entityhuman, EnumHand enumhand) { // TODO Retrouver le nom de la fonction
 		if (this.world.isClientSide)
 			return true; 
-		List<EntityInsentient> list = this.world.a(EntityInsentient.class, new AxisAlignedBB(this.locX - 7.0D, this.locY - 7.0D, this.locZ - 7.0D, this.locX + 7.0D, this.locY + 7.0D, this.locZ + 7.0D));
+		List<EntityInsentient> list = this.world.a(EntityInsentient.class, new AxisAlignedBB(this.locX() - 7.0D, this.locY() - 7.0D, this.locZ() - 7.0D, this.locX() + 7.0D, this.locY() + 7.0D, this.locZ() + 7.0D));
 		Iterator<EntityInsentient> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			EntityInsentient entityinsentient = iterator.next();
@@ -79,7 +71,7 @@ public class TyroHitchEntity extends EntityLeash {
 	}
 
 	public Location getLoc() {
-		return super.bukkitEntity.getLocation();
+		return super.getBukkitEntity().getLocation();
 	}
 	
 	/*

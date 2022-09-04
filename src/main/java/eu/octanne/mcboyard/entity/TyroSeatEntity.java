@@ -6,14 +6,14 @@ import java.util.ConcurrentModificationException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_12_R1.DamageSource;
-import net.minecraft.server.v1_12_R1.EntityArmorStand;
-import net.minecraft.server.v1_12_R1.GenericAttributes;
-import net.minecraft.server.v1_12_R1.PacketPlayOutMount;
+import net.minecraft.server.v1_16_R3.DamageSource;
+import net.minecraft.server.v1_16_R3.EntityArmorStand;
+import net.minecraft.server.v1_16_R3.GenericAttributes;
+import net.minecraft.server.v1_16_R3.PacketPlayOutMount;
 
 public class TyroSeatEntity extends EntityArmorStand {
 	
@@ -22,7 +22,7 @@ public class TyroSeatEntity extends EntityArmorStand {
 	public static ArrayList<TyroSeatEntity> instances = new ArrayList<>();
 	
 	public TyroSeatEntity(World world) {
-		super(((CraftWorld)world).getHandle());
+		super(((CraftWorld)world).getHandle(), 0,0,0);
 		
 		this.noclip = true;
 		this.setCustomNameVisible(false);
@@ -33,7 +33,7 @@ public class TyroSeatEntity extends EntityArmorStand {
 		this.setHealth(0.5f);
 		this.collides = false;
 		this.setNoGravity(true);
-		this.getAttributeInstance(GenericAttributes.maxHealth).setValue(0.5f);
+		this.getAttributeInstance(GenericAttributes.MAX_HEALTH).setValue(0.5f);
 		instances.add(this);
 	}
 	

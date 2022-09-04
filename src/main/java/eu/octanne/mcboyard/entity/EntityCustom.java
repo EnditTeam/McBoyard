@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 
-import net.minecraft.server.v1_12_R1.Entity;
-import net.minecraft.server.v1_12_R1.EntityTypes;
-import net.minecraft.server.v1_12_R1.MinecraftKey;
-import net.minecraft.server.v1_12_R1.RegistryMaterials;
+import net.minecraft.server.v1_16_R3.Entity;
+import net.minecraft.server.v1_16_R3.EntityTypes;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.RegistryMaterials;
 
 public enum EntityCustom {
 	
@@ -36,7 +36,7 @@ public enum EntityCustom {
 	private static void addToMaps(Class<? extends Entity> clazz, String name, int id, String str2)
 	{
 		MinecraftKey key = new MinecraftKey(name);
-		((RegistryMaterials<MinecraftKey, Class<? extends Entity>>)getPrivateField("b", EntityTypes.class, null)).a(id, key, clazz);
+		//((RegistryMaterials<MinecraftKey, Class<? extends Entity>>)getPrivateField("b", EntityTypes.class, null)).a(id, key, clazz);
 		((Set<MinecraftKey>) getPrivateField("d", EntityTypes.class, null)).add(key);
 		List<String> g = (List<String>) getPrivateField("g", EntityTypes.class, null);
 		while (g.size() <= id) {
