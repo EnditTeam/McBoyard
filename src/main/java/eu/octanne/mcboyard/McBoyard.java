@@ -19,7 +19,7 @@ import eu.octanne.mcboyard.modules.CounterPiece;
 import eu.octanne.mcboyard.modules.CreditModule;
 import eu.octanne.mcboyard.modules.KitSystem;
 import eu.octanne.mcboyard.modules.Maitre;
-import eu.octanne.mcboyard.modules.Module;
+import eu.octanne.mcboyard.modules.PlugModule;
 import eu.octanne.mcboyard.modules.MusicModule;
 import eu.octanne.mcboyard.modules.NoChangeWeather;
 import eu.octanne.mcboyard.modules.StaffChat;
@@ -90,12 +90,12 @@ public class McBoyard extends JavaPlugin {
 	 * LOAD / UNLOAD
 	 */
 	public void loadModules() {
-		for (Module mod : Module.modules) {
+		for (PlugModule mod : PlugModule.modules) {
 			mod.onEnable();
 		}
 	}
 	public void unloadModules() {
-		for (Module mod : Module.modules) {
+		for (PlugModule mod : PlugModule.modules) {
 			mod.onDisable();
 		}
 	}

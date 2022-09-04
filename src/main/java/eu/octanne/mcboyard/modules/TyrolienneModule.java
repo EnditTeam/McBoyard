@@ -8,6 +8,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,8 +19,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -48,11 +49,11 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-import net.minecraft.server.v1_12_R1.Entity;
-import net.minecraft.server.v1_12_R1.EnumMoveType;
-import net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity;
+import net.minecraft.server.v1_16_R3.Entity;
+import net.minecraft.server.v1_16_R3.EnumMoveType;
+import net.minecraft.server.v1_16_R3.PacketPlayOutAttachEntity;
 
-public class TyrolienneModule extends Module implements Listener {
+public class TyrolienneModule extends PlugModule implements Listener {
 
 	static ItemStack wandItem = Utils.createItemStack("§6Tyrolienne Wrench", Material.STICK, 1, null, 0, true, false); 
 
@@ -355,7 +356,7 @@ public class TyrolienneModule extends Module implements Listener {
 								
 								
 								Vector toLocStart = Utils.calcVect(en.getBukkitEntity().getLocation(), locStart);
-								en.move(EnumMoveType.SELF, toLocStart.getX(), toLocStart.getY(), toLocStart.getZ());
+								en.move(EnumMoveType.SELF, new Vec3D(toLocStart.getX(), toLocStart.getY(), toLocStart.getZ()));
 								
 								if(debug) {
 									Bukkit.broadcastMessage("Poteau : "+idxTyro+" passé");
@@ -369,7 +370,7 @@ public class TyrolienneModule extends Module implements Listener {
 								Location loc = en.getBukkitEntity().getLocation().clone();
 								loc.setY(loc.getY()-2);
 								if(!loc.getBlock().getType().equals(Material.AIR)) {
-									en.move(EnumMoveType.SELF, 0, 2, 0);
+									en.move(EnumMoveType.SELF, new Vec3D(0, 2, 0));
 								}
 								p.leaveVehicle();
 								p.getScoreboardTags().remove("onTyro");
@@ -382,7 +383,7 @@ public class TyrolienneModule extends Module implements Listener {
 						motion -= 0.01*derive; //descendre == accélére
 						if (motion < 0.1) motion = 0.1;
 						Vector vec = poly.getVector(idx, motion);
-						en.move(EnumMoveType.SELF, vec.getX(), vec.getY(), vec.getZ());
+						en.move(EnumMoveType.SELF, new Vec3D(vec.getX(), vec.getY(), vec.getZ()));
 						idx += motion;
 						}
 					}

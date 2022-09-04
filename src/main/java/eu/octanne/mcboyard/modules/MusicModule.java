@@ -11,7 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import io.netty.buffer.Unpooled;
 
-public class MusicModule extends Module {
+public class MusicModule extends PlugModule {
 
 	public MusicModule(JavaPlugin instance) {
 		super(instance);

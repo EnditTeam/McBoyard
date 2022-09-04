@@ -3,6 +3,7 @@ package eu.octanne.mcboyard.modules;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import eu.octanne.mcboyard.McBoyard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +32,7 @@ import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_16_R3.PacketPlayInSteerVehicle;
 import net.minecraft.server.v1_16_R3.PacketPlayOutMount;
 
-public class Chairs extends Module implements Listener {
+public class Chairs extends PlugModule implements Listener {
 	
 	public Chairs(JavaPlugin instance) {
 		super(instance);

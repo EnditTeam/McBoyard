@@ -163,7 +163,7 @@ public class Utils {
 
 		if(Lore == null) Lore = new ArrayList<>();
 
-		ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) Type.ordinal());
+		ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1, (short) Type.ordinal());
 		SkullMeta itemmeta = (SkullMeta) item.getItemMeta();
 		itemmeta.setLore(Lore);
 		itemmeta.setDisplayName(DisplayName);

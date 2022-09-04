@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -31,7 +32,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 
 import eu.octanne.mcboyard.McBoyard;
 
-public class KitSystem extends Module {
+public class KitSystem extends PlugModule {
 	
 	public KitSystem(JavaPlugin instance) {
 		super(instance);
@@ -52,7 +53,7 @@ public class KitSystem extends Module {
 		WorldGuardPlugin worldguard = getWorldGuard();
 		if(worldguard == null)
 			return null;
-		return worldguard.getRegionContainer().getLoaded().get(0);
+		return WorldGuard.getInstance().getPlatform().getRegionContainer().getLoaded().get(0);
 	}
 	
 	static int task;
@@ -257,7 +258,7 @@ public class KitSystem extends Module {
 		
 		@EventHandler
 		public void onClickInventory(InventoryClickEvent e) {
-			if(e.getClickedInventory() != null && e.getClickedInventory().getName().equalsIgnoreCase(ChatColor.DARK_GRAY+""+ChatColor.BOLD+"Kits")) {
+			if(e.getClickedInventory() != null && e.getView().getTitle().equalsIgnoreCase(ChatColor.DARK_GRAY+""+ChatColor.BOLD+"Kits")) {
 				e.setCancelled(true);
 				if(e.getCurrentItem() != null && !e.getClick().isShiftClick() && (e.getClick().isRightClick() || e.getClick().isLeftClick())) {
 					for(Kit kit : kits) {
@@ -302,7 +303,7 @@ public class KitSystem extends Module {
 				}
 			}
 			for(Kit kit : kits) {
-				if(e.getClickedInventory() != null && e.getClickedInventory().getName().equalsIgnoreCase(kit.getDisplayName())) {
+				if(e.getClickedInventory() != null && e.getView().getTitle().equalsIgnoreCase(kit.getDisplayName())) {
 					Player p = (Player) e.getWhoClicked();
 					if(!p.hasPermission("kit.admin")) {
 						e.setCancelled(true);
@@ -424,7 +425,7 @@ public class KitSystem extends Module {
 			File file = new File(McBoyard.folderPath+"/KitSystem/Kits/"+nKit+".yml");
 			YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 			@SuppressWarnings({ "deprecation", "unchecked" })
-			Kit kit = new Kit(config.getString("name"), config.getString("displayname"), config.getString("permission"), config.getInt("cooldown"), config.getInt("position"), Material.getMaterial(config.getInt("logo-id")), ((byte)config.getInt("logo-data")), (ArrayList<String>)config.get("description"));
+			Kit kit = new Kit(config.getString("name"), config.getString("displayname"), config.getString("permission"), config.getInt("cooldown"), config.getInt("position"), Material.getMaterial(config.getString("logo-id")), ((byte)config.getInt("logo-data")), (ArrayList<String>)config.get("description"));
 			@SuppressWarnings("unchecked")
 			ArrayList<ItemStack> content = ((ArrayList<ItemStack>) config.get("Items"));
 			kit.setContents(content);
@@ -448,7 +449,7 @@ public class KitSystem extends Module {
 				config.set("permission", kit.getPermission());
 				config.set("position", kit.getPosition());
 				config.set("cooldown", kit.getCooldown());
-				config.set("logo-id", kit.getKitItem().getTypeId());
+				config.set("logo-id", kit.getKitItem().getType().getKey());
 				config.set("logo-data", (int)kit.getKitItem().getData().getData());
 				
 				config.set("Items", kit.getContents());

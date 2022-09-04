@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public abstract class Module {
+public abstract class PlugModule {
 	
 	JavaPlugin pl;
 	
-	public static ArrayList<Module> modules = new ArrayList<>();
+	public static ArrayList<PlugModule> modules = new ArrayList<>();
 	
-	public Module(JavaPlugin instance) {
+	public PlugModule(JavaPlugin instance) {
 		this.pl = instance;
 		modules.add(this);
 		onEnable();

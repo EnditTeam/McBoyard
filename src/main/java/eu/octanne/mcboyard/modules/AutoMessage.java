@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import eu.octanne.mcboyard.McBoyard;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -16,9 +17,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.octanne.mcboyard.McBoyard;
-
-public class AutoMessage extends Module implements Listener {
+public class AutoMessage extends PlugModule implements Listener {
 
 	protected File fileMessage;
 	protected static YamlConfiguration configMsg;
