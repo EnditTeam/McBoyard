@@ -99,7 +99,7 @@ public class BoyardRoom extends PlugModule implements Listener{
 			Location locTo0 = e.getTo().clone();
 			locTo0.setY(locTo0.getY()-1);
 			@SuppressWarnings("deprecation")
-			String blockIDTo = locTo0.getBlock().getType().getId() + ":" + (int) locTo0.getBlock().getData();
+			String blockIDTo = locTo0.getBlockX() + "," + locTo0.getBlockY() + "," + locTo0.getBlockZ();
 			if(digiCodeCorrespondence.containsValue(blockIDTo)) {
 				boolean otherPlayer = false;
 				for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
@@ -175,7 +175,7 @@ public class BoyardRoom extends PlugModule implements Listener{
 				// Launch HERSE SOUND
 				for(Player p : Bukkit.getOnlinePlayers()) {
 					PacketPlayOutCustomSoundEffect packet = 
-							new PacketPlayOutCustomSoundEffect(new MinecraftKey("custom:herse"), SoundCategory.MASTER, new Vec3D(1000, 64, 1000), 500.0f, 1);
+							new PacketPlayOutCustomSoundEffect(new MinecraftKey("herse"), SoundCategory.MASTER, new Vec3D(1000, 64, 1000), 500.0f, 1);
 					PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
 					connection.sendPacket(packet);
 				}
@@ -224,24 +224,24 @@ public class BoyardRoom extends PlugModule implements Listener{
 			@Override
 			public void run() {
 				if(round == 1) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), 9, 78, -19));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -12, 78, -19));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), 9, 78, -19));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), -12, 78, -19));
 				}
 				else if(round == 2) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), 8, 78, -25));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -10, 78, -25));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), 8, 78, -25));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), -10, 78, -25));
 				}
 				else if(round == 3) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), 7, 78, -31));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -9, 78, -31));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), 7, 78, -31));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), -9, 78, -31));
 				}
 				else if(round == 4) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), 6, 78, -37));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -8, 78, -37));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), 6, 78, -37));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), -8, 78, -37));
 				}
 				else if(round == 5) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), 5, 78, -43));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -7, 78, -43));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), 5, 78, -43));
+					spawnFireworks(new Location(Bukkit.getWorld("FB"), -7, 78, -43));
 				}
 				else {
 					Bukkit.getScheduler().cancelTask(task);
@@ -263,7 +263,7 @@ public class BoyardRoom extends PlugModule implements Listener{
 		// Launch Generique2 SOUND
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			PacketPlayOutCustomSoundEffect packet = 
-					new PacketPlayOutCustomSoundEffect(new MinecraftKey("custom:generique2"), SoundCategory.MASTER, new Vec3D(1000, 64, 1000), 500.0f, 1);
+					new PacketPlayOutCustomSoundEffect(new MinecraftKey("generiquetheme"), SoundCategory.MASTER, new Vec3D(1000, 64, 1000), 500.0f, 1);
 			PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
 			connection.sendPacket(packet);
 		}
@@ -277,8 +277,8 @@ public class BoyardRoom extends PlugModule implements Listener{
 				if(round <= 40) {
 					for(int xAdd = 0; xAdd < 9; xAdd++) {
 						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_NUGGET, 6));
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
+							Bukkit.getWorld("FB").dropItem(new Location(Bukkit.getWorld("FB"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_NUGGET, 6));
+							Bukkit.getWorld("FB").dropItem(new Location(Bukkit.getWorld("FB"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
 						}
 					}
 				}
@@ -323,16 +323,16 @@ public class BoyardRoom extends PlugModule implements Listener{
 	 */
 	private void digiCodeMapCorrespondence() {
 		digiCodeCorrespondence.put("A", "-1,73,-28"); digiCodeCorrespondence.put("B", "-5,73,-25");
-		digiCodeCorrespondence.put("C", "-3,73,-25"); digiCodeCorrespondence.put("D", "-20,73,-25");
+		digiCodeCorrespondence.put("C", "-3,73,-25"); digiCodeCorrespondence.put("D", "-1,73,-25");
 		digiCodeCorrespondence.put("E", "1,73,-25"); digiCodeCorrespondence.put("F", "3,73,-25");
 		digiCodeCorrespondence.put("G", "-5,73,-22"); digiCodeCorrespondence.put("H", "-3,73,-22");
-		digiCodeCorrespondence.put("I", "-1,73,-22"); digiCodeCorrespondence.put("J", "-1,73,-22");
+		digiCodeCorrespondence.put("I", "-1,73,-22"); digiCodeCorrespondence.put("J", "1,73,-22");
 		digiCodeCorrespondence.put("K", "3,73,-22"); digiCodeCorrespondence.put("L", "-5,73,-19");
 		digiCodeCorrespondence.put("M", "-3,73,-19"); digiCodeCorrespondence.put("N", "-1,73,-19");
 		digiCodeCorrespondence.put("O", "1,73,-19"); digiCodeCorrespondence.put("P", "3,73,-19");
 		digiCodeCorrespondence.put("Q", "-5,73,-16"); digiCodeCorrespondence.put("R", "-3,73,-16");
 		digiCodeCorrespondence.put("S", "-1,73,-16"); digiCodeCorrespondence.put("T", "1,73,-16");
-		digiCodeCorrespondence.put("U", "3,73,16"); digiCodeCorrespondence.put("V", "-5,73,-13");
+		digiCodeCorrespondence.put("U", "3,73,-16"); digiCodeCorrespondence.put("V", "-5,73,-13");
 		digiCodeCorrespondence.put("W", "-3,73,-13"); digiCodeCorrespondence.put("X", "-1,73,-13");
 		digiCodeCorrespondence.put("Y", "1,73,-13"); digiCodeCorrespondence.put("Z", "3,73,-13");
 	}

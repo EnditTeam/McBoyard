@@ -157,7 +157,7 @@ public class CounterPiece extends PlugModule implements Listener  {
 	@EventHandler
 	public void onDropperPickupBoyard(InventoryPickupItemEvent e) {
 		if(e.getInventory().getType().equals(InventoryType.HOPPER) &&
-				((Hopper)e.getInventory().getLocation().getBlock().getBlockData()).getCustomName().equals("Compteur Boyard")) {
+				((Hopper)e.getInventory().getLocation().getBlock().getState()).getCustomName().equals("Compteur Boyard")) {
 			e.setCancelled(true);
 			if(e.getItem().getItemStack().getType().equals(Material.GOLD_NUGGET) && piece == 0) {
 				if(isEnable == false) {

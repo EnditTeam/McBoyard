@@ -43,17 +43,15 @@ public class MusicModule extends PlugModule {
 					String sound = args.length > 1 ? args[1] : "all";
 					if(sound.equals("all")) {
 						for(Player p : Bukkit.getOnlinePlayers()) {
-							Object localObject = new PacketDataSerializer(Unpooled.buffer());
-							((PacketDataSerializer)localObject).a("");
-							((PacketDataSerializer)localObject).a("");
 							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
-								new PacketPlayOutCustomPayload(new MinecraftKey("MC|StopSound"), (PacketDataSerializer)localObject));
+								new PacketPlayOutStopSound(null, SoundCategory.VOICE));
 						}
 						sender.sendMessage("§9Arret de tous les sons en cours !");
 					}else {
 						sender.sendMessage("§9Arret du son : §e"+sound);
 						for(Player p : Bukkit.getOnlinePlayers()) {
-							p.stopSound(sound);
+							((CraftPlayer) p).getHandle().playerConnection.sendPacket(
+									new PacketPlayOutStopSound(new MinecraftKey(sound), SoundCategory.VOICE));
 						}
 					}
 					return true;
