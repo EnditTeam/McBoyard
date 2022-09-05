@@ -275,10 +275,10 @@ public class BoyardRoom extends PlugModule implements Listener{
 			@Override
 			public void run() {
 				if(round <= 40) {
-					for(int xAdd = 0; xAdd < 9; xAdd++) {
-						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("FB").dropItem(new Location(Bukkit.getWorld("FB"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_NUGGET, 6));
-							Bukkit.getWorld("FB").dropItem(new Location(Bukkit.getWorld("FB"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
+					for(int xAdd = 0; xAdd < 3; xAdd++) {
+						for(int zAdd = 0; zAdd < 4; zAdd++) {
+							Bukkit.getWorld("FB").dropItem(new Location(Bukkit.getWorld("FB"), 0-xAdd, 78, -74+zAdd), new ItemStack(Material.GOLD_NUGGET, 6));
+							Bukkit.getWorld("FB").dropItem(new Location(Bukkit.getWorld("FB"), 0-xAdd, 78, -74+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
 						}
 					}
 				}
