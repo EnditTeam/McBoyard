@@ -10,7 +10,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team.Option;
 import org.bukkit.scoreboard.Team.OptionStatus;
 
-public class Maitre extends Module {
+public class Maitre extends PlugModule {
 	
 	public Maitre(JavaPlugin instance) {
 		super(instance);

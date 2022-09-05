@@ -21,11 +21,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.McBoyard;
 
-public class CounterPiece extends Module implements Listener  {
+public class CounterPiece extends PlugModule implements Listener  {
 
 	public CounterPiece(JavaPlugin instance) {
 		super(instance);
@@ -40,23 +41,6 @@ public class CounterPiece extends Module implements Listener  {
 	protected ArmorStand holoTitle;
 	protected Location locTitle;
 	protected Location locCounter;
-	
-	/*
-	 * WORLDGUARD AND REGIOMANAGER
-	 */
-	/*public WorldGuardPlugin getWorldGuard() {
-	    Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-	 
-	    // WorldGuard may not be loaded
-	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
-	        return null; // Maybe you want throw an exception instead
-	    }
-	 
-	    return (WorldGuardPlugin) plugin;
-	}
-	public RegionManager getRegionManager() {
-		return getWorldGuard().getRegionManager(Bukkit.getWorld("world"));
-	}*/
 	
 	public void onEnable() {
 		
@@ -161,9 +145,9 @@ public class CounterPiece extends Module implements Listener  {
 			locDown.setY(locDown.getY()-1);
 
 			if(locDown.getBlock().getType().equals(Material.HOPPER) || e.getItem().getLocation().getBlock().getType().equals(Material.HOPPER)) { //getRegionManager().getRegion("compteur-boyards").contains(e.getItem().getLocation().getBlockX(), e.getItem().getLocation().getBlockY(), e.getItem().getLocation().getBlockZ())
-				if(locDown.getBlock().getType().equals(Material.HOPPER) && ((Hopper) locDown.getBlock().getState()).getInventory().getName().equals("Compteur Boyard")) {
+				if(locDown.getBlock().getType().equals(Material.HOPPER) && ((Hopper) locDown.getBlock().getState()).getCustomName().equals("Compteur Boyard")) {
 					e.setCancelled(true);
-				}else if(e.getItem().getLocation().getBlock().getType().equals(Material.HOPPER) && ((Hopper) e.getItem().getLocation().getBlock().getState()).getInventory().getName().equals("Compteur Boyard")) {
+				}else if(e.getItem().getLocation().getBlock().getType().equals(Material.HOPPER) && ((Hopper) e.getItem().getLocation().getBlock().getState()).getCustomName().equals("Compteur Boyard")) {
 					e.setCancelled(true);
 				}else return;
 			}else return;
@@ -172,7 +156,8 @@ public class CounterPiece extends Module implements Listener  {
 	
 	@EventHandler
 	public void onDropperPickupBoyard(InventoryPickupItemEvent e) {
-		if(e.getInventory().getName().equals("Compteur Boyard")) {
+		if(e.getInventory().getType().equals(InventoryType.HOPPER) &&
+				((Hopper)e.getInventory().getLocation().getBlock().getBlockData()).getCustomName().equals("Compteur Boyard")) {
 			e.setCancelled(true);
 			if(e.getItem().getItemStack().getType().equals(Material.GOLD_NUGGET) && piece == 0) {
 				if(isEnable == false) {

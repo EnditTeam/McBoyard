@@ -15,7 +15,6 @@ import net.minecraft.server.v1_16_R3.RegistryMaterials;
 public enum EntityCustom {
 	
 	//NAME("Entity name", Entity ID, yourcustomclass.class);
-	CHAIR("chair", 400, ChairEntity.class, "Chair"), //You can add as many as you want.
 	TYRO_TAIL("tyro_tail", 55, TyroEntity.class, "TyroTail"), // 55
 	TYRO_SEAT("tyro_seat", 401, TyroSeatEntity.class, "TyroSeat"),
 	TYRO_HITCH("tyro_hitch", 8, TyroHitchEntity.class, "TyroHitch"); // 8

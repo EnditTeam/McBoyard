@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -15,7 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -31,11 +32,8 @@ import org.bukkit.util.Vector;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.BoyardRoom.SecureCode.LetterStat;
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect;
-import net.minecraft.server.v1_12_R1.PlayerConnection;
-import net.minecraft.server.v1_12_R1.SoundCategory;
 
-public class BoyardRoom extends Module implements Listener{
+public class BoyardRoom extends PlugModule implements Listener{
 	
 	public BoyardRoom(JavaPlugin instance) {
 		super(instance);
@@ -83,11 +81,13 @@ public class BoyardRoom extends Module implements Listener{
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-		if((e.getFrom().getBlockY() == 115 || e.getTo().getBlockY() == 115) && 
-		  ((e.getTo().getBlockX() <= -241 && e.getTo().getBlockZ() <= -170 && 
-		    e.getTo().getBlockX() >= -258 && e.getTo().getBlockZ() >= -180) || 
-		   (e.getFrom().getBlockX() <= -241 && e.getFrom().getBlockZ() <= -170 && 
-		    e.getFrom().getBlockX() >= -258 && e.getFrom().getBlockZ() >= -180))) {
+		if((e.getFrom().getBlockY() == 74 || e.getTo().getBlockY() == 74) &&
+
+		  ((e.getTo().getBlockX() <= 4 && e.getTo().getBlockZ() <= -12 &&
+		    e.getTo().getBlockX() >= -6 && e.getTo().getBlockZ() >= -29) ||
+
+		   (e.getFrom().getBlockX() <= 4 && e.getFrom().getBlockZ() <= -12 &&
+		    e.getFrom().getBlockX() >= -6 && e.getFrom().getBlockZ() >= -29))) {
 			
 			if(e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) return;
 			if(e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockY() == e.getTo().getBlockY()
@@ -118,7 +118,7 @@ public class BoyardRoom extends Module implements Listener{
 			Location locFrom0 = e.getFrom().clone();
 			locFrom0.setY(locFrom0.getY()-1);
 			@SuppressWarnings("deprecation")
-			String blockIDFrom = locFrom0.getBlock().getType().getId() + ":" + (int) locFrom0.getBlock().getData();
+			String blockIDFrom = locFrom0.getBlockX() + "," + locFrom0.getBlockY() + "," + locFrom0.getBlockZ();
 			if(digiCodeCorrespondence.containsValue(blockIDFrom)) {
 				boolean otherPlayer = false;
 				for(Entity entity : e.getPlayer().getNearbyEntities(2, 2, 2)) {
@@ -140,7 +140,7 @@ public class BoyardRoom extends Module implements Listener{
 				Location locFrom = e.getFrom().clone();
 				locFrom.setY(locFrom.getY()-1);
 				@SuppressWarnings("deprecation")
-				String blockID = locFrom.getBlock().getType().getId() + ":" + (int) locFrom.getBlock().getData();
+				String blockID = locFrom.getBlockX() + "," + locFrom.getBlockY() + "," + locFrom.getBlockZ();
 				/*Bukkit.broadcastMessage("[Debug] (From) Block ID : " + blockID + ", stat = " + stat.active);*/
 				if(blockID.equalsIgnoreCase(digiCodeCorrespondence.get(stat.letter))) {
 					//Check if have more than 1 player on the block
@@ -163,7 +163,7 @@ public class BoyardRoom extends Module implements Listener{
 				Location locTo = e.getTo().clone();
 				locTo.setY(locTo.getY()-1);
 				@SuppressWarnings("deprecation")
-				String blockID = locTo.getBlock().getType().getId() + ":" + (int) locTo.getBlock().getData();
+				String blockID = locTo.getBlockX() + "," + locTo.getBlockY() + "," + locTo.getBlockZ();
 				/*Bukkit.broadcastMessage("[Debug] (To) Block ID : " + blockID + ", stat = " + stat.active);*/
 				if(blockID.equalsIgnoreCase(digiCodeCorrespondence.get(stat.letter))) {
 					stat.active = true;
@@ -175,7 +175,7 @@ public class BoyardRoom extends Module implements Listener{
 				// Launch HERSE SOUND
 				for(Player p : Bukkit.getOnlinePlayers()) {
 					PacketPlayOutCustomSoundEffect packet = 
-							new PacketPlayOutCustomSoundEffect("herse", SoundCategory.MASTER, 1000, 64, 1000, 500.0f, 1);
+							new PacketPlayOutCustomSoundEffect(new MinecraftKey("custom:herse"), SoundCategory.MASTER, new Vec3D(1000, 64, 1000), 500.0f, 1);
 					PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
 					connection.sendPacket(packet);
 				}
@@ -224,24 +224,24 @@ public class BoyardRoom extends Module implements Listener{
 			@Override
 			public void run() {
 				if(round == 1) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -242, 114.5, -185));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -242, 114.5, -165));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), 9, 78, -19));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -12, 78, -19));
 				}
 				else if(round == 2) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -248, 114.5, -165));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -248, 114.5, -185));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), 8, 78, -25));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -10, 78, -25));
 				}
 				else if(round == 3) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -254, 114.5, -165));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -254, 114.5, -185));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), 7, 78, -31));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -9, 78, -31));
 				}
 				else if(round == 4) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -262, 114.5, -167));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -262, 114.5, -182));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), 6, 78, -37));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -8, 78, -37));
 				}
 				else if(round == 5) {
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -268, 114.5, -171));
-					spawnFireworks(new Location(Bukkit.getWorld("world"), -268, 114.5, -179));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), 5, 78, -43));
+					spawnFireworks(new Location(Bukkit.getWorld("world"), -7, 78, -43));
 				}
 				else {
 					Bukkit.getScheduler().cancelTask(task);
@@ -263,7 +263,7 @@ public class BoyardRoom extends Module implements Listener{
 		// Launch Generique2 SOUND
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			PacketPlayOutCustomSoundEffect packet = 
-					new PacketPlayOutCustomSoundEffect("generique2", SoundCategory.MASTER, 1000, 64, 1000, 500.0f, 1);
+					new PacketPlayOutCustomSoundEffect(new MinecraftKey("custom:generique2"), SoundCategory.MASTER, new Vec3D(1000, 64, 1000), 500.0f, 1);
 			PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
 			connection.sendPacket(packet);
 		}
@@ -277,8 +277,8 @@ public class BoyardRoom extends Module implements Listener{
 				if(round <= 40) {
 					for(int xAdd = 0; xAdd < 9; xAdd++) {
 						for(int zAdd = 0; zAdd < 7; zAdd++) {
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_NUGGET, 6));
-							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), -298-xAdd, 120, -178+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
+							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_NUGGET, 6));
+							Bukkit.getWorld("world").dropItem(new Location(Bukkit.getWorld("world"), 2-xAdd, 78, -77+zAdd), new ItemStack(Material.GOLD_INGOT, 1));
 						}
 					}
 				}
@@ -322,19 +322,19 @@ public class BoyardRoom extends Module implements Listener{
 	 * Mapping Correspondence Code
 	 */
 	private void digiCodeMapCorrespondence() {
-		digiCodeCorrespondence.put("A", "251:0"); digiCodeCorrespondence.put("B", "251:9");
-		digiCodeCorrespondence.put("C", "251:2"); digiCodeCorrespondence.put("D", "251:3");
-		digiCodeCorrespondence.put("E", "251:4"); digiCodeCorrespondence.put("F", "251:5");
-		digiCodeCorrespondence.put("G", "251:6"); digiCodeCorrespondence.put("H", "251:7");
-		digiCodeCorrespondence.put("I", "251:8"); digiCodeCorrespondence.put("J", "251:10");
-		digiCodeCorrespondence.put("K", "251:11"); digiCodeCorrespondence.put("L", "251:12");
-		digiCodeCorrespondence.put("M", "251:13"); digiCodeCorrespondence.put("N", "251:14");
-		digiCodeCorrespondence.put("O", "251:15"); digiCodeCorrespondence.put("P", "159:0");
-		digiCodeCorrespondence.put("Q", "159:1"); digiCodeCorrespondence.put("R", "159:2");
-		digiCodeCorrespondence.put("S", "159:3"); digiCodeCorrespondence.put("T", "159:4");
-		digiCodeCorrespondence.put("U", "159:5"); digiCodeCorrespondence.put("V", "159:6");
-		digiCodeCorrespondence.put("W", "159:7"); digiCodeCorrespondence.put("X", "159:9");
-		digiCodeCorrespondence.put("Y", "159:11"); digiCodeCorrespondence.put("Z", "159:10");
+		digiCodeCorrespondence.put("A", "-1,73,-28"); digiCodeCorrespondence.put("B", "-5,73,-25");
+		digiCodeCorrespondence.put("C", "-3,73,-25"); digiCodeCorrespondence.put("D", "-20,73,-25");
+		digiCodeCorrespondence.put("E", "1,73,-25"); digiCodeCorrespondence.put("F", "3,73,-25");
+		digiCodeCorrespondence.put("G", "-5,73,-22"); digiCodeCorrespondence.put("H", "-3,73,-22");
+		digiCodeCorrespondence.put("I", "-1,73,-22"); digiCodeCorrespondence.put("J", "-1,73,-22");
+		digiCodeCorrespondence.put("K", "3,73,-22"); digiCodeCorrespondence.put("L", "-5,73,-19");
+		digiCodeCorrespondence.put("M", "-3,73,-19"); digiCodeCorrespondence.put("N", "-1,73,-19");
+		digiCodeCorrespondence.put("O", "1,73,-19"); digiCodeCorrespondence.put("P", "3,73,-19");
+		digiCodeCorrespondence.put("Q", "-5,73,-16"); digiCodeCorrespondence.put("R", "-3,73,-16");
+		digiCodeCorrespondence.put("S", "-1,73,-16"); digiCodeCorrespondence.put("T", "1,73,-16");
+		digiCodeCorrespondence.put("U", "3,73,16"); digiCodeCorrespondence.put("V", "-5,73,-13");
+		digiCodeCorrespondence.put("W", "-3,73,-13"); digiCodeCorrespondence.put("X", "-1,73,-13");
+		digiCodeCorrespondence.put("Y", "1,73,-13"); digiCodeCorrespondence.put("Z", "3,73,-13");
 	}
 	
 	class BoyardPasswordConfigCommand implements CommandExecutor {

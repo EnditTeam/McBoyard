@@ -458,8 +458,8 @@ public class TyrolienneModule extends PlugModule implements Listener {
 						return true;
 					} else if(args[0].equalsIgnoreCase("reload")) {
 						sender.sendMessage("§9Tyro §8|§a Rechargement des tyroliennes...");
-						McBoyard.tyroModule.onDisable();
-						McBoyard.tyroModule.onEnable();
+						//McBoyard.tyroModule.onDisable();
+						//McBoyard.tyroModule.onEnable();
 						sender.sendMessage("§9Tyro §8|§a Rechargement terminé!");
 						return true;
 					} else if(args[0].equalsIgnoreCase("help")) {

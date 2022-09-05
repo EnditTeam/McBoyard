@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.McBoyard;
 
-public class NoChangeWeather extends Module implements Listener {
+public class NoChangeWeather extends PlugModule implements Listener {
 	
 	
 	public NoChangeWeather(JavaPlugin instance) {
