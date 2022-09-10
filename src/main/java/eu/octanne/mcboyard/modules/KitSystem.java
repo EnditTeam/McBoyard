@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,6 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,11 +48,11 @@ public class KitSystem extends PlugModule {
 	    return (WorldGuardPlugin) plugin;
 	}
 	
-	public static RegionManager getRegionManager() {
+	public static RegionManager getRegionManager(World world) {
 		WorldGuardPlugin worldguard = getWorldGuard();
 		if(worldguard == null)
 			return null;
-		return WorldGuard.getInstance().getPlatform().getRegionContainer().getLoaded().get(0);
+		return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
 	}
 	
 	static int task;
@@ -138,7 +137,7 @@ public class KitSystem extends PlugModule {
 				@SuppressWarnings("unchecked")
 				ArrayList<String> kitNames = (ArrayList<String>) configM.get("Kits", new ArrayList<String>());
 				if(!kitNames.contains(args[0])) {
-					Kit kit = new Kit(args[0], args[0], "kit."+args[0], 0, 0, Material.STONE, (byte) 0, new ArrayList<String>());
+					Kit kit = new Kit(args[0], args[0], "kit."+args[0], 0, 0, Material.STONE, new ArrayList<String>());
 					for(ItemStack item : p.getInventory().getContents()) {
 						kit.addItem(item);
 					}
@@ -205,7 +204,7 @@ public class KitSystem extends PlugModule {
 				}
 			}
 			if(kp.getCooldown(kit) == 0 && p.hasPermission(kit.getPermission())) {
-				if(!getRegionManager().hasRegion(kit.getName())) {
+				if(!getRegionManager(p.getWorld()).hasRegion(kit.getName())) {
 					for(ItemStack item : kit.getContents()) {
 						if(item != null) {
 							if(p.getInventory().firstEmpty() == -1) {
@@ -217,7 +216,7 @@ public class KitSystem extends PlugModule {
 					}
 					kp.setCooldown(kit, kit.getCooldown());
 					return StatutType.SUCCESS;
-				}else if(getRegionManager().getRegion(kit.getName()).contains(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ())){
+				}else if(getRegionManager(p.getWorld()).getRegion(kit.getName()).contains(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ())){
 					for(ItemStack item : kit.getContents()) {
 						if(item != null) {
 							if(p.getInventory().firstEmpty() == -1) {
@@ -318,35 +317,32 @@ public class KitSystem extends PlugModule {
 	 */
 	static public class Kit {
 		
-		private String permission;
-		private String displayName;
-		private String name;
-		private int position;
+		private final String permission;
+		private final String displayName;
+		private final String name;
+		private final int position;
 		private ArrayList<String> desc = new ArrayList<String>();
-		private Material itemRepresent;
-		private int itemRepresentData;
-		private int cooldown;
+		private final Material itemRepresent;
+		private final int cooldown;
 		private ArrayList<ItemStack> items = new ArrayList<ItemStack>();
 		
-		public Kit(String name, String displayName, String permission, int cooldown, int position, Material itemR, int itemRdata, ArrayList<String> desc) {
+		public Kit(String name, String displayName, String permission, int cooldown, int position, Material itemR, ArrayList<String> desc) {
 			this.name = name;
 			this.displayName = displayName;
 			this.permission = permission;
 			this.position = position;
 			this.cooldown = cooldown;
 			this.itemRepresent = itemR;
-			this.itemRepresentData = itemRdata;
 			this.desc = desc;
 		}
 		
-		public Kit(String name, String displayName, String permission, int cooldown,  int position, Material itemR, int itemRdata) {
+		public Kit(String name, String displayName, String permission, int cooldown,  int position, Material itemR) {
 			this.name = name;
 			this.displayName = displayName;
 			this.permission = permission;
 			this.position = position;
 			this.cooldown = cooldown;
 			this.itemRepresent = itemR;
-			this.itemRepresentData = itemRdata;
 		}
 		
 		public String getPermission() {
@@ -376,10 +372,9 @@ public class KitSystem extends PlugModule {
 		public ArrayList<String> getDesc() {
 			return this.desc;
 		}
-		
-		@SuppressWarnings("deprecation")
+
 		public ItemStack getKitItem() {
-			ItemStack item = new ItemStack(itemRepresent, 1, (short) 0, (byte) this.itemRepresentData);
+			ItemStack item = new ItemStack(itemRepresent, 1);
 			ItemMeta itemM = item.getItemMeta();
 			itemM.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 			itemM.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -424,15 +419,22 @@ public class KitSystem extends PlugModule {
 		public static Kit getKit(String nKit) {
 			File file = new File(McBoyard.folderPath+"/KitSystem/Kits/"+nKit+".yml");
 			YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-			@SuppressWarnings({ "deprecation", "unchecked" })
-			Kit kit = new Kit(config.getString("name"), config.getString("displayname"), config.getString("permission"), config.getInt("cooldown"), config.getInt("position"), Material.getMaterial(config.getString("logo-id")), ((byte)config.getInt("logo-data")), (ArrayList<String>)config.get("description"));
+
+			@SuppressWarnings({ "unchecked" })
+			Kit kit = new Kit(
+					config.getString("name"),
+					config.getString("displayname"),
+					config.getString("permission"),
+					config.getInt("cooldown"),
+					config.getInt("position"),
+					Material.getMaterial(config.getString("logo-id", Material.DIRT.name())),
+					(ArrayList<String>)config.get("description"));
 			@SuppressWarnings("unchecked")
 			ArrayList<ItemStack> content = ((ArrayList<ItemStack>) config.get("Items"));
 			kit.setContents(content);
 			return kit;
 		}
 		
-		@SuppressWarnings("deprecation")
 		public static void save() {
 			File fileM = new File(McBoyard.folderPath+"/KitSystem/config.yml");
 			YamlConfiguration configM = YamlConfiguration.loadConfiguration(fileM);
@@ -449,8 +451,7 @@ public class KitSystem extends PlugModule {
 				config.set("permission", kit.getPermission());
 				config.set("position", kit.getPosition());
 				config.set("cooldown", kit.getCooldown());
-				config.set("logo-id", kit.getKitItem().getType().getKey());
-				config.set("logo-data", (int)kit.getKitItem().getData().getData());
+				config.set("logo-id", kit.getKitItem().getType().name());
 				
 				config.set("Items", kit.getContents());
 				
