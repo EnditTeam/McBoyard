@@ -3,22 +3,11 @@ package eu.octanne.mcboyard;
 import java.io.File;
 import java.io.IOException;
 
+import eu.octanne.mcboyard.modules.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import eu.octanne.mcboyard.modules.AutoMessage;
-import eu.octanne.mcboyard.modules.BoyardRoom;
-import eu.octanne.mcboyard.modules.Chrono;
-import eu.octanne.mcboyard.modules.CounterPiece;
-import eu.octanne.mcboyard.modules.CreditModule;
-import eu.octanne.mcboyard.modules.KitSystem;
-import eu.octanne.mcboyard.modules.Maitre;
-import eu.octanne.mcboyard.modules.PlugModule;
-import eu.octanne.mcboyard.modules.MusicModule;
-import eu.octanne.mcboyard.modules.NoChangeWeather;
-import eu.octanne.mcboyard.modules.StaffChat;
 
 public class McBoyard extends JavaPlugin {
 	
@@ -42,7 +31,8 @@ public class McBoyard extends JavaPlugin {
 	public static StaffChat staffChatModule;
 	public static MusicModule musicModule;
 	public static CreditModule creditModule;
-	//public static TyrolienneModule tyroModule;
+
+	public static ChestRefiller chestFillerModule;
 	
 	@Override
 	public void onEnable() {
@@ -75,7 +65,7 @@ public class McBoyard extends JavaPlugin {
 		musicModule = new MusicModule(this);
 		creditModule = new CreditModule(this);
 		boyardRoomModule = new BoyardRoom(this);
-		//tyroModule = new TyrolienneModule(this);
+		chestFillerModule = new ChestRefiller(this);
 	}
 	
 	/*
