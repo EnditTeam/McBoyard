@@ -67,7 +67,7 @@ public class ChestRefillerCommand implements CommandExecutor, TabCompleter {
                         if (args.length == 2) {
                             switch (args[1]) {
                                 case "chest":
-                                    McBoyard.chestFillerModule.getLootEditor().showEnrollChest((Player) sender);
+                                    McBoyard.chestFillerModule.getLootEditor().showEnrollChests((Player) sender);
                                     return true;
                                 case "item":
                                     McBoyard.chestFillerModule.getLootEditor().showLootableItems((Player) sender);

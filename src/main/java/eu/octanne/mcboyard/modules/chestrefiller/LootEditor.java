@@ -152,7 +152,59 @@ public class LootEditor implements Listener {
 
                 // Open Delete Chest GUI
                 inChestShow.remove((Player)e.getWhoClicked());
-                unenrollChest((Player)e.getWhoClicked(), chest);
+                unrollChest((Player)e.getWhoClicked(), chest);
+                return;
+            }
+        }
+
+        // Page précédente
+        if (e.getSlot() == 1 || e.getSlot() == 37) {
+            // Check if in Loot Show
+            if (inLootShow.containsKey((Player)e.getWhoClicked())) {
+                // Get Page
+                int page = inLootShow.get((Player)e.getWhoClicked());
+                if (page > 1) {
+                    // Open Previous Page
+                    inLootShow.put((Player)e.getWhoClicked(), page - 1);
+                    showLootableItems((Player)e.getWhoClicked(), page - 1);
+                }
+                return;
+            }
+            // Check if in Chest Show
+            if (inChestShow.containsKey((Player)e.getWhoClicked())) {
+                // Get Page
+                int page = inChestShow.get((Player)e.getWhoClicked());
+                if (page > 1) {
+                    // Open Previous Page
+                    inChestShow.put((Player)e.getWhoClicked(), page - 1);
+                    showEnrollChests((Player)e.getWhoClicked(), page - 1);
+                }
+                return;
+            }
+        }
+
+        // Page suivante
+        if (e.getSlot() == 7 || e.getSlot() == 43) {
+            // Check if in Loot Show
+            if (inLootShow.containsKey((Player)e.getWhoClicked())) {
+                // Get Page
+                int page = inLootShow.get((Player)e.getWhoClicked());
+                if (page < McBoyard.chestFillerModule.getLootableItems().size() / 27 + 1) {
+                    // Open Next Page
+                    inLootShow.put((Player)e.getWhoClicked(), page + 1);
+                    showLootableItems((Player)e.getWhoClicked(), page + 1);
+                }
+                return;
+            }
+            // Check if in Chest Show
+            if (inChestShow.containsKey((Player)e.getWhoClicked())) {
+                // Get Page
+                int page = inChestShow.get((Player)e.getWhoClicked());
+                if (page < McBoyard.chestFillerModule.getEnrollChests().size() / 27 + 1) {
+                    // Open Next Page
+                    inChestShow.put((Player)e.getWhoClicked(), page + 1);
+                    showEnrollChests((Player)e.getWhoClicked(), page + 1);
+                }
                 return;
             }
         }
@@ -208,7 +260,7 @@ public class LootEditor implements Listener {
         showLootableItems(p, 1);
     }
 
-    public void showEnrollChest(Player p, int page) {
+    public void showEnrollChests(Player p, int page) {
         var maxPage = (int) Math.ceil((double) McBoyard.chestFillerModule.getEnrollChests().size() / 27);
         if (maxPage == 0) maxPage = 1;
 
@@ -285,8 +337,8 @@ public class LootEditor implements Listener {
         return item;
     }
 
-    public void showEnrollChest(Player p) {
-        showEnrollChest(p, 1);
+    public void showEnrollChests(Player p) {
+        showEnrollChests(p, 1);
     }
 
     public void showLootableItems(Player p, int page) {
@@ -520,7 +572,7 @@ public class LootEditor implements Listener {
      * Ask player to validate to unregister chest location by GUI
      * @param p
      */
-    public void unenrollChest(Player p, Location loc) {
+    public void unrollChest(Player p, Location loc) {
         Inventory inv = Bukkit.createInventory(null, 27, "§cChestR §7| §aSupprimer ?");
         ItemStack separator = getSeparator();
 
