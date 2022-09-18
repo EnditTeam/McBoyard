@@ -1,6 +1,7 @@
 package eu.octanne.mcboyard.modules;
 
 import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.modules.chestrefiller.ChestRefillerCommand;
 import eu.octanne.mcboyard.modules.chestrefiller.LootEditor;
 import eu.octanne.mcboyard.modules.chestrefiller.LootableItem;
 import org.bukkit.Bukkit;
@@ -27,6 +28,10 @@ public class ChestRefiller extends PlugModule {
 	public void onEnable() {
 		lootEditor = new LootEditor();
 		Bukkit.getPluginManager().registerEvents(lootEditor, McBoyard.instance);
+		var cmd = new ChestRefillerCommand();
+		pl.getCommand("chestfiller").setExecutor(cmd);
+		pl.getCommand("chestfiller").setTabCompleter(cmd);
+
 		loadLootableItems();
 		loadEnrollChest();
 	}
@@ -53,14 +58,20 @@ public class ChestRefiller extends PlugModule {
 		// TODO save enroll chest to config
 	}
 
-	public void enrollChest(Location loc) {
-		enrollChest.add(loc);
-		saveEnrollChest();
+	public boolean enrollChest(Location loc) {
+		if (!enrollChest.contains(loc)) {
+			enrollChest.add(loc);
+			saveEnrollChest();
+			return true;
+		} else return false;
 	}
 
-	public void unenrollChest(Location loc) {
-		enrollChest.remove(loc);
-		saveEnrollChest();
+	public boolean unenrollChest(Location loc) {
+		if (enrollChest.contains(loc)) {
+			enrollChest.remove(loc);
+			saveEnrollChest();
+			return true;
+		} else return false;
 	}
 
 	public void addLootableItem(LootableItem lootableItem) {
@@ -79,6 +90,10 @@ public class ChestRefiller extends PlugModule {
 
 	public final List<Location> getEnrollChest() {
 		return enrollChest;
+	}
+
+	public void generateLoots() {
+		// TODO generate loots
 	}
 
 	public LootEditor getLootEditor() {

@@ -41,6 +41,7 @@ public class McBoyard extends JavaPlugin {
 		config = YamlConfiguration.loadConfiguration(fileConfig);
 		if(!fileConfig.exists()) {
 			try {
+				fileConfig.getParentFile().mkdirs();
 				fileConfig.createNewFile();
 			} catch (IOException e) {
 				e.printStackTrace();

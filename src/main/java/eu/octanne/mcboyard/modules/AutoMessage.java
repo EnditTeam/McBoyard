@@ -95,7 +95,6 @@ public class AutoMessage extends PlugModule implements Listener {
 		if(Bukkit.getOnlinePlayers().size() >= minPlayers && !Bukkit.getScheduler().isCurrentlyRunning(task)) {
 			launchMessageScheduler();
 		}
-		e.getPlayer().tab
 	}
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
