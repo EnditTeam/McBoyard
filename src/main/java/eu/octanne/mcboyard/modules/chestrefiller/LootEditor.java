@@ -91,7 +91,6 @@ public class LootEditor implements Listener {
             if (removeLoot.containsKey((Player)e.getWhoClicked())) {
                 // Remove Loot
                 McBoyard.chestFillerModule.removeLootableItem(removeLoot.get((Player)e.getWhoClicked()));
-                removeLoot.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
                 // Message de suppression
                 e.getWhoClicked().sendMessage("§aLoot supprimé !");
@@ -103,7 +102,6 @@ public class LootEditor implements Listener {
             if (editingLoot.containsKey((Player)e.getWhoClicked())) {
                 // Save Loot
                 McBoyard.chestFillerModule.addLootableItem(editingLoot.get((Player)e.getWhoClicked()));
-                editingLoot.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
                 // Message d'ajout
                 e.getWhoClicked().sendMessage("§aLoot ajouté !");
@@ -115,7 +113,6 @@ public class LootEditor implements Listener {
             if (editingChest.containsKey((Player)e.getWhoClicked())) {
                 // Save Chest
                 McBoyard.chestFillerModule.enrollChest(editingChest.get((Player)e.getWhoClicked()));
-                editingChest.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
                 // Message d'ajout
                 e.getWhoClicked().sendMessage("§aCoffre ajouté !");
@@ -127,7 +124,6 @@ public class LootEditor implements Listener {
             if (removeChest.containsKey((Player)e.getWhoClicked())) {
                 // Remove Chest
                 McBoyard.chestFillerModule.unenrollChest(removeChest.get((Player)e.getWhoClicked()));
-                removeChest.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
                 // Message de suppression
                 e.getWhoClicked().sendMessage("§aCoffre supprimé !");
@@ -141,30 +137,30 @@ public class LootEditor implements Listener {
         if (e.getCurrentItem().getType() == Material.RED_WOOL) {
             // Check if remove
             if (removeLoot.containsKey((Player)e.getWhoClicked())) {
-                // Cancel Remove Loot
-                removeLoot.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message d'annulation
+                e.getWhoClicked().sendMessage("§cSuppression annulée !");
                 return;
             }
             // Check if edit
             if (editingLoot.containsKey((Player)e.getWhoClicked())) {
-                // Cancel Edit Loot
-                editingLoot.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message d'annulation
+                e.getWhoClicked().sendMessage("§cAjout annulé !");
                 return;
             }
             // Check if edit chest
             if (editingChest.containsKey((Player)e.getWhoClicked())) {
-                // Cancel Edit Chest
-                editingChest.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message d'annulation
+                e.getWhoClicked().sendMessage("§cAjout annulé !");
                 return;
             }
             // Check if remove chest
             if (removeChest.containsKey((Player)e.getWhoClicked())) {
-                // Cancel Remove Chest
-                removeChest.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message d'annulation
+                e.getWhoClicked().sendMessage("§cSuppression annulée !");
                 return;
             }
         }
@@ -179,7 +175,7 @@ public class LootEditor implements Listener {
                         .get(index + (inLootShow.get((Player)e.getWhoClicked()) - 1) * 27);
 
                 // Open Delete Loot GUI
-                inLootShow.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
                 removeLootableItem((Player)e.getWhoClicked(), loot);
                 return;
             }
@@ -190,7 +186,7 @@ public class LootEditor implements Listener {
                         .get(index + (inChestShow.get((Player)e.getWhoClicked()) - 1) * 27);
 
                 // Open Delete Chest GUI
-                inChestShow.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
                 unrollChest((Player)e.getWhoClicked(), chest);
                 return;
             }
@@ -204,7 +200,7 @@ public class LootEditor implements Listener {
                 int page = inLootShow.get((Player)e.getWhoClicked());
                 if (page > 1) {
                     // Open Previous Page
-                    inLootShow.put((Player)e.getWhoClicked(), page - 1);
+                    e.getWhoClicked().closeInventory();
                     showLootableItems((Player)e.getWhoClicked(), page - 1);
                 }
                 return;
@@ -215,7 +211,7 @@ public class LootEditor implements Listener {
                 int page = inChestShow.get((Player)e.getWhoClicked());
                 if (page > 1) {
                     // Open Previous Page
-                    inChestShow.put((Player)e.getWhoClicked(), page - 1);
+                    e.getWhoClicked().closeInventory();
                     showEnrollChests((Player)e.getWhoClicked(), page - 1);
                 }
                 return;
@@ -230,7 +226,7 @@ public class LootEditor implements Listener {
                 int page = inLootShow.get((Player)e.getWhoClicked());
                 if (page < McBoyard.chestFillerModule.getLootableItems().size() / 27 + 1) {
                     // Open Next Page
-                    inLootShow.put((Player)e.getWhoClicked(), page + 1);
+                    e.getWhoClicked().closeInventory();
                     showLootableItems((Player)e.getWhoClicked(), page + 1);
                 }
                 return;
@@ -241,7 +237,7 @@ public class LootEditor implements Listener {
                 int page = inChestShow.get((Player)e.getWhoClicked());
                 if (page < McBoyard.chestFillerModule.getEnrollChests().size() / 27 + 1) {
                     // Open Next Page
-                    inChestShow.put((Player)e.getWhoClicked(), page + 1);
+                    e.getWhoClicked().closeInventory();
                     showEnrollChests((Player)e.getWhoClicked(), page + 1);
                 }
                 return;
