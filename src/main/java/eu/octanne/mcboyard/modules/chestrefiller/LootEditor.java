@@ -6,7 +6,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -20,15 +25,180 @@ import java.util.List;
 public class LootEditor implements Listener {
 
     // TODO make Event Action for GUI
-    // Remove if player leave on Modification or Show Menu (check if player is in editor)
 
     private HashMap<Player, LootableItem> editingLoot = new HashMap<Player, LootableItem>();
     private HashMap<Player, LootableItem> removeLoot = new HashMap<Player, LootableItem>();
     private HashMap<Player, Location> editingChest = new HashMap<Player, Location>();
     private HashMap<Player, Location> removeChest = new HashMap<Player, Location>();
 
-    private List<Player> inChestShow = new ArrayList<Player>();
-    private List<Player> inLootShow = new ArrayList<Player>();
+    private HashMap<Player, Integer> inChestShow = new HashMap<Player, Integer>();
+    private HashMap<Player, Integer> inLootShow = new HashMap<Player, Integer>();
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent e) {
+        removeIfInGui(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onKick(PlayerKickEvent e) {
+        removeIfInGui(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onCloseInv(InventoryCloseEvent e) {
+        if (e.getPlayer() instanceof Player) removeIfInGui((Player) e.getPlayer());
+    }
+
+    @EventHandler
+    public void onLoot(PlayerDropItemEvent e) {
+        if (checkIfInGui(e.getPlayer())) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onClick(InventoryClickEvent e) {
+        if (!(e.getWhoClicked() instanceof Player)) return;
+        if (checkIfInGui((Player) e.getWhoClicked())) e.setCancelled(true);
+
+        if (e.getCurrentItem() == null) return;
+        if (e.getClickedInventory() == null) return;
+
+        // Check if Validate
+        if (e.getCurrentItem().getType() == Material.GREEN_WOOL) {
+            // Check if remove
+            if (removeLoot.containsKey((Player)e.getWhoClicked())) {
+                // Remove Loot
+                McBoyard.chestFillerModule.removeLootableItem(removeLoot.get((Player)e.getWhoClicked()));
+                removeLoot.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+            // Check if edit
+            if (editingLoot.containsKey((Player)e.getWhoClicked())) {
+                // Save Loot
+                McBoyard.chestFillerModule.addLootableItem(editingLoot.get((Player)e.getWhoClicked()));
+                editingLoot.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+            // Check if edit chest
+            if (editingChest.containsKey((Player)e.getWhoClicked())) {
+                // Save Chest
+                McBoyard.chestFillerModule.enrollChest(editingChest.get((Player)e.getWhoClicked()));
+                editingChest.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+            // Check if remove chest
+            if (removeChest.containsKey((Player)e.getWhoClicked())) {
+                // Remove Chest
+                McBoyard.chestFillerModule.unenrollChest(removeChest.get((Player)e.getWhoClicked()));
+                removeChest.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+        }
+
+        // Check if Cancel
+        if (e.getCurrentItem().getType() == Material.RED_WOOL) {
+            // Check if remove
+            if (removeLoot.containsKey((Player)e.getWhoClicked())) {
+                // Cancel Remove Loot
+                removeLoot.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+            // Check if edit
+            if (editingLoot.containsKey((Player)e.getWhoClicked())) {
+                // Cancel Edit Loot
+                editingLoot.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+            // Check if edit chest
+            if (editingChest.containsKey((Player)e.getWhoClicked())) {
+                // Cancel Edit Chest
+                editingChest.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+            // Check if remove chest
+            if (removeChest.containsKey((Player)e.getWhoClicked())) {
+                // Cancel Remove Chest
+                removeChest.remove((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
+                return;
+            }
+        }
+
+        // Get index of clicked item
+        int index = e.getSlot() - 9;
+        if (index >= 0 && index < 27) {
+            // Check if in Loot Show
+            if (inLootShow.containsKey((Player)e.getWhoClicked())) {
+                // Get Loot
+                LootableItem loot = McBoyard.chestFillerModule.getLootableItems()
+                        .get(index + (inLootShow.get((Player)e.getWhoClicked()) - 1) * 27);
+
+                // Open Delete Loot GUI
+                inLootShow.remove((Player)e.getWhoClicked());
+                removeLootableItem((Player)e.getWhoClicked(), loot);
+                return;
+            }
+            // Check if in Chest Show
+            if (inChestShow.containsKey((Player)e.getWhoClicked())) {
+                // Get Chest
+                Location chest = McBoyard.chestFillerModule.getEnrollChests()
+                        .get(index + (inChestShow.get((Player)e.getWhoClicked()) - 1) * 27);
+
+                // Open Delete Chest GUI
+                inChestShow.remove((Player)e.getWhoClicked());
+                unenrollChest((Player)e.getWhoClicked(), chest);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDrag(InventoryDragEvent e) {
+        if (!(e.getWhoClicked() instanceof Player)) return;
+        if (checkIfInGui((Player) e.getWhoClicked())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMoveItem(InventoryMoveItemEvent e) {
+        if (checkIfInGui((Player) e.getInitiator().getHolder())) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onInteractInv(InventoryInteractEvent e) {
+        if (checkIfInGui((Player) e.getWhoClicked())) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPickItem(InventoryPickupItemEvent e) {
+        if (checkIfInGui((Player) e.getInventory().getHolder())) e.setCancelled(true);
+    }
+
+    private void removeIfInGui(Player p) {
+        editingLoot.remove(p);
+        removeLoot.remove(p);
+        editingChest.remove(p);
+        removeChest.remove(p);
+        inChestShow.remove(p);
+        inLootShow.remove(p);
+    }
+
+    private boolean checkIfInGui(Player p) {
+        if (editingLoot.containsKey(p)) return true;
+        if (removeLoot.containsKey(p)) return true;
+        if (editingChest.containsKey(p)) return true;
+        if (removeChest.containsKey(p)) return true;
+        if (inChestShow.containsKey(p)) return true;
+        if (inLootShow.containsKey(p)) return true;
+        return false;
+    }
 
     public LootEditor() {
 
@@ -39,7 +209,7 @@ public class LootEditor implements Listener {
     }
 
     public void showEnrollChest(Player p, int page) {
-        var maxPage = (int) Math.ceil((double) McBoyard.chestFillerModule.getEnrollChest().size() / 27);
+        var maxPage = (int) Math.ceil((double) McBoyard.chestFillerModule.getEnrollChests().size() / 27);
         if (maxPage == 0) maxPage = 1;
 
         Inventory inv = Bukkit.createInventory(null, 45, "§cChestR §7| §aCoffres enregistrés");
@@ -75,17 +245,17 @@ public class LootEditor implements Listener {
         // Show Chest
         int index = page * 27 - 27;
         for (int i = 9; i < 45-9; i++) {
-            if (index >= McBoyard.chestFillerModule.getEnrollChest().size()) break;
+            if (index >= McBoyard.chestFillerModule.getEnrollChests().size()) break;
             if (index < page*27) {
                 ItemStack chest = new ItemStack(Material.CHEST, 1);
                 ItemMeta chestMeta = chest.getItemMeta();
                 chestMeta.setDisplayName("§aCoffre");
                 List<String> lore = new ArrayList<>();
                 lore.add("§7Coffre enregistré");
-                lore.add("§7Position: §a" + McBoyard.chestFillerModule.getEnrollChest().get(index).getWorld().getName()
-                        + " §7| §a" + McBoyard.chestFillerModule.getEnrollChest().get(index).getX() + " §7| §a"
-                        + McBoyard.chestFillerModule.getEnrollChest().get(index).getY() + " §7| §a"
-                        + McBoyard.chestFillerModule.getEnrollChest().get(index).getZ());
+                lore.add("§7Position: §a" + McBoyard.chestFillerModule.getEnrollChests().get(index).getWorld().getName()
+                        + " §7| §a" + McBoyard.chestFillerModule.getEnrollChests().get(index).getX() + " §7| §a"
+                        + McBoyard.chestFillerModule.getEnrollChests().get(index).getY() + " §7| §a"
+                        + McBoyard.chestFillerModule.getEnrollChests().get(index).getZ());
                 // Show action to delete
                 lore.add("§7");
                 lore.add("§7Cliquez pour supprimer");
@@ -97,6 +267,7 @@ public class LootEditor implements Listener {
             index++;
         }
 
+        inChestShow.put(p, page);
         p.openInventory(inv);
     }
 
@@ -177,6 +348,7 @@ public class LootEditor implements Listener {
             index++;
         }
 
+        inLootShow.put(p, page);
         p.openInventory(inv);
     }
 

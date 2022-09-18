@@ -6,10 +6,7 @@ import eu.octanne.mcboyard.modules.chestrefiller.LootEditor;
 import eu.octanne.mcboyard.modules.chestrefiller.LootableItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -58,6 +55,10 @@ public class ChestRefiller extends PlugModule {
 		// TODO save enroll chest to config
 	}
 
+	public void generateLoots() {
+		// TODO generate loots
+	}
+
 	public boolean enrollChest(Location loc) {
 		if (!enrollChest.contains(loc)) {
 			enrollChest.add(loc);
@@ -88,12 +89,8 @@ public class ChestRefiller extends PlugModule {
 		return lootableItems;
 	}
 
-	public final List<Location> getEnrollChest() {
+	public final List<Location> getEnrollChests() {
 		return enrollChest;
-	}
-
-	public void generateLoots() {
-		// TODO generate loots
 	}
 
 	public LootEditor getLootEditor() {
