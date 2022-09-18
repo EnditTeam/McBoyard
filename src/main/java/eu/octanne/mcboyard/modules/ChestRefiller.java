@@ -6,6 +6,7 @@ import eu.octanne.mcboyard.modules.chestrefiller.LootEditor;
 import eu.octanne.mcboyard.modules.chestrefiller.LootableItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,6 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChestRefiller extends PlugModule {
+
+	static {
+		ConfigurationSerialization.registerClass(LootableItem.class, "LootableItem");
+	}
 
 	private List<LootableItem> lootableItems = new ArrayList<LootableItem>();
 	private List<Location> enrollChest = new ArrayList<Location>();
