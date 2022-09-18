@@ -50,6 +50,29 @@ public class LootEditor implements Listener {
     }
 
     @EventHandler
+    public void onDrag(InventoryDragEvent e) {
+        if (!(e.getWhoClicked() instanceof Player)) return;
+        if (checkIfInGui((Player) e.getWhoClicked())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMoveItem(InventoryMoveItemEvent e) {
+        if (checkIfInGui((Player) e.getInitiator().getHolder())) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onInteractInv(InventoryInteractEvent e) {
+        if (checkIfInGui((Player) e.getWhoClicked())) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPickItem(InventoryPickupItemEvent e) {
+        if (checkIfInGui((Player) e.getInventory().getHolder())) e.setCancelled(true);
+    }
+
+    @EventHandler
     public void onLoot(PlayerDropItemEvent e) {
         if (checkIfInGui(e.getPlayer())) e.setCancelled(true);
     }
@@ -70,6 +93,10 @@ public class LootEditor implements Listener {
                 McBoyard.chestFillerModule.removeLootableItem(removeLoot.get((Player)e.getWhoClicked()));
                 removeLoot.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message de suppression
+                e.getWhoClicked().sendMessage("§aLoot supprimé !");
+                // Reopen Show Loot
+                showLootableItems((Player)e.getWhoClicked());
                 return;
             }
             // Check if edit
@@ -78,6 +105,10 @@ public class LootEditor implements Listener {
                 McBoyard.chestFillerModule.addLootableItem(editingLoot.get((Player)e.getWhoClicked()));
                 editingLoot.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message d'ajout
+                e.getWhoClicked().sendMessage("§aLoot ajouté !");
+                // Reopen Show Loot
+                showLootableItems((Player)e.getWhoClicked());
                 return;
             }
             // Check if edit chest
@@ -86,6 +117,10 @@ public class LootEditor implements Listener {
                 McBoyard.chestFillerModule.enrollChest(editingChest.get((Player)e.getWhoClicked()));
                 editingChest.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message d'ajout
+                e.getWhoClicked().sendMessage("§aCoffre ajouté !");
+                // Reopen Show Chest
+                showEnrollChests((Player)e.getWhoClicked());
                 return;
             }
             // Check if remove chest
@@ -94,6 +129,10 @@ public class LootEditor implements Listener {
                 McBoyard.chestFillerModule.unenrollChest(removeChest.get((Player)e.getWhoClicked()));
                 removeChest.remove((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                // Message de suppression
+                e.getWhoClicked().sendMessage("§aCoffre supprimé !");
+                // Reopen Show Chest
+                showEnrollChests((Player)e.getWhoClicked());
                 return;
             }
         }
@@ -210,29 +249,6 @@ public class LootEditor implements Listener {
         }
     }
 
-    @EventHandler
-    public void onDrag(InventoryDragEvent e) {
-        if (!(e.getWhoClicked() instanceof Player)) return;
-        if (checkIfInGui((Player) e.getWhoClicked())) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onMoveItem(InventoryMoveItemEvent e) {
-        if (checkIfInGui((Player) e.getInitiator().getHolder())) e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onInteractInv(InventoryInteractEvent e) {
-        if (checkIfInGui((Player) e.getWhoClicked())) e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onPickItem(InventoryPickupItemEvent e) {
-        if (checkIfInGui((Player) e.getInventory().getHolder())) e.setCancelled(true);
-    }
-
     private void removeIfInGui(Player p) {
         editingLoot.remove(p);
         removeLoot.remove(p);
@@ -258,87 +274,6 @@ public class LootEditor implements Listener {
 
     public void showLootableItems(Player p) {
         showLootableItems(p, 1);
-    }
-
-    public void showEnrollChests(Player p, int page) {
-        var maxPage = (int) Math.ceil((double) McBoyard.chestFillerModule.getEnrollChests().size() / 27);
-        if (maxPage == 0) maxPage = 1;
-
-        Inventory inv = Bukkit.createInventory(null, 45, "§cChestR §7| §aCoffres enregistrés");
-        ItemStack separator = getSeparator();
-
-        for (int i = 0; i < 9; i++) inv.setItem(i, separator);
-        for (int i = 45-9; i < 45; i++) inv.setItem(i, separator);
-
-        // Next Page
-        ItemStack nextPage = new ItemStack(Material.PLAYER_HEAD, 1);
-        SkullMeta nextPageMeta = (SkullMeta) nextPage.getItemMeta();
-        nextPageMeta.setOwningPlayer(Bukkit.getOfflinePlayer("MHF_ArrowRight"));
-        nextPageMeta.setDisplayName("§aPage suivante");
-        nextPage.setItemMeta(nextPageMeta);
-        inv.setItem(7, nextPage);
-        inv.setItem(43, nextPage);
-        // Prev Page
-        ItemStack prevPage = new ItemStack(Material.PLAYER_HEAD, 1);
-        SkullMeta prevPageMeta = (SkullMeta) prevPage.getItemMeta();
-        prevPageMeta.setOwningPlayer(Bukkit.getOfflinePlayer("MHF_ArrowLeft"));
-        prevPageMeta.setDisplayName("§aPage précédente");
-        prevPage.setItemMeta(prevPageMeta);
-        inv.setItem(1, prevPage);
-        inv.setItem(37, prevPage);
-        // Statut Page
-        ItemStack statutPage = new ItemStack(Material.PAPER, 1);
-        ItemMeta statutPageMeta = statutPage.getItemMeta();
-        statutPageMeta.setDisplayName("§7Page §a" + page + "§7/§a" + maxPage);
-        statutPage.setItemMeta(statutPageMeta);
-        inv.setItem(4, statutPage);
-        inv.setItem(40, statutPage);
-
-        // Show Chest
-        int index = page * 27 - 27;
-        for (int i = 9; i < 45-9; i++) {
-            if (index >= McBoyard.chestFillerModule.getEnrollChests().size()) break;
-            if (index < page*27) {
-                ItemStack chest = new ItemStack(Material.CHEST, 1);
-                ItemMeta chestMeta = chest.getItemMeta();
-                chestMeta.setDisplayName("§aCoffre");
-                List<String> lore = new ArrayList<>();
-                lore.add("§7Coffre enregistré");
-                lore.add("§7Position: §a" + McBoyard.chestFillerModule.getEnrollChests().get(index).getWorld().getName()
-                        + " §7| §a" + McBoyard.chestFillerModule.getEnrollChests().get(index).getX() + " §7| §a"
-                        + McBoyard.chestFillerModule.getEnrollChests().get(index).getY() + " §7| §a"
-                        + McBoyard.chestFillerModule.getEnrollChests().get(index).getZ());
-                // Show action to delete
-                lore.add("§7");
-                lore.add("§7Cliquez pour supprimer");
-                chestMeta.setLore(lore);
-                chestMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                chest.setItemMeta(chestMeta);
-                inv.setItem(i, chest);
-            }
-            index++;
-        }
-
-        inChestShow.put(p, page);
-        p.openInventory(inv);
-    }
-
-    public ItemStack getSeparator() {
-        ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta data = item.getItemMeta();
-        data.setDisplayName(" ");
-        data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        data.addItemFlags(ItemFlag.HIDE_DESTROYS);
-        data.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        data.addItemFlags(ItemFlag.HIDE_PLACED_ON);
-        data.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-        data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-        item.setItemMeta(data);
-        return item;
-    }
-
-    public void showEnrollChests(Player p) {
-        showEnrollChests(p, 1);
     }
 
     public void showLootableItems(Player p, int page) {
@@ -402,6 +337,88 @@ public class LootEditor implements Listener {
 
         inLootShow.put(p, page);
         p.openInventory(inv);
+    }
+
+    public void showEnrollChests(Player p, int page) {
+        var maxPage = (int) Math.ceil((double) McBoyard.chestFillerModule.getEnrollChests().size() / 27);
+        if (maxPage == 0) maxPage = 1;
+
+        Inventory inv = Bukkit.createInventory(null, 45, "§cChestR §7| §aCoffres enregistrés");
+        ItemStack separator = getSeparator();
+
+        for (int i = 0; i < 9; i++) inv.setItem(i, separator);
+        for (int i = 45-9; i < 45; i++) inv.setItem(i, separator);
+
+        // Next Page
+        ItemStack nextPage = new ItemStack(Material.PLAYER_HEAD, 1);
+        SkullMeta nextPageMeta = (SkullMeta) nextPage.getItemMeta();
+        nextPageMeta.setOwningPlayer(Bukkit.getOfflinePlayer("MHF_ArrowRight"));
+        nextPageMeta.setDisplayName("§aPage suivante");
+        nextPage.setItemMeta(nextPageMeta);
+        inv.setItem(7, nextPage);
+        inv.setItem(43, nextPage);
+        // Prev Page
+        ItemStack prevPage = new ItemStack(Material.PLAYER_HEAD, 1);
+        SkullMeta prevPageMeta = (SkullMeta) prevPage.getItemMeta();
+        prevPageMeta.setOwningPlayer(Bukkit.getOfflinePlayer("MHF_ArrowLeft"));
+        prevPageMeta.setDisplayName("§aPage précédente");
+        prevPage.setItemMeta(prevPageMeta);
+        inv.setItem(1, prevPage);
+        inv.setItem(37, prevPage);
+        // Statut Page
+        ItemStack statutPage = new ItemStack(Material.PAPER, 1);
+        ItemMeta statutPageMeta = statutPage.getItemMeta();
+        statutPageMeta.setDisplayName("§7Page §a" + page + "§7/§a" + maxPage);
+        statutPage.setItemMeta(statutPageMeta);
+        inv.setItem(4, statutPage);
+        inv.setItem(40, statutPage);
+
+        // Show Chest
+        int index = page * 27 - 27;
+        for (int i = 9; i < 45-9; i++) {
+            if (index >= McBoyard.chestFillerModule.getEnrollChests().size()) break;
+            if (index < page*27) {
+                ItemStack chest = new ItemStack(McBoyard.chestFillerModule.getEnrollChests().get(index).getBlock().getType(), 1);
+                ItemMeta chestMeta = chest.getItemMeta();
+                chestMeta.setDisplayName("§aCoffre");
+                List<String> lore = new ArrayList<>();
+                lore.add("§7Coffre enregistré");
+                lore.add("§7Type: §a" + McBoyard.chestFillerModule.getEnrollChests().get(index).getBlock().getType().name());
+                lore.add("§7Position: §a" + McBoyard.chestFillerModule.getEnrollChests().get(index).getWorld().getName()
+                        + " §7| §a" + McBoyard.chestFillerModule.getEnrollChests().get(index).getX() + " §7| §a"
+                        + McBoyard.chestFillerModule.getEnrollChests().get(index).getY() + " §7| §a"
+                        + McBoyard.chestFillerModule.getEnrollChests().get(index).getZ());
+                // Show action to delete
+                lore.add("§7");
+                lore.add("§7Cliquez pour supprimer");
+                chestMeta.setLore(lore);
+                chestMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                chest.setItemMeta(chestMeta);
+                inv.setItem(i, chest);
+            }
+            index++;
+        }
+
+        inChestShow.put(p, page);
+        p.openInventory(inv);
+    }
+
+    public void showEnrollChests(Player p) {
+        showEnrollChests(p, 1);
+    }
+
+    public ItemStack getSeparator() {
+        ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta data = item.getItemMeta();
+        data.setDisplayName(" ");
+        data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        data.addItemFlags(ItemFlag.HIDE_DESTROYS);
+        data.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        data.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+        data.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        item.setItemMeta(data);
+        return item;
     }
 
     /**
@@ -525,6 +542,12 @@ public class LootEditor implements Listener {
             return;
         }
 
+        // check if already added
+        if (McBoyard.chestFillerModule.getEnrollChests().contains(targetBlock.getLocation())) {
+            p.sendMessage("§cCoffre déjà ajouté !");
+            return;
+        }
+
         Inventory inv = Bukkit.createInventory(null, 27, "§cChestR §7| §aAjouter ?");
         ItemStack separator = getSeparator();
 
@@ -575,6 +598,12 @@ public class LootEditor implements Listener {
     public void unrollChest(Player p, Location loc) {
         Inventory inv = Bukkit.createInventory(null, 27, "§cChestR §7| §aSupprimer ?");
         ItemStack separator = getSeparator();
+
+        // Check if chest is already deleted
+        if (!McBoyard.chestFillerModule.getEnrollChests().contains(loc)) {
+            p.sendMessage("§cCoffre déjà supprimé !");
+            return;
+        }
 
         for (int i = 0; i < 9; i++) inv.setItem(i, separator);
         inv.setItem(13, separator);
