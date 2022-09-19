@@ -26,7 +26,7 @@ public class ChestRefiller extends PlugModule {
 		ConfigurationSerialization.registerClass(LootableItem.class, "LootableItem");
 	}
 
-	private File configFile = new File(McBoyard.folderPath, "chest_refiller.yml");
+	private File configFile = new File(McBoyard.folderPath + "/chest_refiller.yml");
 	private YamlConfiguration config;
 
 	private List<LootableItem> lootableItems = new ArrayList<LootableItem>();
@@ -46,6 +46,7 @@ public class ChestRefiller extends PlugModule {
 		pl.getCommand("chestfiller").setTabCompleter(cmd);
 
 		// load config
+		configFile = new File(McBoyard.folderPath + "/chest_refiller.yml");
 		config = YamlConfiguration.loadConfiguration(configFile);
 		if(!configFile.exists()) {
 			try {
@@ -71,8 +72,7 @@ public class ChestRefiller extends PlugModule {
 
 	public void loadLootableItems() {
 		// load lootable items from config
-		if (config.contains("lootableItems") && config.isList("lootableItems") && config.getList("lootableItems").size() > 0 
-		&& config.getList("lootableItems").get(0) instanceof LootableItem) {
+		if (config.contains("lootableItems") && config.isList("lootableItems")) {
 			lootableItems = (List<LootableItem>) config.getList("lootableItems");
 		} else {
 			lootableItems = new ArrayList<LootableItem>();
@@ -91,8 +91,7 @@ public class ChestRefiller extends PlugModule {
 
 	public void loadEnrollChest() {
 		// load enroll chest from config
-		if (config.contains("enrollChest") && config.isList("enrollChest") &&
-		 config.getList("enrollChest").size() > 0 && config.getList("enrollChest").get(0) instanceof Location) {
+		if (config.contains("enrollChest") && config.isList("enrollChest")) {
 			enrollChest = (List<Location>) config.getList("enrollChest");
 		} else {
 			enrollChest = new ArrayList<Location>();
@@ -110,6 +109,7 @@ public class ChestRefiller extends PlugModule {
 	}
 
 	public void generateLoots() {
+		ArrayList<Location> toRemove = new ArrayList<Location>();
 		// generate loots for all enroll chest
 		for (Location loc : enrollChest) {
 			if (loc.getBlock().getState() instanceof org.bukkit.block.Chest) {
@@ -126,29 +126,35 @@ public class ChestRefiller extends PlugModule {
 				org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) loc.getBlock().getState();
 				generateLoot(barrel.getInventory());
 			} else {
-				enrollChest.remove(loc);
+				toRemove.add(loc);
 				saveEnrollChest();
-				// send a message to the console to prevent about the delete
+				// send a message to the console to prevent about delete
 				Bukkit.getConsoleSender().sendMessage("§c[§6ChestRefiller§c] §4The chest at " + loc.toString() + " has been deleted because it is not a chest, a shulker box or a barrel.");
 			}
+		}
+		// remove chest from list toRemove
+		for (Location loc : toRemove) {
+			enrollChest.remove(loc);
 		}
 	}
 
 	public void generateLoot(Inventory inventory) {
+		if (lootableItems.size() == 0) {
+			return;
+		}
 		inventory.clear();
-		List<LootableItem> itemsSort = lootableItems.stream()
-			.sorted((a, b) -> a.getChance() - b.getChance()).collect(Collectors.toList());
+		List<LootableItem> itemsSort = lootableItems.stream().collect(Collectors.toList());
 		var nbItems = minItemsPerChest + (int) (Math.random() * (maxItemsPerChest - minItemsPerChest));
 		var nbItemsLoot = 0;
 		var slotChests = new ArrayList<Integer>();
-		for (int i = 0; i < slotChests.size(); i++) {
+		for (int i = 0; i < inventory.getSize(); i++) {
 			slotChests.add(i);
 		}
 		while (nbItemsLoot < nbItems) {
-			int rand = (int) (Math.random() * itemsSort.size());
-			if (itemsSort.get(rand).getChance() > Math.random() * 100) {
+			int idxItem = (int) (Math.random() * itemsSort.size());
+			if (itemsSort.get(idxItem).getChance() > Math.random() * 100) {
 				var slot = slotChests.get((int) (Math.random() * slotChests.size()));
-				inventory.setItem(slot, itemsSort.get(rand).getLoot());
+				inventory.setItem(slot, itemsSort.get(idxItem).getLoot());
 				slotChests.remove(slot);
 				nbItemsLoot++;
 			}
