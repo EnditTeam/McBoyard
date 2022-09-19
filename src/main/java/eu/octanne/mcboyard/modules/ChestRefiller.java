@@ -6,8 +6,11 @@ import eu.octanne.mcboyard.modules.chestrefiller.LootEditor;
 import eu.octanne.mcboyard.modules.chestrefiller.LootableItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -122,6 +125,11 @@ public class ChestRefiller extends PlugModule {
 			else if (loc.getBlock().getState() instanceof org.bukkit.block.Barrel) {
 				org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) loc.getBlock().getState();
 				generateLoot(barrel.getInventory());
+			} else {
+				enrollChest.remove(loc);
+				saveEnrollChest();
+				// send a message to the console to prevent about the delete
+				Bukkit.getConsoleSender().sendMessage("§c[§6ChestRefiller§c] §4The chest at " + loc.toString() + " has been deleted because it is not a chest, a shulker box or a barrel.");
 			}
 		}
 	}
@@ -213,4 +221,5 @@ public class ChestRefiller extends PlugModule {
 			e.printStackTrace();
 		}
 	}
+
 }
