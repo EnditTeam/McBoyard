@@ -6,12 +6,16 @@ import eu.octanne.mcboyard.modules.chestrefiller.LootEditor;
 import eu.octanne.mcboyard.modules.chestrefiller.LootableItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChestRefiller extends PlugModule {
 
@@ -19,9 +23,13 @@ public class ChestRefiller extends PlugModule {
 		ConfigurationSerialization.registerClass(LootableItem.class, "LootableItem");
 	}
 
+	private File configFile = new File(McBoyard.folderPath, "chest_refiller.yml");
+	private YamlConfiguration config;
+
 	private List<LootableItem> lootableItems = new ArrayList<LootableItem>();
 	private List<Location> enrollChest = new ArrayList<Location>();
 	private LootEditor lootEditor;
+	private int minItemsPerChest = 3, maxItemsPerChest = 6;
 
 	public ChestRefiller(JavaPlugin instance) {
 		super(instance);
@@ -34,34 +42,109 @@ public class ChestRefiller extends PlugModule {
 		pl.getCommand("chestfiller").setExecutor(cmd);
 		pl.getCommand("chestfiller").setTabCompleter(cmd);
 
+		// load config
+		config = YamlConfiguration.loadConfiguration(configFile);
+		if(!configFile.exists()) {
+			try {
+				configFile.getParentFile().mkdirs();
+				configFile.createNewFile();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		// load itemperchest from config
+		minItemsPerChest = config.getInt("minItemsPerChest", 3);
+		maxItemsPerChest = config.getInt("maxItemsPerChest", 6);
 		loadLootableItems();
 		loadEnrollChest();
 	}
 	
 	public void onDisable() {
 		HandlerList.unregisterAll(lootEditor);
+
 		saveLootableItems();
 		saveEnrollChest();
 	}
 
 	public void loadLootableItems() {
-		// TODO load lootable items from config
+		// load lootable items from config
+		if (config.contains("lootableItems") && config.isList("lootableItems") && config.getList("lootableItems").size() > 0 
+		&& config.getList("lootableItems").get(0) instanceof LootableItem) {
+			lootableItems = (List<LootableItem>) config.getList("lootableItems");
+		} else {
+			lootableItems = new ArrayList<LootableItem>();
+		}
 	}
 
 	public void saveLootableItems() {
-		// TODO save lootable items to config
+		// save lootable items to config
+		config.set("lootableItems", lootableItems);
+		try {
+			config.save(configFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void loadEnrollChest() {
-		// TODO load enroll chest from config
+		// load enroll chest from config
+		if (config.contains("enrollChest") && config.isList("enrollChest") &&
+		 config.getList("enrollChest").size() > 0 && config.getList("enrollChest").get(0) instanceof Location) {
+			enrollChest = (List<Location>) config.getList("enrollChest");
+		} else {
+			enrollChest = new ArrayList<Location>();
+		}
 	}
 
 	public void saveEnrollChest() {
-		// TODO save enroll chest to config
+		// save enroll chest to config
+		config.set("enrollChest", enrollChest);
+		try {
+			config.save(configFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void generateLoots() {
-		// TODO generate loots
+		// generate loots for all enroll chest
+		for (Location loc : enrollChest) {
+			if (loc.getBlock().getState() instanceof org.bukkit.block.Chest) {
+				org.bukkit.block.Chest chest = (org.bukkit.block.Chest) loc.getBlock().getState();
+				generateLoot(chest.getInventory());
+			}
+			// if shulker box
+			else if (loc.getBlock().getState() instanceof org.bukkit.block.ShulkerBox) {
+				org.bukkit.block.ShulkerBox shulker = (org.bukkit.block.ShulkerBox) loc.getBlock().getState();
+				generateLoot(shulker.getInventory());
+			}
+			// if barrel
+			else if (loc.getBlock().getState() instanceof org.bukkit.block.Barrel) {
+				org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) loc.getBlock().getState();
+				generateLoot(barrel.getInventory());
+			}
+		}
+	}
+
+	public void generateLoot(Inventory inventory) {
+		inventory.clear();
+		List<LootableItem> itemsSort = lootableItems.stream()
+			.sorted((a, b) -> a.getChance() - b.getChance()).collect(Collectors.toList());
+		var nbItems = minItemsPerChest + (int) (Math.random() * (maxItemsPerChest - minItemsPerChest));
+		var nbItemsLoot = 0;
+		var slotChests = new ArrayList<Integer>();
+		for (int i = 0; i < slotChests.size(); i++) {
+			slotChests.add(i);
+		}
+		while (nbItemsLoot < nbItems) {
+			int rand = (int) (Math.random() * itemsSort.size());
+			if (itemsSort.get(rand).getChance() > Math.random() * 100) {
+				var slot = slotChests.get((int) (Math.random() * slotChests.size()));
+				inventory.setItem(slot, itemsSort.get(rand).getLoot());
+				slotChests.remove(slot);
+				nbItemsLoot++;
+			}
+		}
 	}
 
 	public boolean enrollChest(Location loc) {
@@ -102,4 +185,32 @@ public class ChestRefiller extends PlugModule {
 		return lootEditor;
 	}
 
+	public int getMinItemsPerChest() {
+		return minItemsPerChest;
+	}
+
+	public void setMinItemsPerChest(int minItemsPerChest) {
+		this.minItemsPerChest = minItemsPerChest;
+		config.set("minItemsPerChest", minItemsPerChest);
+		try {
+			config.save(configFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public int getMaxItemsPerChest() {
+		return maxItemsPerChest;
+	}
+
+	public void setMaxItemsPerChest(int maxItemsPerChest) {
+		this.maxItemsPerChest = maxItemsPerChest;
+		// save to config
+		config.set("maxItemsPerChest", maxItemsPerChest);
+		try {
+			config.save(configFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

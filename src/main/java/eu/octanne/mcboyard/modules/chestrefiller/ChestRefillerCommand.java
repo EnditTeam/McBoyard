@@ -16,10 +16,35 @@ public class ChestRefillerCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender.hasPermission("mcboyard.chestrefiller") && sender instanceof Player) {
             if (args.length == 0) {
-                sender.sendMessage("§cUsage: /chestrefiller <add|list|enroll> []");
+                sender.sendMessage("§cUsage: /chestrefiller <itemperchest|add|list|enroll> []");
                 return false;
             } else {
                 switch (args[0]) {
+                    // faire la commande pour changer le nombre d'item par coffre
+                    case "itemperchest":
+                        if (args.length == 3) {
+                            try {
+                                int min = Integer.parseInt(args[1]);
+                                int max = Integer.parseInt(args[2]);
+                                if (min >= max) {
+                                    sender.sendMessage("§cLe nombre minimum doit être inférieur au nombre maximum !");
+                                    return false;
+                                } else {
+                                    McBoyard.chestFillerModule.setMinItemsPerChest(min);
+                                    McBoyard.chestFillerModule.setMaxItemsPerChest(max);
+                                    sender.sendMessage("§aLe nombre d'item par coffre a été modifié avec succès !");
+                                    return true;
+                                }
+                            } catch (NumberFormatException e) {
+                                // Preciser que les valeurs sont des nombres
+                                sender.sendMessage("§cLes valeurs doivent être des nombres !");
+                                return false;
+                            }
+                        } else {
+                            sender.sendMessage("§cUsage: /chestrefiller itemperchest <min> <max>");
+                            return false;
+                        }
+
                     case "generate":
                         McBoyard.chestFillerModule.generateLoots();
                         sender.sendMessage("§aLoots générés !");
@@ -33,7 +58,7 @@ public class ChestRefillerCommand implements CommandExecutor, TabCompleter {
                                 int min = Integer.parseInt(args[2]);
                                 int chance = Integer.parseInt(args[3]);
                                 // Check if max > min
-                                if (max > min) {
+                                if (max >= min) {
                                     // Check if chance is between 0 and 100
                                     if (chance >= 0 && chance <= 100) {
                                         // Si le joueur a un item dans la main
