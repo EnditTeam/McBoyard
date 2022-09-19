@@ -25,6 +25,8 @@ public class AutoMessage extends PlugModule implements Listener {
 	public static ArrayList<String> messages;
 	public static int interval;
 	public static int minPlayers;
+
+	public static String header, footer;
 	
 	static protected int task;
 	
@@ -55,6 +57,9 @@ public class AutoMessage extends PlugModule implements Listener {
 		if(!configMsg.isSet("interval"))configMsg.set("interval", interval);
 		if(!configMsg.isSet("min-players"))configMsg.set("min-players", minPlayers);
 		if(!configMsg.isSet("messages"))configMsg.set("messages", new ArrayList<String>());
+		if(!configMsg.isSet("tablist.header"))configMsg.set("tablist.header", "Welcome on McBoyard !");
+		if(!configMsg.isSet("tablist.footer"))configMsg.set("tablist.footer", "Enjoy your stay !");
+
 		try {
 			configMsg.save(fileMessage);
 		} catch (IOException e) {
@@ -64,6 +69,8 @@ public class AutoMessage extends PlugModule implements Listener {
 		interval = configMsg.getInt("interval");
 		minPlayers = configMsg.getInt("min-players");
 		messages = (ArrayList<String>) configMsg.get("messages");
+		header = configMsg.getString("tablist.header");
+		footer = configMsg.getString("tablist.footer");
 		//EVENT REGISTER
 		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
 		if(Bukkit.getOnlinePlayers().size() >= minPlayers && !Bukkit.getScheduler().isCurrentlyRunning(task)) {
@@ -95,6 +102,8 @@ public class AutoMessage extends PlugModule implements Listener {
 		if(Bukkit.getOnlinePlayers().size() >= minPlayers && !Bukkit.getScheduler().isCurrentlyRunning(task)) {
 			launchMessageScheduler();
 		}
+		// SET TAB LIST HEADER AND FOOTER
+		e.getPlayer().setPlayerListHeaderFooter(header, footer);
 	}
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
