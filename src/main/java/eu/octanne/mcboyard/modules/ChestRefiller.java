@@ -65,9 +65,6 @@ public class ChestRefiller extends PlugModule {
 	
 	public void onDisable() {
 		HandlerList.unregisterAll(lootEditor);
-
-		saveLootableItems();
-		saveEnrollChest();
 	}
 
 	public void loadLootableItems() {
