@@ -185,8 +185,8 @@ public class LootEditor implements Listener {
                 Location chest = McBoyard.chestFillerModule.getEnrollChests()
                         .get(index + (inChestShow.get((Player)e.getWhoClicked()) - 1) * 27);
 
-                // If Middle Click
-                if (e.getClick() == ClickType.MIDDLE) {
+                // If Left Click
+                if (e.getClick() == ClickType.LEFT) {
                     // Teleport player to chest
                     e.getWhoClicked().closeInventory();
                     e.getWhoClicked().teleport(chest);
@@ -398,8 +398,7 @@ public class LootEditor implements Listener {
                 lore.add("§7");
                 lore.add("§7Clique droit pour supprimer");
                 // Show action to teleport
-                lore.add("§7");
-                lore.add("§7Clique du milieu pour vous téléporter");
+                lore.add("§7Clique gauche pour se téléporter");
                 chestMeta.setLore(lore);
                 chestMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 chest.setItemMeta(chestMeta);
