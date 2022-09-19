@@ -185,10 +185,20 @@ public class LootEditor implements Listener {
                 Location chest = McBoyard.chestFillerModule.getEnrollChests()
                         .get(index + (inChestShow.get((Player)e.getWhoClicked()) - 1) * 27);
 
-                // Open Delete Chest GUI
-                e.getWhoClicked().closeInventory();
-                unrollChest((Player)e.getWhoClicked(), chest);
-                return;
+                // If Middle Click
+                if (e.getClick() == ClickType.MIDDLE) {
+                    // Teleport player to chest
+                    e.getWhoClicked().closeInventory();
+                    e.getWhoClicked().teleport(chest);
+                    // Message to player
+                    e.getWhoClicked().sendMessage("§aTéléportation au coffre...");
+                    return;
+                } else if (e.getClick() == ClickType.RIGHT) {
+                    // Open Delete Chest GUI
+                    e.getWhoClicked().closeInventory();
+                    unrollChest((Player)e.getWhoClicked(), chest);
+                    return;
+                }
             }
         }
 
@@ -386,7 +396,10 @@ public class LootEditor implements Listener {
                         + McBoyard.chestFillerModule.getEnrollChests().get(index).getZ());
                 // Show action to delete
                 lore.add("§7");
-                lore.add("§7Cliquez pour supprimer");
+                lore.add("§7Clique droit pour supprimer");
+                // Show action to teleport
+                lore.add("§7");
+                lore.add("§7Clique du milieu pour vous téléporter");
                 chestMeta.setLore(lore);
                 chestMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 chest.setItemMeta(chestMeta);
