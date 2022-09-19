@@ -65,7 +65,7 @@ public class ChestRefillerCommand implements CommandExecutor, TabCompleter {
                                         if (((Player) sender).getInventory().getItemInMainHand() != null && !((Player) sender).getInventory().getItemInMainHand().getType().isAir()) {
                                             // Confirmer la création
                                             McBoyard.chestFillerModule.getLootEditor().addLootableItem((Player) sender, new LootableItem(((Player) sender).getInventory().getItemInMainHand(), chance, min, max));
-                                            sender.sendMessage("§aLoot ajouté !");
+                                            sender.sendMessage("§aConfirmation d'ajout...");
                                             return true;
                                         } else {
                                             sender.sendMessage("§cVous devez avoir un item dans la main !");
@@ -128,6 +128,7 @@ public class ChestRefillerCommand implements CommandExecutor, TabCompleter {
             cmds.add("list");
             cmds.add("enroll");
             cmds.add("generate");
+            cmds.add("itemperchest");
         } else if (args.length == 2) {
             if (args[0].equals("list")) {
                 cmds.add("chest");

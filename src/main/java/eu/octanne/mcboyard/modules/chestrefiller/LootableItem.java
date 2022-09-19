@@ -22,7 +22,7 @@ public class LootableItem implements ConfigurationSerializable {
      * @param max
      */
     public LootableItem(ItemStack item, int chance, int min, int max) {
-        this.item = item;
+        this.item = item.clone();
         this.chance = chance;
         this.min = min;
         this.max = max;
