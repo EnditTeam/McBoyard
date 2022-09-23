@@ -26,13 +26,13 @@ public class ChestRefiller extends PlugModule {
 		ConfigurationSerialization.registerClass(LootableItem.class, "LootableItem");
 	}
 
-	private File configFile = new File(McBoyard.folderPath + "/chest_refiller.yml");
+	private File configFile;
 	private YamlConfiguration config;
 
-	private List<LootableItem> lootableItems = new ArrayList<LootableItem>();
-	private List<Location> enrollChest = new ArrayList<Location>();
+	private List<LootableItem> lootableItems;
+	private List<Location> enrollChest;
 	private LootEditor lootEditor;
-	private int minItemsPerChest = 3, maxItemsPerChest = 6;
+	private int minItemsPerChest, maxItemsPerChest;
 
 	public ChestRefiller(JavaPlugin instance) {
 		super(instance);
@@ -47,7 +47,6 @@ public class ChestRefiller extends PlugModule {
 
 		// load config
 		configFile = new File(McBoyard.folderPath + "/chest_refiller.yml");
-		config = YamlConfiguration.loadConfiguration(configFile);
 		if(!configFile.exists()) {
 			try {
 				configFile.getParentFile().mkdirs();
@@ -56,6 +55,8 @@ public class ChestRefiller extends PlugModule {
 				e.printStackTrace();
 			}
 		}
+		config = YamlConfiguration.loadConfiguration(configFile);
+
 		// load itemperchest from config
 		minItemsPerChest = config.getInt("minItemsPerChest", 3);
 		maxItemsPerChest = config.getInt("maxItemsPerChest", 6);
@@ -69,11 +70,12 @@ public class ChestRefiller extends PlugModule {
 
 	public void loadLootableItems() {
 		// load lootable items from config
-		if (config.contains("lootableItems") && config.isList("lootableItems")) {
-			lootableItems = (List<LootableItem>) config.getList("lootableItems");
-		} else {
-			lootableItems = new ArrayList<LootableItem>();
+		// Message for debug
+		lootableItems = new ArrayList<>();
+		if(config.contains("lootableItems")) {
+			lootableItems = config.getList("lootableItems").stream().map(o -> (LootableItem) o).collect(Collectors.toList());
 		}
+		pl.getLogger().info("Loaded " + lootableItems.size() + " lootable items");
 	}
 
 	public void saveLootableItems() {
@@ -84,15 +86,16 @@ public class ChestRefiller extends PlugModule {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		pl.getLogger().info("Lootable items saved !");
 	}
 
 	public void loadEnrollChest() {
 		// load enroll chest from config
-		if (config.contains("enrollChest") && config.isList("enrollChest")) {
-			enrollChest = (List<Location>) config.getList("enrollChest");
-		} else {
-			enrollChest = new ArrayList<Location>();
+		enrollChest = new ArrayList<>();
+		if(config.contains("enrollChest")) {
+			enrollChest = config.getList("enrollChest").stream().map(o -> (Location) o).collect(Collectors.toList());
 		}
+		pl.getLogger().info("Enroll chest loaded : " + enrollChest.size());
 	}
 
 	public void saveEnrollChest() {
@@ -103,6 +106,7 @@ public class ChestRefiller extends PlugModule {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		pl.getLogger().info("Enroll chest saved !");
 	}
 
 	public void generateLoots() {
