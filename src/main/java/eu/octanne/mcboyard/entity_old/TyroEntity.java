@@ -1,4 +1,4 @@
-package eu.octanne.mcboyard.entity;
+package eu.octanne.mcboyard.entity_old;
 
 import java.util.ArrayList;
 import java.util.UUID;

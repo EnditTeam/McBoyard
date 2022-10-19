@@ -1,4 +1,4 @@
-package eu.octanne.mcboyard.entity;
+package eu.octanne.mcboyard.entity_old;
 
 import java.util.Iterator;
 import java.util.List;

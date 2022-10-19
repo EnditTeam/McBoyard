@@ -1,4 +1,4 @@
-package eu.octanne.mcboyard.entity;
+package eu.octanne.mcboyard.entity_old;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

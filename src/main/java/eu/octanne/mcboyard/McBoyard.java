@@ -3,6 +3,7 @@ package eu.octanne.mcboyard;
 import java.io.File;
 import java.io.IOException;
 
+import eu.octanne.mcboyard.entity.CustomEntity;
 import eu.octanne.mcboyard.modules.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -33,6 +34,8 @@ public class McBoyard extends JavaPlugin {
 	public static CreditModule creditModule;
 
 	public static ChestRefiller chestFillerModule;
+
+	public static ExcaliburSystem excaliburModule;
 	
 	@Override
 	public void onEnable() {
@@ -48,6 +51,11 @@ public class McBoyard extends JavaPlugin {
 			}
 		}
 		instanceModules();
+	}
+
+	@Override
+	public void onLoad() {
+		CustomEntity.registerEntities();
 	}
 	
 	@Override
@@ -67,6 +75,7 @@ public class McBoyard extends JavaPlugin {
 		creditModule = new CreditModule(this);
 		boyardRoomModule = new BoyardRoom(this);
 		chestFillerModule = new ChestRefiller(this);
+		excaliburModule = new ExcaliburSystem(this);
 	}
 	
 	/*
