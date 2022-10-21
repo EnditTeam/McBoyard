@@ -38,26 +38,27 @@ public class ExcaliburStand extends EntityArmorStand {
         super.getEquipment(EnumItemSlot.MAINHAND).setDamage(nbSwordDurability);
     }
 
-    public void takeSword(Player p) {
+    public boolean takeSword(Player p) {
         // give sword to player if hasSword is true
         if(hasSword) {
             // create sword with durability
             org.bukkit.inventory.ItemStack sword = new org.bukkit.inventory.ItemStack(Material.IRON_SWORD);
             // set durability of sword
-            sword.setDurability((short) (nbSwordDurability));
+            sword.setDurability((short) (sword.getDurability() - nbSwordDurability));
             // give sword to player
             p.getInventory().addItem(sword);
             hasSword = false;
             // remove sword in hand
             super.setSlot(EnumItemSlot.HEAD, new net.minecraft.server.v1_16_R3.ItemStack(net.minecraft.server.v1_16_R3.Items.AIR));
-        }
+            return true;
+        } else return false;
     }
 
     public void putBackSword() {
         // Set Iron Sword In Hand
         super.setSlot(EnumItemSlot.HEAD, new net.minecraft.server.v1_16_R3.ItemStack(net.minecraft.server.v1_16_R3.Items.IRON_SWORD));
         // set durability of sword
-        super.getEquipment(EnumItemSlot.MAINHAND).setDamage(nbSwordDurability);
+        super.getEquipment(EnumItemSlot.MAINHAND).setDamage(super.getEquipment(EnumItemSlot.MAINHAND).getDamage() - nbSwordDurability);
         hasSword = true;
     }
 
@@ -129,8 +130,11 @@ public class ExcaliburStand extends EntityArmorStand {
     public EnumInteractionResult a(EntityHuman entityhuman, Vec3D vec3d, EnumHand enumhand) {
         // Take Sword
         if(entityhuman.getBukkitEntity() instanceof Player) {
-            takeSword((Player) entityhuman.getBukkitEntity());
-            entityhuman.getBukkitEntity().sendMessage("§aVous avez récupéré l'épée d'Excalibur !");
+            if (takeSword((Player) entityhuman.getBukkitEntity())) {
+                entityhuman.getBukkitEntity().sendMessage("§aVous avez récupéré l'épée Excalibur");
+            } else {
+                entityhuman.getBukkitEntity().sendMessage("§cL'épée Excalibur est déjà prise");
+            }
         }
         return EnumInteractionResult.SUCCESS;
     }
