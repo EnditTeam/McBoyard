@@ -118,6 +118,8 @@ public class ExcaliburCommand implements CommandExecutor, TabCompleter {
             cmds.add("list");
             cmds.add("despawn");
             cmds.add("help");
+            cmds.add("put");
+            cmds.add("putall");
         } else if (strings.length == 2) {
             if (strings[0].equalsIgnoreCase("spawn")) {
                 cmds.add("<nbDurability>");
