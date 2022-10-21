@@ -15,12 +15,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
 public class ExcaliburSystem extends PlugModule {
 
 	private static List<ExcaliburStand> excaliburStands = new ArrayList<>();
+	public static int firstUpdate = -1;
 
 	public ExcaliburSystem(JavaPlugin instance) {
 		super(instance);
@@ -31,22 +33,16 @@ public class ExcaliburSystem extends PlugModule {
 		pl.getCommand("excalibur").setExecutor(excaliburCommand);
 		pl.getCommand("excalibur").setTabCompleter(excaliburCommand);
 		Bukkit.getPluginManager().registerEvents(new ExcaliburListener(), pl);
+		excaliburStands.clear();
+		firstUpdate = -1;
 	}
 	
 	public void onDisable() {
-		
+
 	}
 
 	public static List<ExcaliburStand> getExcaliburStands() {
 		return excaliburStands;
-	}
-
-	public static void saveExcaliburStands() {
-		// TODO
-	}
-
-	public static void loadExcaliburStands() {
-		// TODO
 	}
 
 	public static void addExcaliburStand(ExcaliburStand stand) {
@@ -55,5 +51,9 @@ public class ExcaliburSystem extends PlugModule {
 
 	public static void removeExcaliburStand(ExcaliburStand stand) {
 		excaliburStands.remove(stand);
+	}
+
+	public static boolean hadExcaliburStand(ExcaliburStand stand) {
+		return excaliburStands.contains(stand);
 	}
 }

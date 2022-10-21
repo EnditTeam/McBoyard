@@ -35,7 +35,7 @@ public class ExcaliburCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("§cUsage: /excalibur spawn <nbDurability>, pour spawn un stand d'excalibur.");
                 return true;
             } else if (args[0].equalsIgnoreCase("list")) {
-                sender.sendMessage("§cListe des stands d'excalibur:");
+                sender.sendMessage("§cListe des stands chargées d'excalibur:");
                 for (ExcaliburStand stand : ExcaliburSystem.getExcaliburStands()) {
                     // Afficher infos du stand : Nom, Durabilité, Position
                     sender.sendMessage("§c" + stand.getStandName() + "(" + stand.getStandId() + ")");
@@ -49,7 +49,14 @@ public class ExcaliburCommand implements CommandExecutor, TabCompleter {
                     try {
                         int numStand = Integer.parseInt(args[1]);
                         // despawn excalibur
-                        ExcaliburStand.despawn(numStand);
+                        if (ExcaliburSystem.getExcaliburStands().size() > numStand) {
+                            ExcaliburStand.despawn(numStand);
+                            sender.sendMessage("§aExcalibur despawn avec succès !");
+                            return true;
+                        } else {
+                            sender.sendMessage("§cCe stand n'existe pas !");
+                            return true;
+                        }
                     } catch (NumberFormatException e) {}
                 }
 

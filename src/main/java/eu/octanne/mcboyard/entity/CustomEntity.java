@@ -1,64 +1,63 @@
 package eu.octanne.mcboyard.entity;
 
-import com.google.common.collect.ImmutableMap;
-import net.minecraft.server.v1_16_R3.*;
-import net.minecraft.server.v1_16_R3.EntityTypes.Builder;
-import sun.misc.Unsafe;
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.modules.ExcaliburSystem;
+import net.minecraft.server.v1_16_R3.EntityArmorStand;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.persistence.CraftPersistentDataContainer;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public class CustomEntity {
+public class CustomEntity implements Listener {
 
-    public static EntityTypes<ExcaliburStand> EXCALIBUR_STAND;
-
-    public static void registerEntities() {
-        try {
-            EXCALIBUR_STAND = registerEntity("armor_stand",
-                    Builder.a(EntityArmorStand::new, EnumCreatureType.MISC).a(0.5F, 1.975F).trackingRange(10),
-                    null);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException | NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+    @EventHandler
+    public void onLoadEntities(EntityAddToWorldEvent e) {
+        CraftEntity entity = (CraftEntity) e.getEntity();
+        Location loc = entity.getLocation();
+        if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getHandle() instanceof EntityArmorStand
+                && !(entity.getHandle() instanceof ExcaliburStand)) {
+            // Load ExcaliburStand
+            NamespacedKey escaliburStand_name = new NamespacedKey("excalibur","excalibur_stand");
+            if (entity.getPersistentDataContainer().has(escaliburStand_name, PersistentDataType.TAG_CONTAINER)) {
+                CraftPersistentDataContainer nbtC = (CraftPersistentDataContainer) e.getEntity().getPersistentDataContainer()
+                        .get(escaliburStand_name, PersistentDataType.TAG_CONTAINER);
+                if (nbtC != null) {
+                    NBTTagCompound nbt = nbtC.toTagCompound();
+                    // log nbt
+                    int standID = nbt.getInt("standID");
+                    int nbSwordDurability = nbt.getInt("nbSwordDurability");
+                    McBoyard.instance.getLogger().info("ExcaliburStand prepare to load ! (" + standID + ") " + nbt.toString());
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            ExcaliburStand.spawn(loc, nbSwordDurability, standID);
+                            entity.remove();
+                            McBoyard.instance.getLogger().info("ExcaliburStand loaded ! (" + standID + ") " + nbt.toString());
+                        }
+                    }.runTaskLater(McBoyard.instance, 0);
+                }
+            }
         }
     }
 
-    private static <T extends Entity> EntityTypes<T> registerEntity(String s, Builder entitytypes_builder, AttributeProvider.Builder attributesBuilder) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
-        Class<EntityTypes> clazz = EntityTypes.class;
-        Method aMethod = clazz.getDeclaredMethod("a", String.class, Builder.class);
-        aMethod.setAccessible(true);
-
-        EntityTypes<T> type = (EntityTypes<T>) aMethod.invoke(null, s, entitytypes_builder);
-
-        final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-        unsafeField.setAccessible(true);
-        final Unsafe unsafe = (Unsafe) unsafeField.get(null);
-
-        Field entityTypesField = EntityTypes.class.getField(s);
-        entityTypesField.setAccessible(true);
-        Object staticFieldBase = unsafe.staticFieldBase(entityTypesField);
-        long staticFieldOffset = unsafe.staticFieldOffset(entityTypesField);
-        unsafe.putObject(staticFieldBase, staticFieldOffset, type);
-
-        Field attributesMapField = AttributeDefaults.class.getDeclaredField("b");
-        attributesMapField.setAccessible(true);
-        Map<EntityTypes<? extends EntityLiving>, AttributeProvider> attributesMap = (Map<EntityTypes<? extends EntityLiving>, AttributeProvider>) attributesMapField.get(null);
-        if (attributesMap instanceof ImmutableMap) {
-            attributesMap = new HashMap<>(attributesMap);
-            staticFieldBase = unsafe.staticFieldBase(attributesMapField);
-            staticFieldOffset = unsafe.staticFieldOffset(attributesMapField);
-            unsafe.putObject(staticFieldBase, staticFieldOffset, attributesMap);
+    @EventHandler
+    public void onRemoveEntities(EntityRemoveFromWorldEvent e) {
+        if (e.getEntityType().equals(EntityType.ARMOR_STAND) && ((CraftEntity)e.getEntity()).getHandle() instanceof ExcaliburStand) {
+            ExcaliburStand stand = (ExcaliburStand) ((CraftEntity)e.getEntity()).getHandle();
+            ExcaliburSystem.removeExcaliburStand(stand);
+            McBoyard.instance.getLogger().info("ExcaliburStand unloaded ! (" + stand.getStandName() + ")");
         }
-        attributesMap.put(type, attributesBuilder.a());
-
-
-        return type;
     }
 
 }

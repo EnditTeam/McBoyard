@@ -7,8 +7,12 @@ import eu.octanne.mcboyard.entity.CustomEntity;
 import eu.octanne.mcboyard.modules.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class McBoyard extends JavaPlugin {
 	
@@ -39,23 +43,25 @@ public class McBoyard extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		
 		instance = Bukkit.getPluginManager().getPlugin("McBoyard");
-		config = YamlConfiguration.loadConfiguration(fileConfig);
-		if(!fileConfig.exists()) {
-			try {
-				fileConfig.getParentFile().mkdirs();
-				fileConfig.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		instanceModules();
-	}
+		Bukkit.getPluginManager().registerEvents(new CustomEntity(), this);
 
-	@Override
-	public void onLoad() {
-		CustomEntity.registerEntities();
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				config = YamlConfiguration.loadConfiguration(fileConfig);
+				if(!fileConfig.exists()) {
+					try {
+						fileConfig.getParentFile().mkdirs();
+						fileConfig.createNewFile();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				instanceModules();
+			}
+		}.runTaskLater(this, 1);
 	}
 	
 	@Override
