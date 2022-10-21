@@ -56,4 +56,10 @@ public class ExcaliburSystem extends PlugModule {
 	public static boolean hadExcaliburStand(ExcaliburStand stand) {
 		return excaliburStands.contains(stand);
 	}
+
+	public static void putBackAllExcalibur() {
+		for(ExcaliburStand stand : excaliburStands) {
+			stand.putBackSword();
+		}
+	}
 }

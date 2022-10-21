@@ -57,16 +57,51 @@ public class ExcaliburCommand implements CommandExecutor, TabCompleter {
                             sender.sendMessage("§cCe stand n'existe pas !");
                             return true;
                         }
-                    } catch (NumberFormatException e) {}
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage("Le numéro du stand doit être un nombre !");
+                        return true;
+                    }
                 }
 
                 sender.sendMessage("§cUsage: /excalibur despawn <numStand>, pour despawn un stand d'excalibur.");
                 return true;
+            } else if (args[0].equalsIgnoreCase("put")) {
+                //  check if args[1] is a number
+                if (args.length == 2) {
+                    try {
+                        int numStand = Integer.parseInt(args[1]);
+                        // put sword in excalibur
+                        if (ExcaliburSystem.getExcaliburStands().size() > numStand) {
+                            ExcaliburStand stand = ExcaliburSystem.getExcaliburStands().get(numStand);
+                            stand.putBackSword();
+                            sender.sendMessage("§aExcalibur remis sur " + stand.getStandName() + " avec succès !");
+                            return true;
+                        } else {
+                            sender.sendMessage("§cCe stand n'existe pas !");
+                            return true;
+                        }
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage("Le numéro du stand doit être un nombre !");
+                        return true;
+                    }
+                }
+
+                sender.sendMessage("§cUsage: /excalibur put <numStand>, pour remettre l'épée sur un stand d'excalibur.");
+                return true;
+            } else if (args[0].equalsIgnoreCase("putall")) {
+                // put all sword in excalibur
+                for (ExcaliburStand stand : ExcaliburSystem.getExcaliburStands()) {
+                    stand.putBackSword();
+                }
+                sender.sendMessage("§aExcalibur remis sur tous les stands avec succès !");
+                return true;
             } else if (args[0].equalsIgnoreCase("help")) {
                 sender.sendMessage("§cListe des commandes:");
-                sender.sendMessage("§c- /excalibur spawn <nbDurability>, pour spawn un stand d'excalibur.");
-                sender.sendMessage("§c- /excalibur list, pour lister les stands d'excalibur.");
-                sender.sendMessage("§c- /excalibur despawn <numStand>, pour despawn un stand d'excalibur.");
+                sender.sendMessage("§c/excalibur spawn <nbDurability>, pour spawn un stand d'excalibur.");
+                sender.sendMessage("§c/excalibur list, pour lister les stands d'excalibur.");
+                sender.sendMessage("§c/excalibur despawn <numStand>, pour despawn un stand d'excalibur.");
+                sender.sendMessage("§c/excalibur put <numStand>, pour remettre l'épée sur un stand d'excalibur.");
+                sender.sendMessage("§c/excalibur putall, pour remettre l'épée sur tous les stands d'excalibur.");
                 return true;
             } else {
                 sender.sendMessage("§cUsage: /excalibur help, pour l'aide.");

@@ -20,15 +20,12 @@ public class ExcaliburStand extends EntityArmorStand {
 
     private boolean toRemove = false;
 
-    public ExcaliburStand(EntityTypes entityTypes, World world) {
-        super(entityTypes, world);
-    }
     public ExcaliburStand(World world, Location loc, int nbSwordDurability, int standID) {
         super(EntityTypes.ARMOR_STAND, world);
 
         this.standID = standID;
         this.nbSwordDurability = nbSwordDurability;
-        lockInventory();
+        //lockInventory();
         super.setInvisible(true);
         super.setInvulnerable(true);
         super.setNoGravity(true);
@@ -122,8 +119,14 @@ public class ExcaliburStand extends EntityArmorStand {
 
     @Override
     public EnumInteractionResult a(EntityHuman entityhuman, Vec3D vec3d, EnumHand enumhand) {
-        McBoyard.instance.getLogger().info("Interact with "+getStandName());
-        return super.a(entityhuman, vec3d, enumhand);
+        Bukkit.broadcastMessage("a(1,2,3) Interact with "+getStandName());
+        return EnumInteractionResult.PASS;
+    }
+
+    @Override
+    public EnumInteractionResult a(EntityHuman entityhuman, EnumHand enumhand) {
+        Bukkit.broadcastMessage("a(1,2) Interact with "+getStandName());
+        return EnumInteractionResult.PASS;
     }
 
     @Override
