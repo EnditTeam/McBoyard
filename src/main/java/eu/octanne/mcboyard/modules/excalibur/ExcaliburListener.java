@@ -10,14 +10,5 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 public class ExcaliburListener implements Listener {
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractAtEntityEvent e) {
-        // check if interact with ExcaliburStand
-        if (((CraftEntity)e.getRightClicked()).getHandle().getEntityType() == EntityTypes.ARMOR_STAND &&
-        ((CraftEntity) e.getRightClicked()).getHandle() instanceof ExcaliburStand) {
-            ExcaliburStand stand = (ExcaliburStand) ((CraftEntity)e.getRightClicked()).getHandle();
-            // give sword to player
-            stand.takeSword(e.getPlayer());
-            e.setCancelled(true);
-        }
-    }
+    public void onPlayerInteract(PlayerInteractAtEntityEvent e) {}
 }

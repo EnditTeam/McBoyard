@@ -83,11 +83,18 @@ public class ExcaliburStand extends EntityArmorStand {
         ExcaliburSystem.addExcaliburStand(stand);
     }
 
-    public static void despawn(int numStand) {
-        ExcaliburStand stand = ExcaliburSystem.getExcaliburStands().get(numStand);
-        stand.toRemove = true;
-        stand.die();
-        ExcaliburSystem.removeExcaliburStand(stand);
+    public static boolean despawn(int numStand) {
+        // Search excalibur stand with numStand
+        for(ExcaliburStand stand : ExcaliburSystem.getExcaliburStands()) {
+            if(stand.standID == numStand) {
+                stand.toRemove = true;
+                stand.die();
+                ExcaliburSystem.removeExcaliburStand(stand);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public int getNbSwordDurability() {
@@ -119,14 +126,12 @@ public class ExcaliburStand extends EntityArmorStand {
 
     @Override
     public EnumInteractionResult a(EntityHuman entityhuman, Vec3D vec3d, EnumHand enumhand) {
-        Bukkit.broadcastMessage("a(1,2,3) Interact with "+getStandName());
-        return EnumInteractionResult.PASS;
-    }
-
-    @Override
-    public EnumInteractionResult a(EntityHuman entityhuman, EnumHand enumhand) {
-        Bukkit.broadcastMessage("a(1,2) Interact with "+getStandName());
-        return EnumInteractionResult.PASS;
+        // Take Sword
+        if(entityhuman.getBukkitEntity() instanceof Player) {
+            takeSword((Player) entityhuman.getBukkitEntity());
+            entityhuman.getBukkitEntity().sendMessage("§aVous avez récupéré l'épée d'Excalibur !");
+        }
+        return EnumInteractionResult.SUCCESS;
     }
 
     @Override
@@ -144,12 +149,12 @@ public class ExcaliburStand extends EntityArmorStand {
         if (ExcaliburSystem.firstUpdate == standID) {
             ExcaliburSystem.firstUpdate = -2;
             // Log fin des réenregistrements
-            McBoyard.instance.getLogger().info("Fin des réenregistrements des ExcaliburStand");
+            McBoyard.instance.getLogger().info("Re-enregistrement des ExcaliburStand terminé !");
         }
         else if (ExcaliburSystem.firstUpdate != -2 && !ExcaliburSystem.hadExcaliburStand(this)) {
             ExcaliburSystem.addExcaliburStand(this);
             // log le réenregistrement de l'entité
-            McBoyard.instance.getLogger().info("Réenregistrement de l'entité "+getStandName());
+            McBoyard.instance.getLogger().info("Re-enregistrement de "+getStandName());
             if (ExcaliburSystem.firstUpdate == -1) ExcaliburSystem.firstUpdate = standID;
         }
     }

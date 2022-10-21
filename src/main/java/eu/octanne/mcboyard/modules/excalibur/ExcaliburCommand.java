@@ -49,8 +49,7 @@ public class ExcaliburCommand implements CommandExecutor, TabCompleter {
                     try {
                         int numStand = Integer.parseInt(args[1]);
                         // despawn excalibur
-                        if (ExcaliburSystem.getExcaliburStands().size() > numStand) {
-                            ExcaliburStand.despawn(numStand);
+                        if (ExcaliburStand.despawn(numStand)) {
                             sender.sendMessage("§aExcalibur despawn avec succès !");
                             return true;
                         } else {
@@ -90,9 +89,7 @@ public class ExcaliburCommand implements CommandExecutor, TabCompleter {
                 return true;
             } else if (args[0].equalsIgnoreCase("putall")) {
                 // put all sword in excalibur
-                for (ExcaliburStand stand : ExcaliburSystem.getExcaliburStands()) {
-                    stand.putBackSword();
-                }
+                ExcaliburSystem.putBackAllExcalibur();
                 sender.sendMessage("§aExcalibur remis sur tous les stands avec succès !");
                 return true;
             } else if (args[0].equalsIgnoreCase("help")) {
