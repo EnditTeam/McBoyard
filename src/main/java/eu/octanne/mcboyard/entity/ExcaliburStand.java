@@ -15,7 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 public class ExcaliburStand extends EntityArmorStand {
 
     private int nbSwordDurability = 5;
-    private boolean hasSword = false;
+    private boolean hasSword = true;
     private int standID;
 
     private boolean toRemove = false;
@@ -49,7 +49,7 @@ public class ExcaliburStand extends EntityArmorStand {
             p.getInventory().addItem(sword);
             hasSword = false;
             // remove sword in hand
-            super.setSlot(EnumItemSlot.HEAD, new ItemStack(net.minecraft.server.v1_16_R3.Items.AIR));
+            super.setSlot(EnumItemSlot.HEAD, new net.minecraft.server.v1_16_R3.ItemStack(net.minecraft.server.v1_16_R3.Items.AIR));
         }
     }
 
@@ -58,6 +58,7 @@ public class ExcaliburStand extends EntityArmorStand {
         super.setSlot(EnumItemSlot.HEAD, new net.minecraft.server.v1_16_R3.ItemStack(net.minecraft.server.v1_16_R3.Items.IRON_SWORD));
         // set durability of sword
         super.getEquipment(EnumItemSlot.MAINHAND).setDamage(nbSwordDurability);
+        hasSword = true;
     }
 
     public void lockInventory() {
