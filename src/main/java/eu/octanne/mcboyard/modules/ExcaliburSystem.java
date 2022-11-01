@@ -3,6 +3,7 @@ package eu.octanne.mcboyard.modules;
 import eu.octanne.mcboyard.entity.ExcaliburStand;
 import eu.octanne.mcboyard.modules.excalibur.ExcaliburCommand;
 import eu.octanne.mcboyard.modules.excalibur.ExcaliburListener;
+import eu.octanne.mcboyard.modules.excalibur.StandKey;
 import net.minecraft.server.v1_16_R3.EntityTypes;
 import net.minecraft.server.v1_16_R3.EnumCreatureType;
 import org.bukkit.Bukkit;
@@ -34,11 +35,12 @@ public class ExcaliburSystem extends PlugModule {
 		pl.getCommand("excalibur").setTabCompleter(excaliburCommand);
 		Bukkit.getPluginManager().registerEvents(new ExcaliburListener(), pl);
 		excaliburStands.clear();
+		StandKey.clearStandKeys();
 		firstUpdate = -1;
 	}
 	
 	public void onDisable() {
-
+		StandKey.markAllStandToUpdate();
 	}
 
 	public static List<ExcaliburStand> getExcaliburStands() {

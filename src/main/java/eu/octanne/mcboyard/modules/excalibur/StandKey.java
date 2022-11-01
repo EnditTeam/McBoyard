@@ -22,6 +22,7 @@ public class StandKey {
 
     private final UUID id;
     private boolean isComplete;
+    private boolean toUpdate = false;
 
     public StandKey(String locWorld, double locX, double locY, double locZ) {
         this.locStand = new double[]{locX, locY, locZ};
@@ -40,6 +41,16 @@ public class StandKey {
 
         this.id = id;
         isComplete = false;
+    }
+
+    public static void clearStandKeys() {
+        standKeys.clear();
+    }
+
+    public static void markAllStandToUpdate() {
+        for (StandKey standKey : standKeys) {
+            standKey.toUpdate = true;
+        }
     }
 
     public boolean attachMiddleEntity(MiddleEntity middleEntity) {
@@ -71,6 +82,26 @@ public class StandKey {
                 && this.crochetEntities[2] != null && this.crochetEntities[3] != null) {
             isComplete = true;
         }
+        return true;
+    }
+
+    public boolean detachCrochetEntity(CrochetEntity crochetEntity) {
+        for (int i = 0; i < crochetEntities.length; i++) {
+            if (crochetEntities[i] != null && crochetEntities[i].getStandKeyID().equals(crochetEntity.getStandKeyID())) {
+                crochetEntities[i] = null;
+                break;
+            }
+        }
+        if (this.crochetEntities[0] == null || this.crochetEntities[1] == null
+                || this.crochetEntities[2] == null || this.crochetEntities[3] == null) {
+            isComplete = false;
+        }
+        return true;
+    }
+
+    public boolean detachMiddleEntity() {
+        this.middleEntity = null;
+        isComplete = false;
         return true;
     }
 
@@ -136,7 +167,8 @@ public class StandKey {
     }
 
     public void delete() {
-        // TODO
+        standKeys.remove(this);
+        despawn();
     }
 
     public static List<StandKey> getStandKeys() {
@@ -152,16 +184,6 @@ public class StandKey {
         return Optional.empty();
     }
 
-    public static boolean removeStandKey(StandKey standKey) {
-        // TODO remove stand key
-        return false;
-    }
-
-    public static Optional<StandKey> createStandKey(String locWorld, double locX, double locY, double locZ) {
-        // TODO create stand key
-        return Optional.empty();
-    }
-
     public static StandKey getStandKeyRegenIfNotLoad(UUID idStandKey) {
         Optional<StandKey> standKey = getStandKey(idStandKey);
         if (standKey.isPresent()) {
@@ -170,6 +192,43 @@ public class StandKey {
             StandKey standKey1 = new StandKey(idStandKey);
             standKeys.add(standKey1);
             return standKey1;
+        }
+    }
+
+    public static boolean removeStandKey(UUID standKeyID) {
+        Optional<StandKey> standKey = getStandKey(standKeyID);
+        if (standKey.isPresent()) {
+            standKey.get().despawn();
+            standKeys.remove(standKey.get());
+            return true;
+        } else return false;
+    }
+
+    public static Optional<StandKey> createStandKey(String locWorld, double locX, double locY, double locZ) {
+        // check if standkey is already exist
+        for (StandKey standKey : standKeys) {
+            if (standKey.locWorld.equals(locWorld) && standKey.locStand[0] == locX
+                    && standKey.locStand[1] == locY && standKey.locStand[2] == locZ) {
+                return Optional.empty();
+            }
+        }
+
+        StandKey standKey = new StandKey(locWorld, locX, locY, locZ);
+        standKeys.add(standKey);
+        return Optional.of(standKey);
+    }
+
+    public boolean isUpdate() {
+        return !toUpdate;
+    }
+
+    public boolean updateStandKeyInstance() {
+        if (toUpdate && !standKeys.contains(this)) {
+            toUpdate = false;
+            standKeys.add(this);
+            return true;
+        } else {
+            return false;
         }
     }
 }

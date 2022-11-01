@@ -30,6 +30,12 @@ public class MiddleEntity extends EntityArmorStand {
 
     @Override
     public void tick() {
+        if (!standKey.isUpdate()) {
+            McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" lance la mise à jour");
+            if (standKey.updateStandKeyInstance())
+                McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" a fini la mise à jour");
+            else McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" erreur lors de la mise à jour");
+        }
         super.tick();
     }
 

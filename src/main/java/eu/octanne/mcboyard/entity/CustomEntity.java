@@ -50,6 +50,20 @@ public class CustomEntity implements Listener {
             ExcaliburSystem.removeExcaliburStand(stand);
             McBoyard.instance.getLogger().info("ExcaliburStand unloaded ! (" + stand.getStandName() + ")");
         }
+        // Unload MiddleEntity
+        if (e.getEntityType().equals(EntityType.ARMOR_STAND) &&
+                ((CraftEntity)e.getEntity()).getHandle() instanceof MiddleEntity) {
+            MiddleEntity stand = (MiddleEntity) ((CraftEntity)e.getEntity()).getHandle();
+            StandKey.getStandKey(stand.getStandKeyID()).ifPresent(StandKey::detachMiddleEntity);
+            McBoyard.instance.getLogger().info("MiddleEntity unloaded ! (" + stand.getStandKeyID() + ")");
+        }
+        // Unload CrochetEntity
+        if (e.getEntityType().equals(EntityType.ARMOR_STAND) &&
+                ((CraftEntity)e.getEntity()).getHandle() instanceof CrochetEntity) {
+            CrochetEntity stand = (CrochetEntity) ((CraftEntity)e.getEntity()).getHandle();
+            StandKey.getStandKey(stand.getStandKeyID()).ifPresent(standKey -> standKey.detachCrochetEntity(stand));
+            McBoyard.instance.getLogger().info("CrochetEntity unloaded ! (" + stand.getStandKeyID() + ")");
+        }
     }
 
     private static void loadExcaliburStand(EntityAddToWorldEvent e, CraftEntity entity, Location loc) {

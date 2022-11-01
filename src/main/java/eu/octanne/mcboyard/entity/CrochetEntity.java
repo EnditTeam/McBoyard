@@ -30,6 +30,12 @@ public class CrochetEntity extends EntitySlime {
 
     @Override
     public void tick() {
+        if (!standKey.isUpdate()) {
+            McBoyard.instance.getLogger().info("CrochetEntity de StandKey : "+getStandKeyID()+" lance la mise à jour");
+            if (standKey.updateStandKeyInstance())
+                McBoyard.instance.getLogger().info("CrochetEntity de StandKey : "+getStandKeyID()+" a fini la mise à jour");
+            else McBoyard.instance.getLogger().info("CrochetEntity de StandKey : "+getStandKeyID()+" erreur lors de la mise à jour");
+        }
         super.tick();
     }
 
