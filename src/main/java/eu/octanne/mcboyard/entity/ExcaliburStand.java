@@ -25,7 +25,6 @@ public class ExcaliburStand extends EntityArmorStand {
 
         this.standID = standID;
         this.nbSwordDurability = nbSwordDurability;
-        //lockInventory();
         super.setInvisible(true);
         super.setInvulnerable(true);
         super.setNoGravity(true);
