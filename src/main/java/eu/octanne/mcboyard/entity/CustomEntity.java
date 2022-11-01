@@ -25,37 +25,43 @@ public class CustomEntity implements Listener {
         Location loc = entity.getLocation();
         if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getHandle() instanceof EntityArmorStand
                 && !(entity.getHandle() instanceof ExcaliburStand)) {
-            // Load ExcaliburStand
-            NamespacedKey escaliburStand_name = new NamespacedKey("excalibur","excalibur_stand");
-            if (entity.getPersistentDataContainer().has(escaliburStand_name, PersistentDataType.TAG_CONTAINER)) {
-                CraftPersistentDataContainer nbtC = (CraftPersistentDataContainer) e.getEntity().getPersistentDataContainer()
-                        .get(escaliburStand_name, PersistentDataType.TAG_CONTAINER);
-                if (nbtC != null) {
-                    NBTTagCompound nbt = nbtC.toTagCompound();
-                    // log nbt
-                    int standID = nbt.getInt("standID");
-                    int nbSwordDurability = nbt.getInt("nbSwordDurability");
-                    McBoyard.instance.getLogger().info("ExcaliburStand prepare to load ! (" + standID + ") " + nbt.toString());
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            ExcaliburStand.spawn(loc, nbSwordDurability, standID);
-                            entity.remove();
-                            McBoyard.instance.getLogger().info("ExcaliburStand loaded ! (" + standID + ") " + nbt.toString());
-                        }
-                    }.runTaskLater(McBoyard.instance, 0);
-                }
-            }
+            loadExcaliburStand(e, entity, loc);
         }
     }
 
     @EventHandler
     public void onRemoveEntities(EntityRemoveFromWorldEvent e) {
-        if (e.getEntityType().equals(EntityType.ARMOR_STAND) && ((CraftEntity)e.getEntity()).getHandle() instanceof ExcaliburStand) {
+        // Unload ExcaliburStand
+        if (e.getEntityType().equals(EntityType.ARMOR_STAND) &&
+                ((CraftEntity)e.getEntity()).getHandle() instanceof ExcaliburStand) {
             ExcaliburStand stand = (ExcaliburStand) ((CraftEntity)e.getEntity()).getHandle();
             ExcaliburSystem.removeExcaliburStand(stand);
             McBoyard.instance.getLogger().info("ExcaliburStand unloaded ! (" + stand.getStandName() + ")");
         }
+
     }
 
+    private static void loadExcaliburStand(EntityAddToWorldEvent e, CraftEntity entity, Location loc) {
+        // Load ExcaliburStand
+        NamespacedKey escaliburStand_name = new NamespacedKey("excalibur","excalibur_stand");
+        if (entity.getPersistentDataContainer().has(escaliburStand_name, PersistentDataType.TAG_CONTAINER)) {
+            CraftPersistentDataContainer nbtC = (CraftPersistentDataContainer) e.getEntity().getPersistentDataContainer()
+                    .get(escaliburStand_name, PersistentDataType.TAG_CONTAINER);
+            if (nbtC != null) {
+                NBTTagCompound nbt = nbtC.toTagCompound();
+                // log nbt
+                int standID = nbt.getInt("standID");
+                int nbSwordDurability = nbt.getInt("nbSwordDurability");
+                McBoyard.instance.getLogger().info("ExcaliburStand prepare to load ! (" + standID + ") " + nbt.toString());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        ExcaliburStand.spawn(loc, nbSwordDurability, standID);
+                        entity.remove();
+                        McBoyard.instance.getLogger().info("ExcaliburStand loaded ! (" + standID + ") " + nbt.toString());
+                    }
+                }.runTaskLater(McBoyard.instance, 0);
+            }
+        }
+    }
 }
