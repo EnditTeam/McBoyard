@@ -4,6 +4,10 @@ import eu.octanne.mcboyard.entity.CrochetEntity;
 import eu.octanne.mcboyard.entity.MiddleEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.FaceAttachable;
+import org.bukkit.block.data.type.Grindstone;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
@@ -156,14 +160,38 @@ public class StandKey {
         // TODO construct crochet entities
     }
 
+    public void reset() {
+        // TODO reset crochet entities
+    }
+
     public List<Location> getBlocksLoc() {
         List<Location> locs = new ArrayList<>();
-        // TODO get blocks loc
+        // Loc Left Top
+        locs.add(new Location(Bukkit.getWorld(locWorld), locStand[0]-2, locStand[1]+1, locStand[2]-2));
+        // Loc Right Top
+        locs.add(new Location(Bukkit.getWorld(locWorld), locStand[0]+2, locStand[1]+1, locStand[2]+2));
+        // Loc Left Bottom
+        locs.add(new Location(Bukkit.getWorld(locWorld), locStand[0]-2, locStand[1]+1, locStand[2]+2));
+        // Loc Right Bottom
+        locs.add(new Location(Bukkit.getWorld(locWorld), locStand[0]+2, locStand[1]+1, locStand[2]-2));
+        // Loc anvil
+        locs.add(new Location(Bukkit.getWorld(locWorld), locStand[0], locStand[1], locStand[2]));
         return locs;
     }
 
     private void setBlocks() {
-        // TODO setblock of crochet & middle stand
+        int i = 0;
+        for (Location loc : getBlocksLoc()) {
+            if (i == 4) {
+                loc.getBlock().setType(org.bukkit.Material.ANVIL);
+            } else {
+                loc.getBlock().setType(Material.GRINDSTONE);
+                Grindstone grindstone = (Grindstone) loc.getBlock().getBlockData();
+                grindstone.setAttachedFace(FaceAttachable.AttachedFace.FLOOR);
+                grindstone.setFacing(BlockFace.SOUTH);
+            }
+            i++;
+        }
     }
 
     public void delete() {

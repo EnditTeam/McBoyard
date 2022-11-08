@@ -3,7 +3,6 @@ package eu.octanne.mcboyard.entity;
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.ExcaliburSystem;
 import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
