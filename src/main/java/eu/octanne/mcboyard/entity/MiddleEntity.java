@@ -17,6 +17,18 @@ public class MiddleEntity extends EntityArmorStand {
 
     private StandKey standKey;
 
+    public MiddleEntity(World world, Location loc, StandKey standKey) {
+        super(EntityTypes.ARMOR_STAND, world);
+        this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+
+        toDie = false;
+        this.setSilent(true);
+        this.setInvulnerable(true);
+        this.standKeyID = standKey.getID();
+        this.standKey = standKey;
+        world.addEntity(this);
+    }
+
     public MiddleEntity(World world, Location loc, UUID standKeyID) {
         super(EntityTypes.ARMOR_STAND, world);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());

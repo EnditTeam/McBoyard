@@ -17,6 +17,18 @@ public class CrochetEntity extends EntitySlime {
 
     private StandKey standKey;
 
+    public CrochetEntity(World world, Location loc, StandKey standKey) {
+        super(EntityTypes.SLIME, world);
+        this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+
+        this.toDie = false;
+        this.setSilent(true);
+        this.setInvulnerable(true);
+        this.standKeyID = standKey.getID();
+        this.standKey = standKey;
+        world.addEntity(this);
+    }
+
     public CrochetEntity(World world, Location loc, UUID standKeyID) {
         super(EntityTypes.SLIME, world);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());

@@ -162,10 +162,10 @@ public class StandKey {
         for (Location loc : getBlocksLoc()) {
             if (i == 4) {
                 // Middle Entity
-                middleEntity = new MiddleEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this.getID());
+                middleEntity = new MiddleEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this);
             } else {
                 // Crochet Entity
-                crochetEntityList.add(new CrochetEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this.getID()));
+                crochetEntityList.add(new CrochetEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this));
             }
             i++;
         }
