@@ -78,4 +78,27 @@ public class CrochetEntity extends EntitySlime {
 
         return standKey;
     }
+
+    public boolean attachStringFromMiddle() {
+        if (!isAttachToMiddle()) {
+            this.setLeashHolder(getStandKey().getMiddleEntity(), true);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean detachStringFromMiddle() {
+        // TODO add animation
+        if (isAttachToMiddle()) {
+            this.unleash(true, false);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isAttachToMiddle() {
+        return this.getLeashHolder() != null;
+    }
 }

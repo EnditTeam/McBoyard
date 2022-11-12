@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.FaceAttachable;
 import org.bukkit.block.data.type.Grindstone;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
@@ -32,7 +33,7 @@ public class StandKey {
         this.locStand = new double[]{locX, locY, locZ};
         this.locWorld = locWorld;
 
-        constructCrochetEntities();
+        constructCrochetAndMiddleEntities();
         setBlocks();
 
         id = UUID.randomUUID();
@@ -40,7 +41,7 @@ public class StandKey {
     }
 
     public StandKey(UUID id) {
-        constructCrochetEntities();
+        constructCrochetAndMiddleEntities();
         setBlocks();
 
         this.id = id;
@@ -137,7 +138,7 @@ public class StandKey {
             crochetEntity.despawn();
         }
         middleEntity.despawn();
-        constructCrochetEntities();
+        constructCrochetAndMiddleEntities();
         setBlocks();
     }
 
@@ -155,13 +156,27 @@ public class StandKey {
         } else return false;
     }
 
-    private void constructCrochetEntities() {
-        crochetEntities = new CrochetEntity[4];
-        // TODO construct crochet entities
+    private void constructCrochetAndMiddleEntities() {
+        List<CrochetEntity> crochetEntityList = new ArrayList<>();
+        int i = 0;
+        for (Location loc : getBlocksLoc()) {
+            if (i == 4) {
+                // Middle Entity
+                middleEntity = new MiddleEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this.getID());
+            } else {
+                // Crochet Entity
+                crochetEntityList.add(new CrochetEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this.getID()));
+            }
+            i++;
+        }
+        crochetEntities = crochetEntityList.toArray(new CrochetEntity[0]);
+        reset();
     }
 
     public void reset() {
-        // TODO reset crochet entities
+        for (CrochetEntity crochetEntity : crochetEntities) {
+            crochetEntity.attachStringFromMiddle();
+        }
     }
 
     public List<Location> getBlocksLoc() {
@@ -197,6 +212,10 @@ public class StandKey {
     public void delete() {
         standKeys.remove(this);
         despawn();
+    }
+
+    public MiddleEntity getMiddleEntity() {
+        return middleEntity;
     }
 
     public static List<StandKey> getStandKeys() {
