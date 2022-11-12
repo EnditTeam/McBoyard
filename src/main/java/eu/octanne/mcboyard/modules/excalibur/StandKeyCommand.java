@@ -25,7 +25,6 @@ public class StandKeyCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (args[0].equalsIgnoreCase("spawn")) {
-                int nbDurability = Integer.parseInt(args[1]);
                 // apparition du standKey
                 Location loc = ((Player) sender).getLocation();
                 Optional<StandKey> standKey = StandKey.createStandKey(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ());
