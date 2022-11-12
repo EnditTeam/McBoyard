@@ -32,19 +32,21 @@ public class StandKey {
     public StandKey(String locWorld, double locX, double locY, double locZ) {
         this.locStand = new double[]{locX, locY, locZ};
         this.locWorld = locWorld;
+        id = UUID.randomUUID();
 
         constructCrochetAndMiddleEntities();
         setBlocks();
 
-        id = UUID.randomUUID();
         isComplete = true;
     }
 
     public StandKey(UUID id) {
-        constructCrochetAndMiddleEntities();
-        setBlocks();
-
         this.id = id;
+        setBlocks();
+        // set crochet and middle entities to null
+        crochetEntities = new CrochetEntity[]{null, null, null, null};
+        middleEntity = null;
+
         isComplete = false;
     }
 
@@ -145,7 +147,6 @@ public class StandKey {
     public boolean entityIsStandKey(Entity entity) {
         if (((CraftEntity)entity).getHandle() instanceof MiddleEntity ||
                 ((CraftEntity)entity).getHandle() instanceof CrochetEntity) {
-            net.minecraft.server.v1_16_R3.Entity nmsEntity = ((CraftEntity)entity).getHandle();
             if (middleEntity.getBukkitEntity().equals(entity) ||
                     crochetEntities[0].getBukkitEntity().equals(entity) ||
                     crochetEntities[1].getBukkitEntity().equals(entity) ||

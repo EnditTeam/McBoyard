@@ -21,9 +21,7 @@ public class CrochetEntity extends EntitySlime {
         super(EntityTypes.SLIME, world);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
-        this.toDie = false;
-        this.setSilent(true);
-        this.setInvulnerable(true);
+        setTagEntity();
         this.standKeyID = standKey.getID();
         this.standKey = standKey;
         world.addEntity(this);
@@ -33,11 +31,17 @@ public class CrochetEntity extends EntitySlime {
         super(EntityTypes.SLIME, world);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
-        this.toDie = false;
-        this.setSilent(true);
-        this.setInvulnerable(true);
+        setTagEntity();
         this.standKeyID = standKeyID;
         world.addEntity(this);
+    }
+
+    private void setTagEntity() {
+        this.toDie = false;
+        this.setSilent(true);
+        this.setNoAI(true);
+        this.setNoGravity(true);
+        this.setInvulnerable(true);
     }
 
     @Override
@@ -54,7 +58,7 @@ public class CrochetEntity extends EntitySlime {
     @Override
     public void die() {
         if (toDie) {
-            this.die();
+            getBukkitEntity().remove();
         }
     }
 

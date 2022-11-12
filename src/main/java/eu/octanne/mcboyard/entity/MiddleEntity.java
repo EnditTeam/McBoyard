@@ -21,9 +21,7 @@ public class MiddleEntity extends EntityArmorStand {
         super(EntityTypes.ARMOR_STAND, world);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
-        toDie = false;
-        this.setSilent(true);
-        this.setInvulnerable(true);
+        setTagEntity();
         this.standKeyID = standKey.getID();
         this.standKey = standKey;
         world.addEntity(this);
@@ -33,11 +31,15 @@ public class MiddleEntity extends EntityArmorStand {
         super(EntityTypes.ARMOR_STAND, world);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
+        setTagEntity();
+        this.standKeyID = standKeyID;
+        world.addEntity(this);
+    }
+
+    private void setTagEntity() {
         toDie = false;
         this.setSilent(true);
         this.setInvulnerable(true);
-        this.standKeyID = standKeyID;
-        world.addEntity(this);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class MiddleEntity extends EntityArmorStand {
     @Override
     public void die() {
         if (toDie) {
-            this.die();
+            getBukkitEntity().remove();
         }
     }
 
