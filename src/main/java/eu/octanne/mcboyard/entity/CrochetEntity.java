@@ -42,6 +42,8 @@ public class CrochetEntity extends EntitySlime {
         this.setNoAI(true);
         this.setNoGravity(true);
         this.setInvulnerable(true);
+        this.setPersistent();
+        this.addEffect(new MobEffect(MobEffects.INVISIBILITY, 999999999, 0, false, false));
     }
 
     @Override
@@ -58,7 +60,7 @@ public class CrochetEntity extends EntitySlime {
     @Override
     public void die() {
         if (toDie) {
-            getBukkitEntity().remove();
+            super.die();
         }
     }
 
@@ -79,7 +81,7 @@ public class CrochetEntity extends EntitySlime {
 
     public void despawn() {
         this.toDie = true;
-        this.die();
+        getBukkitEntity().remove();
     }
 
     public UUID getStandKeyID() {

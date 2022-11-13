@@ -9,6 +9,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.FaceAttachable;
 import org.bukkit.block.data.type.Grindstone;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.impl.CraftAnvil;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
@@ -42,7 +43,7 @@ public class StandKey {
 
     public StandKey(UUID id) {
         this.id = id;
-        setBlocks();
+
         // set crochet and middle entities to null
         crochetEntities = new CrochetEntity[]{null, null, null, null};
         middleEntity = null;
@@ -66,9 +67,10 @@ public class StandKey {
         this.locWorld = middleEntity.getWorld().getWorld().getName();
         this.locStand = new double[]{
                 middleEntity.getBukkitEntity().getLocation().getX(),
-                middleEntity.getBukkitEntity().getLocation().getY(),
+                middleEntity.getBukkitEntity().getLocation().getY()-0.5,
                 middleEntity.getBukkitEntity().getLocation().getZ()
         };
+        setBlocks();
         if (this.crochetEntities[0] != null && this.crochetEntities[1] != null
                 && this.crochetEntities[2] != null && this.crochetEntities[3] != null) {
             isComplete = true;
@@ -163,10 +165,14 @@ public class StandKey {
         for (Location loc : getBlocksLoc()) {
             if (i == 4) {
                 // Middle Entity
-                middleEntity = new MiddleEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this);
+                Location locMiddle = loc.clone();
+                locMiddle.setY(locMiddle.getY() + 0.5);
+                middleEntity = new MiddleEntity(((CraftWorld)loc.getWorld()).getHandle(), locMiddle, this);
             } else {
                 // Crochet Entity
-                crochetEntityList.add(new CrochetEntity(((CraftWorld)loc.getWorld()).getHandle(), loc, this));
+                Location locCrochet = loc.clone();
+                locCrochet.setY(loc.getY() + 0.65);
+                crochetEntityList.add(new CrochetEntity(((CraftWorld)loc.getWorld()).getHandle(), locCrochet, this));
             }
             i++;
         }
@@ -199,12 +205,16 @@ public class StandKey {
         int i = 0;
         for (Location loc : getBlocksLoc()) {
             if (i == 4) {
-                loc.getBlock().setType(org.bukkit.Material.ANVIL);
+                loc.getBlock().setType(Material.DAMAGED_ANVIL);
+                CraftAnvil anvil = (CraftAnvil) loc.getBlock().getState().getBlockData();
+                anvil.setFacing(BlockFace.NORTH);
+                loc.getBlock().setBlockData(anvil);
             } else {
                 loc.getBlock().setType(Material.GRINDSTONE);
                 Grindstone grindstone = (Grindstone) loc.getBlock().getBlockData();
                 grindstone.setAttachedFace(FaceAttachable.AttachedFace.FLOOR);
                 grindstone.setFacing(BlockFace.SOUTH);
+                loc.getBlock().setBlockData(grindstone);
             }
             i++;
         }

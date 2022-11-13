@@ -39,14 +39,17 @@ public class MiddleEntity extends EntityArmorStand {
     private void setTagEntity() {
         toDie = false;
         this.setSilent(true);
+        this.setInvisible(true);
+        this.setArms(false);
+        this.setNoGravity(true);
         this.setInvulnerable(true);
     }
 
     @Override
     public void tick() {
-        if (!standKey.isUpdate()) {
+        if (!getStandKey().isUpdate()) {
             McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" lance la mise à jour");
-            if (standKey.updateStandKeyInstance())
+            if (getStandKey().updateStandKeyInstance())
                 McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" a fini la mise à jour");
             else McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" erreur lors de la mise à jour");
         }
@@ -56,7 +59,7 @@ public class MiddleEntity extends EntityArmorStand {
     @Override
     public void die() {
         if (toDie) {
-            getBukkitEntity().remove();
+            super.die();
         }
     }
 
@@ -72,12 +75,13 @@ public class MiddleEntity extends EntityArmorStand {
 
     @Override
     public EnumInteractionResult a(EntityHuman entityhuman, Vec3D vec3d, EnumHand enumhand) {
-        return super.a(entityhuman, vec3d, enumhand);
+        return EnumInteractionResult.PASS;
+        // super.a(entityhuman, vec3d, enumhand);
     }
 
     public void despawn() {
         this.toDie = true;
-        this.die();
+        getBukkitEntity().remove();
     }
 
     public UUID getStandKeyID() {
