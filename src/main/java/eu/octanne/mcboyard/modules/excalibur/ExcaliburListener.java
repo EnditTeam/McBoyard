@@ -1,17 +1,11 @@
 package eu.octanne.mcboyard.modules.excalibur;
 
-import eu.octanne.mcboyard.entity.standkey.CrochetEntity;
-import eu.octanne.mcboyard.entity.standkey.KeyEntity;
-import eu.octanne.mcboyard.entity.standkey.MiddleEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class ExcaliburListener implements Listener {

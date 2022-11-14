@@ -39,7 +39,7 @@ public class StandKey {
     private boolean isComplete;
 
     private int[] cordeResistance;
-    private static final int minDura = 4, maxDura = 8;
+    private static final int minDura = 12, maxDura = 12;
 
     public StandKey(String locWorld, double locX, double locY, double locZ) {
         this.locStand = new double[]{locX, locY, locZ};
