@@ -37,6 +37,7 @@ public class KeyEntity extends EntityArmorStand {
     public KeyEntity(World world, Location loc, StandKey standKey) {
         super(EntityTypes.ARMOR_STAND, world);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+        this.setYawPitch(loc.getYaw(), loc.getPitch());
 
         setTagEntity();
         this.standKeyID = standKey.getID();
