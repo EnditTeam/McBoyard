@@ -70,14 +70,14 @@ public class CrochetEntity extends EntitySlime {
     @Override
     public boolean damageEntity(DamageSource damagesource, float f) {
         if (toDie) return super.damageEntity(damagesource, f);
-        else {
+        else if (this.isAttachToMiddle()){
             if (damagesource.getEntity() != null && damagesource.getEntity().getEntityType().equals(EntityTypes.PLAYER) &&
                     ExcaliburListener.useSword((Player) damagesource.getEntity().getBukkitEntity())) {
                 getStandKey().attaquerCorde(this, (Player) damagesource.getEntity().getBukkitEntity());
             }
 
             return false;
-        }
+        } else return false;
     }
     @Override
     public void killEntity() {

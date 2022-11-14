@@ -23,7 +23,8 @@ public class ExcaliburListener implements Listener {
             for (StandKey standKey : StandKey.getStandKeys()) {
                 for (Location loc : standKey.getBlocksLoc()) {
                     if (loc.getBlock().equals(e.getClickedBlock())) {
-                        if (e.getAction().equals(Action.LEFT_CLICK_BLOCK) && useSword(e.getPlayer())) {
+                        if (e.getAction().equals(Action.LEFT_CLICK_BLOCK) && useSword(e.getPlayer())
+                                && e.getClickedBlock().getType().equals(Material.GRINDSTONE)) {
                             standKey.attaquerCorde(standKey.getCloserCrochet(e.getClickedBlock().getLocation()), e.getPlayer());
                         }
 
@@ -36,7 +37,8 @@ public class ExcaliburListener implements Listener {
     }
 
     public static boolean useSword(Player p) {
-        if (p.getInventory().getItemInMainHand().getType().equals(Material.IRON_SWORD)
+        if (p.getInventory().getItemInMainHand().getType().equals(Material.IRON_SWORD) && p.getInventory().getItemInMainHand().hasItemMeta()
+                && p.getInventory().getItemInMainHand().getItemMeta().hasDisplayName()
                 && p.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals("§bExcalibur")) {
             return true;
         } else {

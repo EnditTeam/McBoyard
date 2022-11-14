@@ -16,6 +16,9 @@ import org.bukkit.craftbukkit.v1_16_R3.block.impl.CraftAnvil;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -195,35 +198,39 @@ public class StandKey {
     }
 
     public boolean attaquerCorde(CrochetEntity en, Player p) {
-        if (!isComplete() && en.isAttachToMiddle()) return false;
+        if (!isComplete() || !en.isAttachToMiddle() || !p.getInventory().getItemInMainHand().getType().equals(Material.IRON_SWORD)) return false;
+        ItemStack item = p.getInventory().getItemInMainHand();
         for (int i = 0; i < crochetEntities.length; i++) {
-            if (crochetEntities[i].getStandKeyID().equals(en.getStandKeyID())) {
+            if (crochetEntities[i].equals(en)) {
                 cordeResistance[i] -= 1;
 
-                if (p.getItemOnCursor().getDurability() == 0) {
-                    p.getItemOnCursor().setAmount(0);
+                if (((Damageable)item.getItemMeta()).getDamage() == 250) {
+                    item.setAmount(0);
                 } else {
-                    p.getItemOnCursor().setDurability((short)(p.getItemOnCursor().getDurability() - 1));
+                    ItemMeta meta = item.getItemMeta();
+                    ((Damageable)meta).setDamage(((Damageable)meta).getDamage() + 1);
+                    item.setItemMeta(meta);
                 }
 
                 if (cordeResistance[i] <= 0) {
                     crochetEntities[i].detachStringFromMiddle();
                     // play Sound
-                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_DISPENSER_LAUNCH, 1, 1);
+                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_DISPENSER_LAUNCH, 2f, 1);
                 } else {
                     // play Sound
-                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1, 1);
+                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.7f, 1);
                 }
 
                 if (allCordeBroken()) {
                     // play Sound
-                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1, 1);
+                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_CHAIN_PLACE, 2.5f, 1);
                     // drop key
                     keyEntity.lootKey();
                 }
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public boolean allCordeBroken() {

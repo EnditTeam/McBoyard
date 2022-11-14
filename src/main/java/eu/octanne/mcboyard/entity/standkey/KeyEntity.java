@@ -57,7 +57,11 @@ public class KeyEntity extends EntityArmorStand {
     }
 
     public void lootKey() {
-        getBukkitEntity().getWorld().dropItem(getBukkitEntity().getLocation(), keyItem);
+        Location loc = getStandKey().getBukkitLocation().clone();
+        loc.setY(loc.getY() + 1);
+        loc.setX(loc.getX() + 0.5);
+        loc.setZ(loc.getZ() + 0.5);
+        getBukkitEntity().getWorld().dropItem(loc, keyItem);
         this.setSlot(EnumItemSlot.HEAD, new ItemStack(Items.AIR));
     }
 

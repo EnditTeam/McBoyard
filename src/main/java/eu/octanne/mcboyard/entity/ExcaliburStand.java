@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.meta.Damageable;
 
 public class ExcaliburStand extends EntityArmorStand {
 
@@ -41,11 +42,11 @@ public class ExcaliburStand extends EntityArmorStand {
         if(hasSword) {
             // create sword with durability
             org.bukkit.inventory.ItemStack sword = new org.bukkit.inventory.ItemStack(Material.IRON_SWORD);
-            // set durability of sword
-            sword.setDurability((short) (sword.getDurability() - nbSwordDurability));
             // set Name
             org.bukkit.inventory.meta.ItemMeta meta = sword.getItemMeta();
             meta.setDisplayName("§bExcalibur");
+            // set durability of sword
+            ((Damageable)meta).setDamage(250 - nbSwordDurability);
             sword.setItemMeta(meta);
             // give sword to player
             p.getInventory().addItem(sword);
