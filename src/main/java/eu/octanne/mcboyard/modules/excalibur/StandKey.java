@@ -74,7 +74,7 @@ public class StandKey {
         this.locWorld = middleEntity.getWorld().getWorld().getName();
         this.locStand = new double[]{
                 middleEntity.getBukkitEntity().getLocation().getX(),
-                middleEntity.getBukkitEntity().getLocation().getY()-0.5,
+                middleEntity.getBukkitEntity().getLocation().getY(),
                 middleEntity.getBukkitEntity().getLocation().getZ()
         };
         setBlocks();
