@@ -7,6 +7,7 @@ import eu.octanne.mcboyard.entity.standkey.MiddleEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.FaceAttachable;
 import org.bukkit.block.data.type.Grindstone;
@@ -35,11 +36,13 @@ public class StandKey {
     private boolean isComplete;
 
     private int[] cordeResistance;
+    private static final int minDura = 4, maxDura = 8;
 
     public StandKey(String locWorld, double locX, double locY, double locZ) {
         this.locStand = new double[]{locX, locY, locZ};
         this.locWorld = locWorld;
         id = UUID.randomUUID();
+        genRandomResistances(minDura,maxDura);
 
         constructCrochetAndMiddleEntities();
         setBlocks();
@@ -49,6 +52,7 @@ public class StandKey {
 
     public StandKey(UUID id) {
         this.id = id;
+        genRandomResistances(minDura,maxDura);
 
         // set crochet and middle entities to null
         crochetEntities = new CrochetEntity[]{null, null, null, null};
@@ -179,6 +183,7 @@ public class StandKey {
             crochetEntity.attachStringFromMiddle();
         }
         keyEntity.restoreKey();
+        genRandomResistances(minDura,maxDura);
     }
 
     private void genRandomResistances(int min, int max) {
@@ -194,6 +199,7 @@ public class StandKey {
         for (int i = 0; i < crochetEntities.length; i++) {
             if (crochetEntities[i].getStandKeyID().equals(en.getStandKeyID())) {
                 cordeResistance[i] -= 1;
+
                 if (p.getItemOnCursor().getDurability() == 0) {
                     p.getItemOnCursor().setAmount(0);
                 } else {
@@ -202,8 +208,27 @@ public class StandKey {
 
                 if (cordeResistance[i] <= 0) {
                     crochetEntities[i].detachStringFromMiddle();
+                    // play Sound
+                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_DISPENSER_LAUNCH, 1, 1);
+                } else {
+                    // play Sound
+                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1, 1);
+                }
+
+                if (allCordeBroken()) {
+                    // play Sound
+                    p.getWorld().playSound(p.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1, 1);
+                    // drop key
+                    keyEntity.lootKey();
                 }
             }
+        }
+        return true;
+    }
+
+    public boolean allCordeBroken() {
+        for (int i = 0; i < cordeResistance.length; i++) {
+            if (cordeResistance[i] > 0) return false;
         }
         return true;
     }
