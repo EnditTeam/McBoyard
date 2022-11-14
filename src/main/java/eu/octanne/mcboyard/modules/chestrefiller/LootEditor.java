@@ -59,7 +59,7 @@ public class LootEditor implements Listener {
 
     @EventHandler
     public void onMoveItem(InventoryMoveItemEvent e) {
-        if (checkIfInGui((Player) e.getInitiator().getHolder())) e.setCancelled(true);
+        if (e.getInitiator().getHolder() instanceof Player && checkIfInGui((Player) e.getInitiator().getHolder())) e.setCancelled(true);
     }
 
     @EventHandler
