@@ -76,9 +76,21 @@ public class ExcaliburStand extends EntityArmorStand {
 
     public static void spawn(Location loc, int nbSwordDurability) {
         ExcaliburStand stand = new ExcaliburStand(((CraftWorld)loc.getWorld()).getHandle(), loc,
-                nbSwordDurability, ExcaliburSystem.getExcaliburStands().size());
+                nbSwordDurability, getDispoID(ExcaliburSystem.getExcaliburStands().size()));
         ((CraftWorld)loc.getWorld()).getHandle().addEntity(stand);
         ExcaliburSystem.addExcaliburStand(stand);
+    }
+
+    private static int getDispoID(int startID) {
+        int idChoose = startID;
+        boolean alreadyUse = false;
+        for (ExcaliburStand stand : ExcaliburSystem.getExcaliburStands()) {
+            if(stand.standID == idChoose) {
+                alreadyUse = true;
+                break;
+            }
+        }
+        return alreadyUse ? getDispoID(startID + 1) : idChoose;
     }
 
     public static void spawn(Location loc, int nbSwordDurability, int standID) {
