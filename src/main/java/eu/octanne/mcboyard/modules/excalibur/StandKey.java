@@ -274,7 +274,7 @@ public class StandKey {
             if (i == 4) {
                 loc.getBlock().setType(Material.DAMAGED_ANVIL);
                 CraftAnvil anvil = (CraftAnvil) loc.getBlock().getState().getBlockData();
-                anvil.setFacing(BlockFace.NORTH);
+                anvil.setFacing(BlockFace.EAST);
                 loc.getBlock().setBlockData(anvil);
             } else {
                 loc.getBlock().setType(Material.GRINDSTONE);
