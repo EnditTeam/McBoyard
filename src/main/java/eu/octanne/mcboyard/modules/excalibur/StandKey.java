@@ -1,7 +1,9 @@
 package eu.octanne.mcboyard.modules.excalibur;
 
-import eu.octanne.mcboyard.entity.CrochetEntity;
-import eu.octanne.mcboyard.entity.MiddleEntity;
+import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.entity.standkey.CrochetEntity;
+import eu.octanne.mcboyard.entity.standkey.KeyEntity;
+import eu.octanne.mcboyard.entity.standkey.MiddleEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,6 +14,7 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.impl.CraftAnvil;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -26,9 +29,12 @@ public class StandKey {
 
     private MiddleEntity middleEntity;
 
+    private KeyEntity keyEntity;
+
     private final UUID id;
     private boolean isComplete;
-    private boolean toUpdate = false;
+
+    private int[] cordeResistance;
 
     public StandKey(String locWorld, double locX, double locY, double locZ) {
         this.locStand = new double[]{locX, locY, locZ};
@@ -52,13 +58,7 @@ public class StandKey {
     }
 
     public static void clearStandKeys() {
-        standKeys.clear();
-    }
-
-    public static void markAllStandToUpdate() {
-        for (StandKey standKey : standKeys) {
-            standKey.toUpdate = true;
-        }
+        standKeys = new ArrayList<>();
     }
 
     public boolean attachMiddleEntity(MiddleEntity middleEntity) {
@@ -71,12 +71,13 @@ public class StandKey {
                 middleEntity.getBukkitEntity().getLocation().getZ()
         };
         setBlocks();
-        if (this.crochetEntities[0] != null && this.crochetEntities[1] != null
-                && this.crochetEntities[2] != null && this.crochetEntities[3] != null) {
-            isComplete = true;
-        }
+        return checkIfComplete();
+    }
 
-        return true;
+    public boolean attachKeyEntity(KeyEntity keyEntity) {
+        if (isComplete) return false;
+        this.keyEntity = keyEntity;
+        return checkIfComplete();
     }
 
     public boolean attachCrochetEntity(CrochetEntity crochetEntity) {
@@ -87,9 +88,15 @@ public class StandKey {
                 break;
             }
         }
+        return checkIfComplete();
+    }
+
+    private boolean checkIfComplete() {
         if (this.crochetEntities[0] != null && this.crochetEntities[1] != null
-                && this.crochetEntities[2] != null && this.crochetEntities[3] != null) {
+                && this.crochetEntities[2] != null && this.crochetEntities[3] != null &&
+                this.keyEntity != null && this.middleEntity != null) {
             isComplete = true;
+            reset();
         }
         return true;
     }
@@ -114,6 +121,12 @@ public class StandKey {
         return true;
     }
 
+    public boolean detachKeyEntity() {
+        this.keyEntity = null;
+        isComplete = false;
+        return true;
+    }
+
     public boolean isComplete() {
         return isComplete;
     }
@@ -128,35 +141,13 @@ public class StandKey {
 
     public void despawn() {
         for (CrochetEntity crochetEntity : crochetEntities) {
-            crochetEntity.despawn();
+            if (crochetEntity != null) crochetEntity.despawn();
         }
-        middleEntity.despawn();
-
+        if (middleEntity != null) middleEntity.despawn();
+        if (keyEntity != null) keyEntity.despawn();
         for (Location loc : getBlocksLoc()) {
             loc.getBlock().setType(org.bukkit.Material.AIR);
         }
-    }
-
-    public void respawn() {
-        for (CrochetEntity crochetEntity : crochetEntities) {
-            crochetEntity.despawn();
-        }
-        middleEntity.despawn();
-        constructCrochetAndMiddleEntities();
-        setBlocks();
-    }
-
-    public boolean entityIsStandKey(Entity entity) {
-        if (((CraftEntity)entity).getHandle() instanceof MiddleEntity ||
-                ((CraftEntity)entity).getHandle() instanceof CrochetEntity) {
-            if (middleEntity.getBukkitEntity().equals(entity) ||
-                    crochetEntities[0].getBukkitEntity().equals(entity) ||
-                    crochetEntities[1].getBukkitEntity().equals(entity) ||
-                    crochetEntities[2].getBukkitEntity().equals(entity) ||
-                    crochetEntities[3].getBukkitEntity().equals(entity)) {
-                return true;
-            } else return false;
-        } else return false;
     }
 
     private void constructCrochetAndMiddleEntities() {
@@ -177,6 +168,9 @@ public class StandKey {
             i++;
         }
         crochetEntities = crochetEntityList.toArray(new CrochetEntity[0]);
+        Location keyLoc = getBukkitLocation().clone();
+        keyLoc.setY(keyLoc.getY() - 0.10);
+        keyEntity = new KeyEntity(((CraftWorld)middleEntity.getBukkitEntity().getWorld()).getHandle(), keyLoc, this);
         reset();
     }
 
@@ -184,6 +178,46 @@ public class StandKey {
         for (CrochetEntity crochetEntity : crochetEntities) {
             crochetEntity.attachStringFromMiddle();
         }
+        keyEntity.restoreKey();
+    }
+
+    private void genRandomResistances(int min, int max) {
+        cordeResistance = new int[4];
+        for (int i = 0; i < cordeResistance.length; i++) {
+            // Generate random resistance between min and max
+            cordeResistance[i] = (int)(Math.random() * (max - min + 1) + min);
+        }
+    }
+
+    public boolean attaquerCorde(CrochetEntity en, Player p) {
+        if (!isComplete() && en.isAttachToMiddle()) return false;
+        for (int i = 0; i < crochetEntities.length; i++) {
+            if (crochetEntities[i].getStandKeyID().equals(en.getStandKeyID())) {
+                cordeResistance[i] -= 1;
+                if (p.getItemOnCursor().getDurability() == 0) {
+                    p.getItemOnCursor().setAmount(0);
+                } else {
+                    p.getItemOnCursor().setDurability((short)(p.getItemOnCursor().getDurability() - 1));
+                }
+
+                if (cordeResistance[i] <= 0) {
+                    crochetEntities[i].detachStringFromMiddle();
+                }
+            }
+        }
+        return true;
+    }
+
+    public CrochetEntity getCloserCrochet(Location loc) {
+        double distance = 999999999;
+        CrochetEntity crochetEntity = null;
+        for (CrochetEntity crochetEntity1 : crochetEntities) {
+            if (crochetEntity1.getBukkitEntity().getLocation().distance(loc) < distance) {
+                distance = crochetEntity1.getBukkitEntity().getLocation().distance(loc);
+                crochetEntity = crochetEntity1;
+            }
+        }
+        return crochetEntity;
     }
 
     public List<Location> getBlocksLoc() {
@@ -256,8 +290,7 @@ public class StandKey {
     public static boolean removeStandKey(UUID standKeyID) {
         Optional<StandKey> standKey = getStandKey(standKeyID);
         if (standKey.isPresent()) {
-            standKey.get().despawn();
-            standKeys.remove(standKey.get());
+            standKey.get().delete();
             return true;
         } else return false;
     }
@@ -274,19 +307,5 @@ public class StandKey {
         StandKey standKey = new StandKey(locWorld, locX, locY, locZ);
         standKeys.add(standKey);
         return Optional.of(standKey);
-    }
-
-    public boolean isUpdate() {
-        return !toUpdate;
-    }
-
-    public boolean updateStandKeyInstance() {
-        if (toUpdate && !standKeys.contains(this)) {
-            toUpdate = false;
-            standKeys.add(this);
-            return true;
-        } else {
-            return false;
-        }
     }
 }

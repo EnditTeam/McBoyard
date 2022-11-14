@@ -43,6 +43,10 @@ public class ExcaliburStand extends EntityArmorStand {
             org.bukkit.inventory.ItemStack sword = new org.bukkit.inventory.ItemStack(Material.IRON_SWORD);
             // set durability of sword
             sword.setDurability((short) (sword.getDurability() - nbSwordDurability));
+            // set Name
+            org.bukkit.inventory.meta.ItemMeta meta = sword.getItemMeta();
+            meta.setDisplayName("§bExcalibur");
+            sword.setItemMeta(meta);
             // give sword to player
             p.getInventory().addItem(sword);
             hasSword = false;
@@ -121,7 +125,7 @@ public class ExcaliburStand extends EntityArmorStand {
         nbtBase.setInt("standID", standID);
         getBukkitEntity().getPersistentDataContainer().put(new NamespacedKey("excalibur","excalibur_stand").toString(), nbtBase);
         super.saveData(nbttagcompound);
-        McBoyard.instance.getLogger().info("Sauvegarde de l'entité "+getStandName());
+        //McBoyard.instance.getLogger().info("Sauvegarde de l'entité "+getStandName());
     }
 
     @Override
@@ -143,22 +147,22 @@ public class ExcaliburStand extends EntityArmorStand {
             McBoyard.instance.getLogger().info("Destruction de l'ExcaliburStand : "+getStandName());
             ExcaliburSystem.removeExcaliburStand(this);
             super.die();
-        } else McBoyard.instance.getLogger().info("ExcaliburStand "+getStandName()+" ne peut pas être détruit");
+        } //else McBoyard.instance.getLogger().info("ExcaliburStand "+getStandName()+" ne peut pas être détruit");
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (ExcaliburSystem.firstUpdate == standID) {
-            ExcaliburSystem.firstUpdate = -2;
+        if (ExcaliburSystem.excaliburUpdate == standID) {
+            ExcaliburSystem.excaliburUpdate = -2;
             // Log fin des réenregistrements
             McBoyard.instance.getLogger().info("Re-enregistrement des ExcaliburStand terminé !");
         }
-        else if (ExcaliburSystem.firstUpdate != -2 && !ExcaliburSystem.hadExcaliburStand(this)) {
+        else if (ExcaliburSystem.excaliburUpdate != -2 && !ExcaliburSystem.hadExcaliburStand(this)) {
             ExcaliburSystem.addExcaliburStand(this);
             // log le réenregistrement de l'entité
             McBoyard.instance.getLogger().info("Re-enregistrement de "+getStandName());
-            if (ExcaliburSystem.firstUpdate == -1) ExcaliburSystem.firstUpdate = standID;
+            if (ExcaliburSystem.excaliburUpdate == -1) ExcaliburSystem.excaliburUpdate = standID;
         }
     }
 

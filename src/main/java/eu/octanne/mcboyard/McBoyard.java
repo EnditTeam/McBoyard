@@ -7,9 +7,6 @@ import eu.octanne.mcboyard.entity.CustomEntity;
 import eu.octanne.mcboyard.modules.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,6 +42,7 @@ public class McBoyard extends JavaPlugin {
 	public void onEnable() {
 		instance = Bukkit.getPluginManager().getPlugin("McBoyard");
 		Bukkit.getPluginManager().registerEvents(new CustomEntity(), this);
+		preWorldModules();
 
 		new BukkitRunnable() {
 
@@ -59,7 +57,7 @@ public class McBoyard extends JavaPlugin {
 						e.printStackTrace();
 					}
 				}
-				instanceModules();
+				postWorldModules();
 			}
 		}.runTaskLater(this, 1);
 	}
@@ -69,7 +67,7 @@ public class McBoyard extends JavaPlugin {
 		unloadModules();
 	}
 	
-	public void instanceModules() {
+	public void postWorldModules() {
 		counterPieceModule = new CounterPiece(this);
 		chronoModule = new Chrono(this);
 		kitModule = new KitSystem(this);
@@ -81,6 +79,9 @@ public class McBoyard extends JavaPlugin {
 		creditModule = new CreditModule(this);
 		boyardRoomModule = new BoyardRoom(this);
 		chestFillerModule = new ChestRefiller(this);
+	}
+
+	public void preWorldModules() {
 		excaliburModule = new ExcaliburSystem(this);
 	}
 	

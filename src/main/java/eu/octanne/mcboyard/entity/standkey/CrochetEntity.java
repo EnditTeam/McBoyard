@@ -1,10 +1,19 @@
-package eu.octanne.mcboyard.entity;
+package eu.octanne.mcboyard.entity.standkey;
 
 import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.entity.CustomEntity;
+import eu.octanne.mcboyard.modules.excalibur.ExcaliburListener;
 import eu.octanne.mcboyard.modules.excalibur.StandKey;
 import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.persistence.CraftPersistentDataContainer;
+import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -24,15 +33,8 @@ public class CrochetEntity extends EntitySlime {
         setTagEntity();
         this.standKeyID = standKey.getID();
         this.standKey = standKey;
-        world.addEntity(this);
-    }
 
-    public CrochetEntity(World world, Location loc, UUID standKeyID) {
-        super(EntityTypes.SLIME, world);
-        this.setPosition(loc.getX(), loc.getY(), loc.getZ());
-
-        setTagEntity();
-        this.standKeyID = standKeyID;
+        saveCustomData();
         world.addEntity(this);
     }
 
@@ -48,12 +50,6 @@ public class CrochetEntity extends EntitySlime {
 
     @Override
     public void tick() {
-        if (!standKey.isUpdate()) {
-            McBoyard.instance.getLogger().info("CrochetEntity de StandKey : "+getStandKeyID()+" lance la mise à jour");
-            if (standKey.updateStandKeyInstance())
-                McBoyard.instance.getLogger().info("CrochetEntity de StandKey : "+getStandKeyID()+" a fini la mise à jour");
-            else McBoyard.instance.getLogger().info("CrochetEntity de StandKey : "+getStandKeyID()+" erreur lors de la mise à jour");
-        }
         super.tick();
     }
 
@@ -65,13 +61,41 @@ public class CrochetEntity extends EntitySlime {
     }
 
     @Override
+    public void die(DamageSource damagesource) {
+        if (toDie) {
+            super.die(damagesource);
+        }
+    }
+
+    @Override
+    public boolean damageEntity(DamageSource damagesource, float f) {
+        if (toDie) return super.damageEntity(damagesource, f);
+        else {
+            if (damagesource.getEntity() != null && damagesource.getEntity().getEntityType().equals(EntityTypes.PLAYER) &&
+                    ExcaliburListener.useSword((Player) damagesource.getEntity().getBukkitEntity())) {
+                getStandKey().attaquerCorde(this, (Player) damagesource.getEntity().getBukkitEntity());
+            }
+
+            return false;
+        }
+    }
+    @Override
+    public void killEntity() {
+        if(toDie) super.killEntity();
+    }
+
+    @Override
     public void saveData(NBTTagCompound nbttagcompound) {
+        saveCustomData();
+        super.saveData(nbttagcompound);
+        //McBoyard.instance.getLogger().info("Sauvegarde CrochetEntity de StandKey : "+getStandKeyID());
+    }
+
+    public void saveCustomData() {
         NBTTagCompound nbtBase = new NBTTagCompound();
         nbtBase.setString("standKeyID", standKeyID.toString());
         getBukkitEntity().getPersistentDataContainer()
                 .put(new NamespacedKey("excalibur","crochet_entity").toString(), nbtBase);
-        super.saveData(nbttagcompound);
-        McBoyard.instance.getLogger().info("Sauvegarde CrochetEntity de StandKey : "+getStandKeyID());
     }
 
     @Override

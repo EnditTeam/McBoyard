@@ -1,10 +1,18 @@
-package eu.octanne.mcboyard.entity;
+package eu.octanne.mcboyard.entity.standkey;
 
 import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.entity.CustomEntity;
+import eu.octanne.mcboyard.modules.ExcaliburSystem;
 import eu.octanne.mcboyard.modules.excalibur.StandKey;
 import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.persistence.CraftPersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -24,15 +32,8 @@ public class MiddleEntity extends EntityArmorStand {
         setTagEntity();
         this.standKeyID = standKey.getID();
         this.standKey = standKey;
-        world.addEntity(this);
-    }
 
-    public MiddleEntity(World world, Location loc, UUID standKeyID) {
-        super(EntityTypes.ARMOR_STAND, world);
-        this.setPosition(loc.getX(), loc.getY(), loc.getZ());
-
-        setTagEntity();
-        this.standKeyID = standKeyID;
+        saveCustomData();
         world.addEntity(this);
     }
 
@@ -47,12 +48,6 @@ public class MiddleEntity extends EntityArmorStand {
 
     @Override
     public void tick() {
-        if (!getStandKey().isUpdate()) {
-            McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" lance la mise à jour");
-            if (getStandKey().updateStandKeyInstance())
-                McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" a fini la mise à jour");
-            else McBoyard.instance.getLogger().info("MiddleEntity de StandKey : "+getStandKeyID()+" erreur lors de la mise à jour");
-        }
         super.tick();
     }
 
@@ -65,13 +60,19 @@ public class MiddleEntity extends EntityArmorStand {
 
     @Override
     public void saveData(NBTTagCompound nbttagcompound) {
+        saveCustomData();
+        super.saveData(nbttagcompound);
+        //McBoyard.instance.getLogger().info("Sauvegarde MiddleEntity de StandKey : "+getStandKeyID());
+    }
+
+    public void saveCustomData() {
         NBTTagCompound nbtBase = new NBTTagCompound();
         nbtBase.setString("standKeyID", standKeyID.toString());
         getBukkitEntity().getPersistentDataContainer()
                 .put(new NamespacedKey("excalibur","middle_entity").toString(), nbtBase);
-        super.saveData(nbttagcompound);
-        McBoyard.instance.getLogger().info("Sauvegarde MiddleEntity de StandKey : "+getStandKeyID());
     }
+
+
 
     @Override
     public EnumInteractionResult a(EntityHuman entityhuman, Vec3D vec3d, EnumHand enumhand) {
