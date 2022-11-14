@@ -164,19 +164,20 @@ public class StandKey {
             if (i == 4) {
                 // Middle Entity
                 Location locMiddle = loc.clone();
-                locMiddle.setY(locMiddle.getY() + 0.5);
+                locMiddle.setY(locMiddle.getY() + 0.25);
                 middleEntity = new MiddleEntity(((CraftWorld)loc.getWorld()).getHandle(), locMiddle, this);
             } else {
                 // Crochet Entity
                 Location locCrochet = loc.clone();
-                locCrochet.setY(loc.getY() + 0.65);
+                locCrochet.setY(loc.getY() + 0.40);
                 crochetEntityList.add(new CrochetEntity(((CraftWorld)loc.getWorld()).getHandle(), locCrochet, this));
             }
             i++;
         }
         crochetEntities = crochetEntityList.toArray(new CrochetEntity[0]);
         Location keyLoc = getBukkitLocation().clone();
-        keyLoc.setY(keyLoc.getY() - 0.10);
+        keyLoc.setY(keyLoc.getY() - 0.35);
+        keyLoc.setYaw(90.0f);
         keyEntity = new KeyEntity(((CraftWorld)middleEntity.getBukkitEntity().getWorld()).getHandle(), keyLoc, this);
         reset();
     }
