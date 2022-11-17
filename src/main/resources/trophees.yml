@@ -1,10 +1,11 @@
+
+world: FB
+
 # Format :
 #  <trophy name>:
 #   location: <x> <y> <z>
 #   advancement: <advancement>
-
-world: world
-
+#   challenge-sound: <true|false>
 trophees:
   ile:
     location: -448 72 221
@@ -14,23 +15,49 @@ trophees:
     location: -448 72 207
     advancement: fb_succes:fort_boyard/ile
     challenge-sound: true
-  toit: # helico
-    location: -35 109 -50
-    advancement: fb_succes:fort_boyard/toit
+  ile3:
+    location: -448 73 222
+    advancement: fb_succes:fort_boyard/ile
     challenge-sound: true
+  ile4:
+    location: -448 73 206
+    advancement: fb_succes:fort_boyard/ile
+    challenge-sound: true
+  
   hall:
     location: -39 73 32
     advancement: fb_succes:fort_boyard/hall
     challenge-sound: true
+
+  toit: # helico
+    location: -35 109 -5
+    advancement: fb_succes:fort_boyard/toit
+    challenge-sound: true
+  toit2: # helico
+    location: -36 110 -5
+    advancement: fb_succes:fort_boyard/toit
+    challenge-sound: true
+
   vigie:
     location: -4 120 133
     advancement: fb_succes:fort_boyard/vigie
     challenge-sound: true
+
   conseil:
     location: -10 94 -75
     advancement: fb_succes:fort_boyard/conseil
     challenge-sound: true
+  conseil2:
+    location: -11 95 -75
+    advancement: fb_succes:fort_boyard/conseil
+    challenge-sound: true
+
   boyards:
     location: 3 74 -64
+    advancement: fb_succes:fort_boyard/boyards
+    challenge-sound: true
+    
+  boyards2:
+    location: 4 74 -64
     advancement: fb_succes:fort_boyard/boyards
     challenge-sound: true
