@@ -33,7 +33,8 @@ public class McBoyard extends JavaPlugin {
 	public static StaffChat staffChatModule;
 	public static MusicModule musicModule;
 	public static CreditModule creditModule;
-
+	public static TropheesModule tropheesModule;
+	
 	public static ChestRefiller chestFillerModule;
 
 	public static ExcaliburSystem excaliburModule;
@@ -79,6 +80,7 @@ public class McBoyard extends JavaPlugin {
 		creditModule = new CreditModule(this);
 		boyardRoomModule = new BoyardRoom(this);
 		chestFillerModule = new ChestRefiller(this);
+		tropheesModule = new TropheesModule(this);
 	}
 
 	public void preWorldModules() {
