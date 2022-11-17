@@ -19,11 +19,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TropheesModule extends PlugModule implements Listener {
+	private Map<Location, String> tropeesBlock;
+
 	public TropheesModule(JavaPlugin instance) {
 		super(instance);
 	}
-
-	private Map<Location, String> tropeesBlock = new HashMap<>();
 
 	public File getTrophesFile() {
 		return new File(pl.getDataFolder(), "trophees.yml");
@@ -35,7 +35,7 @@ public class TropheesModule extends PlugModule implements Listener {
 			pl.saveResource("trophees.yml", false);
 		}
 		// load trophees.yml
-		tropeesBlock.clear();
+		tropeesBlock = new HashMap<>();
 		YamlConfiguration config = YamlConfiguration.loadConfiguration(getTrophesFile());
 		String worldName = config.getString("world", "world");
 		Set<String> tropheesName = config.getConfigurationSection("trophees").getKeys(false);
