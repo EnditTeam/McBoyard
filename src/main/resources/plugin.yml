@@ -46,3 +46,6 @@ commands:
     description: Lancer et stopper la music
   boyardpassword:
     description: Modifier le mot de passe de la salle à Boyard.
+  mcboyard:
+    description: Paramètres du plugin.
+    permission: mcboyard
