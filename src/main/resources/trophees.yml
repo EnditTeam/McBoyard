@@ -52,11 +52,19 @@ trophees:
     advancement: fb_succes:fort_boyard/conseil
     challenge-sound: true
 
+  prison:
+    location: -1 59 60
+    advancement: fb_succes:fort_boyard/prison
+    challenge-sound: true
+  prison2:
+    location: -1 60 61
+    advancement: fb_succes:fort_boyard/prison
+    challenge-sound: true
+
   boyards:
     location: 3 74 -64
     advancement: fb_succes:fort_boyard/boyards
     challenge-sound: true
-    
   boyards2:
     location: 4 74 -64
     advancement: fb_succes:fort_boyard/boyards
