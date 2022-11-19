@@ -69,7 +69,8 @@ public class LootEditor implements Listener {
 
     @EventHandler
     public void onPickItem(InventoryPickupItemEvent e) {
-        if (checkIfInGui((Player) e.getInventory().getHolder())) e.setCancelled(true);
+        if (e.getInventory().getHolder() instanceof Player
+                && checkIfInGui((Player) e.getInventory().getHolder())) e.setCancelled(true);
     }
 
     @EventHandler
