@@ -268,7 +268,8 @@ public class BoyardRoom extends PlugModule implements Listener{
 			connection.sendPacket(packet);
 		}
 		//Laché des Boyards
-		task2 = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),"function fb_boyards_font:actions/demarrer_120secondes");
+		/*task2 = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 			
 			int round = 1;
 			
@@ -284,7 +285,7 @@ public class BoyardRoom extends PlugModule implements Listener{
 				}
 				round++;
 			}
-		}, 75, 20);
+		}, 75, 20);*/
 	}
 	
 	protected class SecureCode {
