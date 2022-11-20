@@ -156,11 +156,11 @@ public class CounterPiece extends PlugModule implements Listener  {
 	
 	@EventHandler
 	public void onDropperPickupBoyard(InventoryPickupItemEvent e) {
-		if(e.getInventory().getType().equals(InventoryType.HOPPER) &&
-				((Hopper)e.getInventory().getLocation().getBlock().getState()).getCustomName().equals("Compteur Boyard")) {
+		if(e.getInventory().getType().equals(InventoryType.HOPPER) && ((Hopper)e.getInventory().getLocation().getBlock().getState()).getCustomName() != null
+				&& ((Hopper)e.getInventory().getLocation().getBlock().getState()).getCustomName().equals("Compteur Boyard")) {
 			e.setCancelled(true);
 			if(e.getItem().getItemStack().getType().equals(Material.GOLD_NUGGET) && piece == 0) {
-				if(isEnable == false) {
+				if(!isEnable) {
 					isEnable = true;
 					piece = new Random().nextInt((35142 - 10451) + 1) + 10451;
 					changeHoloCooldown(ChatColor.GRAY+"§k00000");
@@ -208,7 +208,7 @@ public class CounterPiece extends PlugModule implements Listener  {
 	/*
 	 * COMMAND RSTBOYARD
 	 */
-	class ResetBoyardCommand implements CommandExecutor{
+	static class ResetBoyardCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
