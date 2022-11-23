@@ -27,6 +27,9 @@ commands:
   chronostop:
     description: Arrêter le chronomètre en cours.
     permission: chrono
+  clap:
+    description: Lancer un clap de 5 secondes.
+    permission: clap
   kitcreate:
     description: Ajouter un kit (Avec les items de l'inventaire).
     permission: kit.admin

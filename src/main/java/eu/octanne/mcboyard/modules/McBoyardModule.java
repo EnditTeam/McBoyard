@@ -70,6 +70,7 @@ public class McBoyardModule extends PlugModule implements CommandExecutor, TabCo
 			if (args.length == 2) {
 				return List.of("counterPieceModule",
 							   "chronoModule",
+							   "clapModule",
 							   "kitModule",
 							   "noChangeWeatherModule",
 							   "autoMessageModule",
@@ -93,6 +94,8 @@ public class McBoyardModule extends PlugModule implements CommandExecutor, TabCo
 			return McBoyard.counterPieceModule;
 		case "chronoModule":
 			return McBoyard.chronoModule;
+		case "clapModule":
+			return McBoyard.clapModule;
 		case "kitModule":
 			return McBoyard.kitModule;
 		case "noChangeWeatherModule":

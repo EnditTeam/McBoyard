@@ -25,6 +25,7 @@ public class McBoyard extends JavaPlugin {
 	 */
 	public static CounterPiece counterPieceModule;
 	public static Chrono chronoModule;
+	public static ClapModule clapModule;
 	public static KitSystem kitModule;
 	public static NoChangeWeather noChangeWeatherModule;
 	public static AutoMessage autoMessageModule;
@@ -72,6 +73,7 @@ public class McBoyard extends JavaPlugin {
 	public void postWorldModules() {
 		counterPieceModule = new CounterPiece(this);
 		chronoModule = new Chrono(this);
+		clapModule = new ClapModule(this);
 		kitModule = new KitSystem(this);
 		noChangeWeatherModule = new NoChangeWeather(this);
 		autoMessageModule = new AutoMessage(this);
