@@ -16,9 +16,8 @@ public class ClapModule extends PlugModule {
 		super(instance);
 	}
 
-	protected boolean cancel;
-	protected boolean isStart;
-	protected int task;
+	protected boolean cancel = false;
+	protected int taskID = -1;
 	protected int secTotal;
 	protected String tickSound = "block.note_block.xylophone";
 	protected String finalSound = "block.note_block.xylophone";
@@ -27,8 +26,6 @@ public class ClapModule extends PlugModule {
 	protected float volume = 0.5f;
 
 	public void onEnable() {
-		cancel = false;
-		isStart = false;
 		secTotal = 0;
 		pl.getCommand("clap").setExecutor(new ClapCommand());
 
@@ -84,10 +81,10 @@ public class ClapModule extends PlugModule {
 
 	@SuppressWarnings("deprecation")
 	public void clap(int secondes) {
-		if (isStart)
+		if (taskID != -1)
 			return;
 		secTotal = secondes;
-		task = Bukkit.getScheduler().scheduleAsyncRepeatingTask(McBoyard.instance, new Runnable() {
+		taskID = Bukkit.getScheduler().scheduleAsyncRepeatingTask(McBoyard.instance, new Runnable() {
 			@Override
 			public void run() {
 				if (cancel == true || secTotal <= 0) {
@@ -95,9 +92,9 @@ public class ClapModule extends PlugModule {
 						sendToEveryone(ChatColor.GOLD + "Clap Annulé", null, 0);
 					else
 						sendToEveryone(ChatColor.GOLD + "C'est partit !", finalSound, finalSoundPitch);
-					isStart = false;
+					Bukkit.getScheduler().cancelTask(taskID);
 					cancel = false;
-					Bukkit.getScheduler().cancelTask(task);
+					taskID = -1;
 					return;
 				}
 
@@ -122,7 +119,7 @@ public class ClapModule extends PlugModule {
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-			if (McBoyard.clapModule.isStart == false) {
+			if (McBoyard.clapModule.taskID == -1) {
 				int sec;
 				if (args.length >= 1) {
 					try {
