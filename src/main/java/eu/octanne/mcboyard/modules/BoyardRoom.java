@@ -268,7 +268,7 @@ public class BoyardRoom extends PlugModule implements Listener{
 			connection.sendPacket(packet);
 		}
 		//Laché des Boyards
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),"function fb_boyards_font:actions/demarrer_120secondes");
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),"function boyards_fontaine:actions/demarrer_120secondes");
 		/*task2 = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 			
 			int round = 1;

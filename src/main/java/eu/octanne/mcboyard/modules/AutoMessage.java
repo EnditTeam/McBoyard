@@ -28,7 +28,7 @@ public class AutoMessage extends PlugModule implements Listener {
 
 	public static String header, footer;
 	
-	static protected int task;
+	static protected int task = -1;
 	
 	public AutoMessage(JavaPlugin instance) {
 		super(instance);
@@ -73,23 +73,23 @@ public class AutoMessage extends PlugModule implements Listener {
 		footer = configMsg.getString("tablist.footer");
 		//EVENT REGISTER
 		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
-		if(Bukkit.getOnlinePlayers().size() >= minPlayers && !Bukkit.getScheduler().isCurrentlyRunning(task)) {
+		if(canRun() && !isRunning()) {
 			launchMessageScheduler();
 		}
 		
 		pl.getCommand("amsgreload").setExecutor(new ReloadCommand());
 	}
+
 	public void onDisable() {
-		
+		stopMessageScheduler();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	static public void reloadMessage() {
 		interval = configMsg.getInt("interval");
 		minPlayers = configMsg.getInt("min-players");
 		messages = (ArrayList<String>) configMsg.get("messages");
-		if(Bukkit.getScheduler().isCurrentlyRunning(task)) {
-			Bukkit.getScheduler().cancelTask(task);
+		if(canRun() && !isRunning()) {
 			launchMessageScheduler();
 		}
 	}
@@ -99,7 +99,7 @@ public class AutoMessage extends PlugModule implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		if(Bukkit.getOnlinePlayers().size() >= minPlayers && !Bukkit.getScheduler().isCurrentlyRunning(task)) {
+		if(canRun() && !isRunning()) {
 			launchMessageScheduler();
 		}
 		// SET TAB LIST HEADER AND FOOTER
@@ -107,17 +107,25 @@ public class AutoMessage extends PlugModule implements Listener {
 	}
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
-		if(Bukkit.getOnlinePlayers().size()-1 < minPlayers) {
-			Bukkit.getScheduler().cancelTask(task);
-			task = -1;
+		if(!canRun()) {
+			stopMessageScheduler();
 		}
+	}
+	
+	public static boolean canRun() {
+		return Bukkit.getOnlinePlayers().size() >= minPlayers;
+	}
+
+	public static boolean isRunning() {
+		return task != -1;
 	}
 	
 	/*
 	 * MESSAGE SCHEDULER
 	 */
 	static public void launchMessageScheduler() {
-		if(!messages.isEmpty()) {
+		if(!messages.isEmpty() && !isRunning()) {
+			Bukkit.getScheduler().cancelTask(task);
 			task = Bukkit.getScheduler().scheduleSyncRepeatingTask(McBoyard.instance, new Runnable() {
 				
 				int msgNumber = 0;
@@ -135,6 +143,11 @@ public class AutoMessage extends PlugModule implements Listener {
 				
 			}, 0, 20*interval);
 		}
+	}
+
+	static public void stopMessageScheduler() {
+		Bukkit.getScheduler().cancelTask(task);
+		task = -1;
 	}
 	
 	/*
