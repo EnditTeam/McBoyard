@@ -29,6 +29,7 @@ public class TropheesModule extends PlugModule implements Listener {
 		return new File(pl.getDataFolder(), "trophees.yml");
 	}
 
+	@Override
 	public void onEnable() {
 		// save trophees.yml if not exist
 		if (!getTrophesFile().exists()) {
@@ -58,6 +59,11 @@ public class TropheesModule extends PlugModule implements Listener {
 		}
 
 		Bukkit.getPluginManager().registerEvents(this, McBoyard.instance);
+	}
+
+	@Override
+	public void onDisable() {
+		// Nothing to do
 	}
 
 	public void collectTrophee(Player player, String tropheeName) {

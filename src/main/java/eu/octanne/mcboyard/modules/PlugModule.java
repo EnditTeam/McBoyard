@@ -10,17 +10,13 @@ public abstract class PlugModule {
 	
 	public static ArrayList<PlugModule> modules = new ArrayList<>();
 	
-	public PlugModule(JavaPlugin instance) {
+	protected PlugModule(JavaPlugin instance) {
 		this.pl = instance;
 		modules.add(this);
 		onEnable();
 	}
 	
-	public void onEnable() {
-		
-	}
-	
-	public void onDisable() {
-		
-	}
+	public abstract void onEnable();
+
+	public abstract void onDisable();
 }

@@ -15,9 +15,15 @@ public class McBoyardModule extends PlugModule implements CommandExecutor, TabCo
 		super(instance);
 	}
 
+	@Override
 	public void onEnable() {
 		pl.getCommand("mcboyard").setExecutor(this);
 		pl.getCommand("mcboyard").setTabCompleter(this);
+	}
+
+	@Override
+	public void onDisable() {
+		// Nothing to do
 	}
 
 	@Override
