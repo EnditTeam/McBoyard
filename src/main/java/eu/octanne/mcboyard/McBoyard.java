@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import eu.octanne.mcboyard.entity.CustomEntity;
 import eu.octanne.mcboyard.modules.*;
+import eu.octanne.mcboyard.modules.coffrefort.CoffreFortModule;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -40,7 +42,9 @@ public class McBoyard extends JavaPlugin {
 	public static ChestRefiller chestFillerModule;
 
 	public static ExcaliburSystem excaliburModule;
-	
+
+	public static CoffreFortModule coffreFortModule;
+
 	@Override
 	public void onEnable() {
 		instance = Bukkit.getPluginManager().getPlugin("McBoyard");
@@ -85,6 +89,7 @@ public class McBoyard extends JavaPlugin {
 		chestFillerModule = new ChestRefiller(this);
 		tropheesModule = new TropheesModule(this);
 		mcboyardModule = new McBoyardModule(this);
+		coffreFortModule = new CoffreFortModule(this);
 	}
 
 	public void preWorldModules() {

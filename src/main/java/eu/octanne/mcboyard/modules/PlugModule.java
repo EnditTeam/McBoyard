@@ -6,7 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class PlugModule {
 	
-	JavaPlugin pl;
+	public final JavaPlugin pl;
 	
 	public static ArrayList<PlugModule> modules = new ArrayList<>();
 	

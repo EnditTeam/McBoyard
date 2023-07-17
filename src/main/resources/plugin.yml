@@ -13,6 +13,9 @@ commands:
     description: système d'excalibur.
   chestfiller:
     description: système de chestfiller.
+  coffrefort:
+    description: Salle Le Coffre (Fort).
+    permission: mcboyard.coffrefort
   credit:
     description: afficher les credits a un joueur.
   resetcounter:
