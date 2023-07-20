@@ -8,9 +8,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -23,7 +25,6 @@ public class CoffreFortAnimation {
     private final GridAnimation[] grids;
     private BukkitTask task;
     private int ticksUntilDrop = 0;
-    private int ticksUntilKillItems = 0;
     private int ticksSalle = 0;
     private final Block dropper1;
     private final Block dropper2;
@@ -114,22 +115,38 @@ public class CoffreFortAnimation {
         }
     }
 
+    public void playAlarme() {
+        Location loc = new Location(McBoyard.getWorld(), 41, 77, 26);
+        List<Player> players = loc.getWorld().getNearbyEntities(loc, 30, 10, 20, entity -> entity instanceof Player)
+                .stream()
+                .map(entity -> (Player) entity)
+                .toList();
+
+        for (Player player : players) {
+            player.playSound(loc, "minecraft:alarme", SoundCategory.RECORDS, 0.02f, 0.5f);
+        }
+    }
+
     private void onTick() {
+        ticksSalle--;
+        if (ticksSalle < 0) {
+            stop();
+            return;
+        }
+
         ticksUntilDrop--;
         if (ticksUntilDrop <= 0) {
             ticksUntilDrop = random.nextInt(20 * 10);
             dropCode();
         }
 
-        ticksUntilKillItems--;
-        if (ticksUntilKillItems <= 0) {
-            ticksUntilKillItems = 20 * 10; // every 10 seconds
+        if (ticksSalle % 200 == 0) {
+            // every 10 seconds
             killCodesItems(true);
         }
 
-        ticksSalle--;
-        if (ticksSalle < 0) {
-            stop();
+        if (ticksSalle % 113 == 0) {
+            playAlarme();
         }
     }
 }

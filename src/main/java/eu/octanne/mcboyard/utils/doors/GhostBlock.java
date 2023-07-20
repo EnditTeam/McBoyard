@@ -27,6 +27,7 @@ public class GhostBlock {
         ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
         armorStand.setGravity(false);
         armorStand.setVisible(false);
+        armorStand.addScoreboardTag("McBoyard_GhostBlock");
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             armorStand.addEquipmentLock(slot, ArmorStand.LockType.ADDING_OR_CHANGING);
         }

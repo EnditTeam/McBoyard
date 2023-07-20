@@ -41,6 +41,8 @@ public class CoffreFortModule extends PlugModule {
     protected void startAnimation() {
         if (animation != null)
             return;
+        clearCoffres();
+        resetCompteur();
         animation = new CoffreFortAnimation();
         animation.start();
     }
@@ -61,6 +63,7 @@ public class CoffreFortModule extends PlugModule {
         animation.reset();
         animation = null;
         clearCoffres();
+        resetCompteur();
     }
 
     public @Nullable Chest getCoffre(@NotNull Block block) {
@@ -155,5 +158,14 @@ public class CoffreFortModule extends PlugModule {
                 }
             }
         }
+    }
+
+    /**
+     * Reset Collecteur & Clé
+     */
+    public void resetCompteur() {
+        World w = McBoyard.getWorld();
+        Block block = w.getBlockAt(30, 50, -46);
+        block.setType(Material.REDSTONE_BLOCK);
     }
 }

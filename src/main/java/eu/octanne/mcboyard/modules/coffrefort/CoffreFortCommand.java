@@ -21,7 +21,7 @@ public class CoffreFortCommand implements CommandExecutor, TabCompleter {
         if (!sender.hasPermission("mcboyard.coffrefort"))
             return null;
         if (args.length == 1) {
-            return Arrays.asList("infinit", "code", "start", "stop");
+            return Arrays.asList("infinit", "code", "start", "stop", "reset");
         }
 
         return null;
@@ -34,7 +34,7 @@ public class CoffreFortCommand implements CommandExecutor, TabCompleter {
             return false;
 
         if (args.length == 0) {
-            sender.sendMessage("§c/coffrefort <infinit|code|start|stop>");
+            sender.sendMessage("§c/coffrefort <infinit|code|start|stop|reset>");
             return false;
         }
 
@@ -64,7 +64,7 @@ public class CoffreFortCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("Salle Le Coffre réinitialisée.");
                 break;
             default:
-                sender.sendMessage("§c/coffrefort <infinit|code|start|stop>");
+                sender.sendMessage("§c/coffrefort <infinit|code|start|stop|reset>");
                 return false;
         }
 
