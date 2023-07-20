@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import eu.octanne.mcboyard.McBoyard;
+
 public class CoffreFortCommand implements CommandExecutor, TabCompleter {
 
     @Override
@@ -19,7 +21,7 @@ public class CoffreFortCommand implements CommandExecutor, TabCompleter {
         if (!sender.hasPermission("mcboyard.coffrefort"))
             return null;
         if (args.length == 1) {
-            return Arrays.asList("infinit", "code");
+            return Arrays.asList("infinit", "code", "start", "stop");
         }
 
         return null;
@@ -32,7 +34,7 @@ public class CoffreFortCommand implements CommandExecutor, TabCompleter {
             return false;
 
         if (args.length == 0) {
-            sender.sendMessage("§c/coffrefort <infinit|code>");
+            sender.sendMessage("§c/coffrefort <infinit|code|start|stop>");
             return false;
         }
 
@@ -49,8 +51,20 @@ public class CoffreFortCommand implements CommandExecutor, TabCompleter {
             case "code":
                 player.getInventory().addItem(CoffreCodeItem.createCode().getItem());
                 break;
+            case "start":
+                McBoyard.coffreFortModule.startAnimation();
+                sender.sendMessage("Salle Le Coffre démarrée.");
+                break;
+            case "stop":
+                McBoyard.coffreFortModule.stopAnimation();
+                sender.sendMessage("Salle Le Coffre terminée.");
+                break;
+            case "reset":
+                McBoyard.coffreFortModule.reset();
+                sender.sendMessage("Salle Le Coffre réinitialisée.");
+                break;
             default:
-                sender.sendMessage("§c/coffrefort <infinit|code>");
+                sender.sendMessage("§c/coffrefort <infinit|code|start|stop>");
                 return false;
         }
 

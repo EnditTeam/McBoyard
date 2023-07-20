@@ -8,6 +8,7 @@ import eu.octanne.mcboyard.modules.*;
 import eu.octanne.mcboyard.modules.coffrefort.CoffreFortModule;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +22,7 @@ public class McBoyard extends JavaPlugin {
 	static public String folderPath = "plugins/McBoyard";
 	static public File fileConfig = new File(folderPath+"/config.yml");
 	static public YamlConfiguration config;
+	public static World world;
 	
 	/*
 	 * MODULES
@@ -110,5 +112,18 @@ public class McBoyard extends JavaPlugin {
 			mod.onDisable();
 		}
 	}
-	
+
+	public static World getWorld() {
+		if (world != null)
+			return world;
+		world = Bukkit.getWorld("FB");
+		if (world == null)
+			world = Bukkit.getWorld("world");
+		if (world == null)
+			world = Bukkit.getWorlds().get(0);
+		if (world == null)
+			throw new NullPointerException("No world loaded");
+		instance.getLogger().info("Found world : " + world.getName());
+		return world;
+	}
 }

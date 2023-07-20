@@ -2,6 +2,7 @@ package eu.octanne.mcboyard.modules.coffrefort;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -11,12 +12,15 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.PlugModule;
 import eu.octanne.mcboyard.utils.LootTableBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CoffreFortModule extends PlugModule {
+    private CoffreFortAnimation animation = null;
+
     public CoffreFortModule(JavaPlugin instance) {
         super(instance);
     }
@@ -31,7 +35,32 @@ public class CoffreFortModule extends PlugModule {
 
     @Override
     public void onDisable() {
-        // Nothing to do
+        stopAnimation();
+    }
+
+    protected void startAnimation() {
+        if (animation != null)
+            return;
+        animation = new CoffreFortAnimation();
+        animation.start();
+    }
+
+    protected void stopAnimation() {
+        if (animation != null) {
+            animation.stop();
+            animation = null;
+        }
+    }
+
+    public void reset() {
+        if (animation == null) {
+            // Create a new animation to reset the grids
+            // The grids doesn't spawn, they are juste placed in open position
+            animation = new CoffreFortAnimation();
+        }
+        animation.reset();
+        animation = null;
+        clearCoffres();
     }
 
     public @Nullable Chest getCoffre(@NotNull Block block) {
@@ -108,5 +137,23 @@ public class CoffreFortModule extends PlugModule {
         }
 
         lootTable.fillInventory(coffre.getBlockInventory(), false);
+    }
+
+    public void clearCoffres() {
+        // Salle : 42 73 18 => 50 79 35
+        Vector min = new Vector(42, 73, 18);
+        Vector max = new Vector(50, 79, 35);
+        World w = McBoyard.getWorld();
+        for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+            for (int y = min.getBlockY(); y <= max.getBlockY(); y++) {
+                for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
+                    Block block = w.getBlockAt(x, y, z);
+                    if (block.getType() == Material.CHEST) {
+                        Chest chest = (Chest) block.getState();
+                        chest.getBlockInventory().clear();
+                    }
+                }
+            }
+        }
     }
 }
