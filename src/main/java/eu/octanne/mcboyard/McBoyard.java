@@ -6,6 +6,7 @@ import java.io.IOException;
 import eu.octanne.mcboyard.entity.CustomEntity;
 import eu.octanne.mcboyard.modules.*;
 import eu.octanne.mcboyard.modules.coffrefort.CoffreFortModule;
+import eu.octanne.mcboyard.modules.maitika.MaitikaModule;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -46,6 +47,8 @@ public class McBoyard extends JavaPlugin {
 	public static ExcaliburSystem excaliburModule;
 
 	public static CoffreFortModule coffreFortModule;
+
+	public static MaitikaModule maitikaModule;
 
 	@Override
 	public void onEnable() {
@@ -92,6 +95,7 @@ public class McBoyard extends JavaPlugin {
 		tropheesModule = new TropheesModule(this);
 		mcboyardModule = new McBoyardModule(this);
 		coffreFortModule = new CoffreFortModule(this);
+		maitikaModule = new MaitikaModule(this);
 	}
 
 	public void preWorldModules() {

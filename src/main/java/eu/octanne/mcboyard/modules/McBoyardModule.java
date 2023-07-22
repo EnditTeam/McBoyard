@@ -88,7 +88,9 @@ public class McBoyardModule extends PlugModule implements CommandExecutor, TabCo
 							   "tropheesModule",
 							   "mcboyardModule",
 							   "chestFillerModule",
-							   "excaliburModule");
+							   "excaliburModule",
+							   "coffreFortModule",
+							   "maitikaModule");
 			}
 		}
 		return null;
@@ -126,6 +128,10 @@ public class McBoyardModule extends PlugModule implements CommandExecutor, TabCo
 			return McBoyard.chestFillerModule;
 		case "excaliburModule":
 			return McBoyard.excaliburModule;
+		case "coffreFortModule":
+			return McBoyard.coffreFortModule;
+		case "maitikaModule":
+			return McBoyard.maitikaModule;
 		default:
 			return null;
 		}
