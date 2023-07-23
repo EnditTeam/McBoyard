@@ -99,7 +99,7 @@ public class MaitikaModule extends PlugModule {
         LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) leggings.getItemMeta();
         leggingsMeta.setColor(Color.fromRGB(90, 82, 71));
         leggingsMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(),
-                "generic.armor", 10, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+                "generic.armor", 20, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
         leggingsMeta.setUnbreakable(true);
         leggingsMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         leggings.setItemMeta(leggingsMeta);
@@ -109,7 +109,7 @@ public class MaitikaModule extends PlugModule {
         LeatherArmorMeta bootsMeta = (LeatherArmorMeta) boots.getItemMeta();
         bootsMeta.setColor(Color.fromRGB(82, 66, 49));
         bootsMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(),
-                "generic.armor", 10, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET));
+                "generic.armor", 20, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET));
         bootsMeta.setUnbreakable(true);
         bootsMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         boots.setItemMeta(bootsMeta);
@@ -124,8 +124,8 @@ public class MaitikaModule extends PlugModule {
         sword.setItemMeta(swordMeta);
         equipment.setItemInMainHand(sword);
 
-        if (!player.getInventory().contains(Material.COOKED_BEEF, 32)) {
-            ItemStack food = new ItemStack(Material.COOKED_BEEF, 32);
+        ItemStack food = new ItemStack(Material.COOKED_BEEF, 32);
+        if (!player.getInventory().containsAtLeast(food, 32)) {
             player.getInventory().addItem(food);
         }
     }

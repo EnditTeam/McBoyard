@@ -10,7 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.craftbukkit.v1_16_R3.command.CraftBlockCommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCaveSpider;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftSpider;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -86,7 +86,7 @@ public class MaitikaCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             case "kill":
-                List<CraftCaveSpider> entities = MaitikaEntity.getMaitikaEntities(w);
+                List<CraftSpider> entities = MaitikaEntity.getMaitikaEntities(w);
                 entities.forEach(entity -> entity.remove());
                 int count = entities.size();
                 sender.sendMessage("§a" + count + " entité(s) Maïtika supprimée(s).");

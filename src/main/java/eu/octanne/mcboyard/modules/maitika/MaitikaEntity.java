@@ -2,31 +2,40 @@ package eu.octanne.mcboyard.modules.maitika;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCaveSpider;
-import org.bukkit.entity.CaveSpider;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftSpider;
+import org.bukkit.entity.Spider;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.server.v1_16_R3.AxisAlignedBB;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.DamageSource;
+import net.minecraft.server.v1_16_R3.DifficultyDamageScaler;
 import net.minecraft.server.v1_16_R3.Entity;
-import net.minecraft.server.v1_16_R3.EntityCaveSpider;
 import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.EntityLlamaSpit;
+import net.minecraft.server.v1_16_R3.EntityPose;
+import net.minecraft.server.v1_16_R3.EntitySize;
+import net.minecraft.server.v1_16_R3.EntitySpider;
 import net.minecraft.server.v1_16_R3.EntityTypes;
+import net.minecraft.server.v1_16_R3.EnumMobSpawn;
+import net.minecraft.server.v1_16_R3.GroupDataEntity;
 import net.minecraft.server.v1_16_R3.MathHelper;
 import net.minecraft.server.v1_16_R3.MobEffect;
 import net.minecraft.server.v1_16_R3.MobEffects;
 import net.minecraft.server.v1_16_R3.MovingObjectPositionEntity;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.SoundEffects;
 import net.minecraft.server.v1_16_R3.World;
+import net.minecraft.server.v1_16_R3.WorldAccess;
 
-public class MaitikaEntity extends EntityCaveSpider {
+public class MaitikaEntity extends EntitySpider {
     public enum MaitikaAttackState {
         VANILLA,
         THROW,
@@ -44,8 +53,8 @@ public class MaitikaEntity extends EntityCaveSpider {
         world.addEntity(this);
         setCustomName(new ChatComponentText("Maïtika"));
         setCustomNameVisible(true);
-        craftAttributes.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1000);
-        setHealth(1000);
+        craftAttributes.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(200);
+        setHealth(200);
         craftAttributes.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.5);
 
         moveAvoidBlocks();
@@ -55,17 +64,30 @@ public class MaitikaEntity extends EntityCaveSpider {
         this(((CraftWorld) loc.getWorld()).getHandle(), loc);
     }
 
+    @Nullable
+    @Override
+    public GroupDataEntity prepare(WorldAccess worldaccess, DifficultyDamageScaler difficultydamagescaler,
+            EnumMobSpawn enummobspawn, @Nullable GroupDataEntity groupdataentity,
+            @Nullable NBTTagCompound nbttagcompound) {
+        return groupdataentity;
+    }
+
+    @Override
+    protected float b(EntityPose entitypose, EntitySize entitysize) {
+        return 0.45F;
+    }
+
     @Override
     public boolean isClimbing() {
         // Empêche l'araignée de grimper
         return false;
     }
 
-    public static List<CraftCaveSpider> getMaitikaEntities(org.bukkit.World world) {
-        return world.getEntitiesByClasses(CaveSpider.class)
+    public static List<CraftSpider> getMaitikaEntities(org.bukkit.World world) {
+        return world.getEntitiesByClasses(Spider.class)
                 .stream()
                 .filter(entity -> entity.getScoreboardTags().contains("maitika"))
-                .map(entity -> (CraftCaveSpider) entity)
+                .map(entity -> (CraftSpider) entity)
                 .toList();
     }
 
