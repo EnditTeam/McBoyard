@@ -132,7 +132,7 @@ public class MaitikaEntity extends EntityCaveSpider {
         EntityLlamaSpit spit = new EntityLlamaSpit(EntityTypes.LLAMA_SPIT, getWorld()) {
             @Override
             protected void a(MovingObjectPositionEntity target) {
-                target.getEntity().damageEntity(DamageSource.a(this, maitika).c(), 4.0F);
+                target.getEntity().damageEntity(DamageSource.a(this, maitika).c(), 3.0F);
             }
         };
         spit.setPosition(locX(), locY() + 0.5, locZ());

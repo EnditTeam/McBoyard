@@ -89,7 +89,7 @@ public class MaitikaModule extends PlugModule {
         LeatherArmorMeta chestplateMeta = (LeatherArmorMeta) chestplate.getItemMeta();
         chestplateMeta.setColor(Color.fromRGB(255, 255, 255));
         chestplateMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(),
-                "generic.armor", 10, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+                "generic.armor", 20, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
         chestplateMeta.setUnbreakable(true);
         chestplateMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         chestplate.setItemMeta(chestplateMeta);
