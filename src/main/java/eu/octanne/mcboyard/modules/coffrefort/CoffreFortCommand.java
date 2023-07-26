@@ -38,19 +38,20 @@ public class CoffreFortCommand implements CommandExecutor, TabCompleter {
             return false;
         }
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("§cVous devez être un joueur pour exécuter cette commande.");
-            return false;
-        }
-        Player player = (Player) sender;
-
         switch (args[0]) {
             case "infinit":
-                player.getInventory().addItem(CoffreCodeItem.createInfinitCode().getItem());
+            case "code": {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("§cVous devez être un joueur pour exécuter cette commande.");
+                    return false;
+                }
+                Player player = (Player) sender;
+                if (args[0].equals("infinit"))
+                    player.getInventory().addItem(CoffreCodeItem.createInfinitCode().getItem());
+                else
+                    player.getInventory().addItem(CoffreCodeItem.createCode().getItem());
                 break;
-            case "code":
-                player.getInventory().addItem(CoffreCodeItem.createCode().getItem());
-                break;
+            }
             case "start":
                 McBoyard.coffreFortModule.startAnimation();
                 sender.sendMessage("Salle Le Coffre démarrée.");
