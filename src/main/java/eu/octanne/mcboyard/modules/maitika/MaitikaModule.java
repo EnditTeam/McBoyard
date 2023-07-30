@@ -135,14 +135,14 @@ public class MaitikaModule extends PlugModule {
         inv.addItem(sword);
 
         // Give food
-        ItemStack food = new ItemStack(Material.COOKED_BEEF, 16);
-        if (!inv.containsAtLeast(food, 16)) {
+        ItemStack food = new ItemStack(Material.COOKED_BEEF, 8);
+        if (!inv.containsAtLeast(food, 8)) {
             ItemStack foodInInv = Stream.of(inv.getContents())
                     .filter(item -> item != null && item.getType() == Material.COOKED_BEEF)
                     .findFirst()
                     .orElse(null);
             if (foodInInv != null) {
-                foodInInv.setAmount(16);
+                foodInInv.setAmount(8);
             } else {
                 inv.addItem(food);
             }

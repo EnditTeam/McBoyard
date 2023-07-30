@@ -4,13 +4,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftSpider;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Spider;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
@@ -51,8 +49,8 @@ public class MaitikaEntity extends EntitySpider implements IRangedEntity {
     private static final float MOVEMENT_SPEED = 0.5f;
     private static final int POISON_DURATION_TICKS = 30;
     private static final int POISON_LEVEL = 1;
-    private static final float GENERIC_DAMAGE = 3.0f;
-    private static final float SPIT_DAMAGE = 1.5f;
+    private static final float GENERIC_DAMAGE = 4.0f;
+    private static final float SPIT_DAMAGE = 2.0f;
     private static final float SPIT_SPEED = 0.3f;
     private static final float SPIT_CURVE_COEFF = 0.5F; // Should be inverse proportional to spit speed
     private static final float SPIT_INACCURACY = 0.1f;
@@ -333,9 +331,6 @@ public class MaitikaEntity extends EntitySpider implements IRangedEntity {
      */
     @Override
     public void a(EntityLiving entityliving, float f) {
-        for (Player player : Bukkit.getWorlds().get(0).getPlayers()) {
-            player.sendMessage("throwSpit as IRangedEntity !");
-        }
         throwSpit(entityliving);
         ticksPreviousRangedAttack = ticksLived;
     }
