@@ -1,7 +1,9 @@
 package eu.octanne.mcboyard.modules.maitika;
 
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,14 +14,18 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.PlugModule;
@@ -37,6 +43,7 @@ public class MaitikaModule extends PlugModule {
         MaitikaCommand maitikaCommand = new MaitikaCommand();
         pl.getCommand("maitika").setExecutor(maitikaCommand);
         pl.getCommand("maitika").setTabCompleter(maitikaCommand);
+        Bukkit.getPluginManager().registerEvents(new MaitikaListener(), pl);
     }
 
     @Override
@@ -83,13 +90,14 @@ public class MaitikaModule extends PlugModule {
 
     public void equipGoodArmor(Player player) {
         EntityEquipment equipment = player.getEquipment();
+        Inventory inv = player.getInventory();
         equipment.setHelmet(null);
 
         ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
         LeatherArmorMeta chestplateMeta = (LeatherArmorMeta) chestplate.getItemMeta();
         chestplateMeta.setColor(Color.fromRGB(255, 255, 255));
         chestplateMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(),
-                "generic.armor", 20, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+                "generic.armor", 10, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
         chestplateMeta.setUnbreakable(true);
         chestplateMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         chestplate.setItemMeta(chestplateMeta);
@@ -99,7 +107,7 @@ public class MaitikaModule extends PlugModule {
         LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) leggings.getItemMeta();
         leggingsMeta.setColor(Color.fromRGB(90, 82, 71));
         leggingsMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(),
-                "generic.armor", 20, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+                "generic.armor", 7, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
         leggingsMeta.setUnbreakable(true);
         leggingsMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         leggings.setItemMeta(leggingsMeta);
@@ -109,8 +117,10 @@ public class MaitikaModule extends PlugModule {
         LeatherArmorMeta bootsMeta = (LeatherArmorMeta) boots.getItemMeta();
         bootsMeta.setColor(Color.fromRGB(82, 66, 49));
         bootsMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(),
-                "generic.armor", 20, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET));
+                "generic.armor", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET));
         bootsMeta.setUnbreakable(true);
+        bootsMeta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(UUID.randomUUID(),
+                "generic.movement_speed", -0.02, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET));
         bootsMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         boots.setItemMeta(bootsMeta);
         equipment.setBoots(boots);
@@ -122,12 +132,28 @@ public class MaitikaModule extends PlugModule {
                 new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 100,
                         AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND));
         sword.setItemMeta(swordMeta);
-        equipment.setItemInMainHand(sword);
+        inv.addItem(sword);
 
-        ItemStack food = new ItemStack(Material.COOKED_BEEF, 32);
-        if (!player.getInventory().containsAtLeast(food, 32)) {
-            player.getInventory().addItem(food);
+        // Give food
+        ItemStack food = new ItemStack(Material.COOKED_BEEF, 16);
+        if (!inv.containsAtLeast(food, 16)) {
+            ItemStack foodInInv = Stream.of(inv.getContents())
+                    .filter(item -> item != null && item.getType() == Material.COOKED_BEEF)
+                    .findFirst()
+                    .orElse(null);
+            if (foodInInv != null) {
+                foodInInv.setAmount(16);
+            } else {
+                inv.addItem(food);
+            }
         }
+
+        // Give health potion
+        ItemStack healthPotion = new ItemStack(Material.POTION, 1);
+        PotionMeta healthPotionMeta = (PotionMeta) healthPotion.getItemMeta();
+        healthPotionMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL, false, true));
+        healthPotion.setItemMeta(healthPotionMeta);
+        inv.addItem(healthPotion);
     }
 
     public void equipBadArmor(Player player) {
@@ -180,5 +206,19 @@ public class MaitikaModule extends PlugModule {
         if (battle == null)
             return;
         battle.stop();
+    }
+
+    public void removeArmor(Player player) {
+        // Remove armor, sword and health potion
+        EntityEquipment equipment = player.getEquipment();
+        if (equipment.getChestplate() != null && equipment.getChestplate().getType() == Material.LEATHER_CHESTPLATE)
+            equipment.setChestplate(null);
+        if (equipment.getLeggings() != null && equipment.getLeggings().getType() == Material.LEATHER_LEGGINGS)
+            equipment.setLeggings(null);
+        if (equipment.getBoots() != null && equipment.getBoots().getType() == Material.LEATHER_BOOTS)
+            equipment.setBoots(null);
+        Inventory inv = player.getInventory();
+        inv.remove(Material.GOLDEN_SWORD);
+        inv.remove(Material.POTION);
     }
 }

@@ -42,6 +42,16 @@ public class MaitikaEntity extends EntitySpider {
         ON_PLAYER
     }
 
+    private static final int MAX_HEALTH = 100;
+    private static final float MOVEMENT_SPEED = 0.5f;
+    private static final int POISON_DURATION_TICKS = 30;
+    private static final int POISON_LEVEL = 1;
+    private static final float GENERIC_DAMAGE = 3.0f;
+    private static final float SPIT_DAMAGE = 1.5f;
+    private static final float SPIT_SPEED = 0.7f;
+    private static final float SPIT_CURVE_COEFF = 0.3F; // Should be inverse proportional to spit speed
+    private static final float SPIT_INACCURACY = 0.1f;
+
     private MaitikaAttackState attackState = MaitikaAttackState.VANILLA;
     private int ticksUntilNewState = 0;
 
@@ -53,9 +63,10 @@ public class MaitikaEntity extends EntitySpider {
         world.addEntity(this);
         setCustomName(new ChatComponentText("Maïtika"));
         setCustomNameVisible(true);
-        craftAttributes.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(200);
-        setHealth(200);
-        craftAttributes.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.5);
+        craftAttributes.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(MAX_HEALTH);
+        setHealth(MAX_HEALTH);
+        craftAttributes.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED);
+        craftAttributes.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(GENERIC_DAMAGE);
 
         moveAvoidBlocks();
     }
@@ -107,7 +118,7 @@ public class MaitikaEntity extends EntitySpider {
                     if (!this.isPassenger()) {
                         this.startRiding(entityLiving);
                     }
-                    entityLiving.addEffect(new MobEffect(MobEffects.POISON, 25, 0));
+                    entityLiving.addEffect(new MobEffect(MobEffects.POISON, POISON_DURATION_TICKS, POISON_LEVEL));
                     super.attackEntity(target);
                     return true;
                 }
@@ -130,6 +141,10 @@ public class MaitikaEntity extends EntitySpider {
         if (ticksUntilNewState <= 0) {
             setAttackState(MaitikaAttackState.values()[(int) (Math.random() * MaitikaAttackState.values().length)]);
             ticksUntilNewState = (int) (Math.random() * 9) + 1; // Entre 1 et 10 coups
+            if (attackState == MaitikaAttackState.ON_PLAYER) {
+                // Increase the duration of the attack
+                ticksUntilNewState *= 1.5;
+            }
         }
     }
 
@@ -154,17 +169,17 @@ public class MaitikaEntity extends EntitySpider {
         EntityLlamaSpit spit = new EntityLlamaSpit(EntityTypes.LLAMA_SPIT, getWorld()) {
             @Override
             protected void a(MovingObjectPositionEntity target) {
-                target.getEntity().damageEntity(DamageSource.a(this, maitika).c(), 3.0F);
+                target.getEntity().damageEntity(DamageSource.a(this, maitika).c(), SPIT_DAMAGE);
             }
         };
-        spit.setPosition(locX(), locY() + 0.5, locZ());
+        spit.setPosition(locX(), locY() + 0.7, locZ()); // Lower = the spit hit the carpet
         spit.setShooter(this);
 
         double dX = target.locX() - spit.locX();
-        double dY = target.e(1. / 3) - spit.locY();
+        double dY = target.e(0.5) - spit.locY(); // middle of the target
         double dZ = target.locZ() - spit.locZ();
-        float f = MathHelper.sqrt(dX * dX + dZ * dZ) * 0.2F;
-        spit.shoot(dX, dY + f, dZ, 1.0F, 10.0F);
+        float f = MathHelper.sqrt(dX * dX + dZ * dZ) * SPIT_CURVE_COEFF;
+        spit.shoot(dX, dY + f, dZ, SPIT_SPEED, SPIT_INACCURACY);
         float r1 = random.nextFloat();
         float r2 = random.nextFloat();
         this.world.playSound(null, locX(), locY(), locZ(),
