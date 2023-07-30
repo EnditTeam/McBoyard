@@ -50,14 +50,7 @@ public class CoffreFortAnimation {
     }
 
     public void reset() {
-        for (GridAnimation grid : grids) {
-            grid.placeOpen();
-        }
-
-        if (task != null) {
-            task.cancel();
-            task = null;
-        }
+        stop();
     }
 
     public void start() {
@@ -74,6 +67,7 @@ public class CoffreFortAnimation {
         for (GridAnimation grid : grids) {
             grid.placeClosed();
         }
+        killPaperItemsInRoom();
 
         if (task != null) {
             task.cancel();
@@ -99,19 +93,32 @@ public class CoffreFortAnimation {
         loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.5, 0.5, 0.5, 0.1);
     }
 
-    public void killCodesItems(boolean ifTooMany) {
-        Location loc = new Location(dropper1.getWorld(), 28, 73, 27);
-        List<Item> items = loc.getWorld().getNearbyEntities(loc, 8, 3, 8, entity -> entity instanceof Item)
+    public List<Item> getNearbyPaperItem(Location center, Vector size) {
+        return center.getWorld()
+                .getNearbyEntities(center, size.getX(), size.getY(), size.getZ(), entity -> entity instanceof Item)
                 .stream()
                 .map(entity -> (Item) entity)
                 .filter(entity -> (entity).getItemStack().getType() == Material.PAPER)
                 .toList();
+    }
+
+    public void killCodesItems(boolean ifTooMany) {
+        Location loc = new Location(dropper1.getWorld(), 28, 73, 27);
+        List<Item> items = getNearbyPaperItem(loc, new Vector(8, 3, 8));
         int nbItemsMax = ifTooMany ? 50 : 0;
         if (items.size() > nbItemsMax) {
             for (int i = 0; i < items.size() - nbItemsMax; i++) {
                 Item item = items.get(i);
                 item.remove();
             }
+        }
+    }
+
+    public void killPaperItemsInRoom() {
+        Location cener = new Location(McBoyard.getWorld(), 38, 73, 26);
+        List<Item> items = getNearbyPaperItem(cener, new Vector(13, 5, 11));
+        for (Item item : items) {
+            item.remove();
         }
     }
 
