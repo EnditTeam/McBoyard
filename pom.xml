@@ -49,7 +49,8 @@
             <groupId>io.papermc.patched</groupId>
             <artifactId>papermc-patched</artifactId>
             <version>1.16.5</version>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>/home/corentin/Documents/Code/ObeProd/papermc-patched-1.16.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>

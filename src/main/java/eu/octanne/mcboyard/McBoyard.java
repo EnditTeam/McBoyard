@@ -41,14 +41,11 @@ public class McBoyard extends JavaPlugin {
 	public static CreditModule creditModule;
 	public static TropheesModule tropheesModule;
 	public static McBoyardModule mcboyardModule;
-	
 	public static ChestRefiller chestFillerModule;
-
 	public static ExcaliburSystem excaliburModule;
-
 	public static CoffreFortModule coffreFortModule;
-
 	public static MaitikaModule maitikaModule;
+	public static ElytraParkourModule elytraParkourModule;
 
 	@Override
 	public void onEnable() {
@@ -96,6 +93,7 @@ public class McBoyard extends JavaPlugin {
 		mcboyardModule = new McBoyardModule(this);
 		coffreFortModule = new CoffreFortModule(this);
 		maitikaModule = new MaitikaModule(this);
+		elytraParkourModule = new ElytraParkourModule(this);
 	}
 
 	public void preWorldModules() {
