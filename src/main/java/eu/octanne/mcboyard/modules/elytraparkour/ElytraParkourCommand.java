@@ -258,6 +258,8 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                     Player player = (Player) commandSender;
                     if (ElytraParkourModule.playersInParkour.contains(player)) {
                         ElytraParkourModule.playersInParkour.remove(player);
+                        // remove elytra from player
+                        player.getInventory().setChestplate(null);
                         commandSender.sendMessage("§cVous avez été retiré du parcours.");
                         return true;
                     } else {
