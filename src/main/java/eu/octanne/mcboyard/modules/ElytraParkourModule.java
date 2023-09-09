@@ -27,6 +27,8 @@ public class ElytraParkourModule extends PlugModule implements Listener {
     }
 
     public static double distanceFromRing = 0.5;
+    public static double distanceFromRingY = 0.75;
+
     public static int defaultDuration = 3;
 
     public static ArrayList<ElytraRing> ringsLocation = new ArrayList<>();
@@ -52,6 +54,7 @@ public class ElytraParkourModule extends PlugModule implements Listener {
             config.set("rings", ringsLocation);
             config.set("defaultDuration", defaultDuration);
             config.set("distanceFromRing", distanceFromRing);
+            config.set("distanceFromRingY", distanceFromRingY);
             try {
                 config.save(configFile);
             } catch (Exception e) {
@@ -65,6 +68,7 @@ public class ElytraParkourModule extends PlugModule implements Listener {
             config.set("rings", ringsLocation);
             config.set("defaultDuration", defaultDuration);
             config.set("distanceFromRing", distanceFromRing);
+            config.set("distanceFromRingY", distanceFromRingY);
             try {
                 config.save(configFile);
             } catch (Exception e) {
@@ -85,6 +89,10 @@ public class ElytraParkourModule extends PlugModule implements Listener {
             ringsLocation = (ArrayList<ElytraRing>) config.get("rings", new ArrayList<ElytraRing>());
             // load default duration
             defaultDuration = config.getInt("defaultDuration", 3);
+            // load distance from ring
+            distanceFromRing = config.getDouble("distanceFromRing", 0.5);
+            // load distance from ring Y
+            distanceFromRingY = config.getDouble("distanceFromRingY", 0.75);
             return true;
         }
     }
@@ -121,7 +129,7 @@ public class ElytraParkourModule extends PlugModule implements Listener {
             if (e.getPlayer().getInventory()
                     .getChestplate() != null && e.getPlayer().getInventory().getChestplate().getType().name().contains("ELYTRA")) {
                 for (ElytraRing ring : ringsLocation) {
-                    if (distanceWithoutY(e.getTo(),ring.getLocation()) <= distanceFromRing && distanceBetweenY(e.getTo(), ring.getLocation()) <= 0.5
+                    if (distanceWithoutY(e.getTo(),ring.getLocation()) <= distanceFromRing && distanceBetweenY(e.getTo(), ring.getLocation()) <= distanceFromRingY
                             && distanceWithoutY(e.getFrom(), ring.getLocation()) > distanceFromRing) {
                         // give back elytra durability
                         Damageable itemMeta = (Damageable) e.getPlayer().getInventory().getChestplate().getItemMeta();

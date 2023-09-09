@@ -35,9 +35,25 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
             commandSender.sendMessage("§c/elytraparkour leave [player]");
             commandSender.sendMessage("§c/elytraparkour setDefaultDuration <duration>");
             commandSender.sendMessage("§c/elytraparkour setDistanceFromRing <distance>");
+            commandSender.sendMessage("§c/elytraparkour setDistanceFromRingY <distance>");
             return false;
         } else {
-            if (args[0].equalsIgnoreCase("setDistanceFromRing")) {
+            if (args[0].equalsIgnoreCase("setDistanceFromRingY")) {
+                if (args.length >= 2) {
+                    try {
+                        double distance = Double.parseDouble(args[1]);
+                        ElytraParkourModule.distanceFromRingY = distance;
+                        commandSender.sendMessage("§cLa distance par défaut en Y a été modifiée.");
+                        return true;
+                    } catch (Exception e) {
+                        commandSender.sendMessage("§cLa distance n'est pas valide.");
+                        return false;
+                    }
+                } else {
+                    commandSender.sendMessage("§c/elytraparkour setDistanceFromRingY <distance>");
+                    return false;
+                }
+            } else if (args[0].equalsIgnoreCase("setDistanceFromRing")) {
                 if (args.length >= 2) {
                     try {
                         double distance = Double.parseDouble(args[1]);
@@ -226,9 +242,10 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
             tabComplete.add("leave");
             tabComplete.add("setDefaultDuration");
             tabComplete.add("setDistanceFromRing");
+            tabComplete.add("setDistanceFromRingY");
             return tabComplete;
         } else if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("setDistanceFromRing")) {
+            if (args[0].equalsIgnoreCase("setDistanceFromRing") || args[0].equalsIgnoreCase("setDistanceFromRingY")) {
                 tabComplete.add("<distance>");
                 return tabComplete;
             } else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("setDefaultDuration")) {
