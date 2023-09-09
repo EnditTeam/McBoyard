@@ -33,6 +33,7 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
             commandSender.sendMessage("§c/elytraparkour list");
             commandSender.sendMessage("§c/elytraparkour join [player]");
             commandSender.sendMessage("§c/elytraparkour leave [player]");
+            commandSender.sendMessage("§c/elytraparkour resetPlayer [player]");
             commandSender.sendMessage("§c/elytraparkour setDefaultDuration <duration>");
             commandSender.sendMessage("§c/elytraparkour setDistanceFromRing <distance>");
             commandSender.sendMessage("§c/elytraparkour setDistanceFromRingY <distance>");
@@ -148,6 +149,48 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                     commandSender.sendMessage("§cVous devez être un joueur pour utiliser cette commande.");
                     return false;
                 }
+            } else if (args[0].equalsIgnoreCase("resetPlayer")) {
+                // check if a player is specified or if sender is a player
+                if (args.length >= 2) {
+                    Player player = Bukkit.getPlayer(args[1]);
+                    if (player != null) {
+                        if (ElytraParkourModule.playersInParkour.contains(player)) {
+                            // add elytra with default duration to player
+                            ItemStack elytra = new ItemStack(Material.ELYTRA);
+                            Damageable meta = (Damageable) elytra.getItemMeta();
+                            meta.setDamage(432-ElytraParkourModule.defaultDuration);
+                            elytra.setItemMeta((ItemMeta) meta);
+                            player.getInventory().setChestplate(elytra);
+
+                            commandSender.sendMessage("§cLe joueur " + player.getName() + " a été reinisialisé.");
+                            return true;
+                        } else {
+                            commandSender.sendMessage("§cLe joueur " + player.getName() + " n'est pas dans le parcours.");
+                            return false;
+                        }
+                    } else {
+                        commandSender.sendMessage("§cLe joueur " + args[1] + " n'est pas connecté.");
+                        return false;
+                    }
+                } else if (commandSender instanceof Player) {
+                    Player player = (Player) commandSender;
+                    if (ElytraParkourModule.playersInParkour.contains(player)) {
+                        // add elytra with default duration to player
+                        ItemStack elytra = new ItemStack(Material.ELYTRA);
+                        Damageable meta = (Damageable) elytra.getItemMeta();
+                        meta.setDamage(432-ElytraParkourModule.defaultDuration);
+                        elytra.setItemMeta((ItemMeta) meta);
+                        player.getInventory().setChestplate(elytra);
+                        commandSender.sendMessage("§cVous avez été reinisialisé.");
+                        return true;
+                    } else {
+                        commandSender.sendMessage("§cVous n'êtes pas dans le parcours.");
+                        return false;
+                    }
+                } else {
+                    commandSender.sendMessage("§cVous devez être un joueur pour utiliser cette commande.");
+                    return false;
+                }
             } else if (args[0].equalsIgnoreCase("join")) {
                 // check if a player is specified or if sender is a player
                 if (args.length >= 2) {
@@ -160,7 +203,7 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                             Damageable meta = (Damageable) elytra.getItemMeta();
                             meta.setDamage(432-ElytraParkourModule.defaultDuration);
                             elytra.setItemMeta((ItemMeta) meta);
-                            player.getInventory().addItem(elytra);
+                            player.getInventory().setChestplate(elytra);
 
                             commandSender.sendMessage("§cLe joueur " + player.getName() + " a été ajouté au parcours.");
                             return true;
@@ -181,7 +224,7 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                         Damageable meta = (Damageable) elytra.getItemMeta();
                         meta.setDamage(432-ElytraParkourModule.defaultDuration);
                         elytra.setItemMeta((ItemMeta) meta);
-                        player.getInventory().addItem(elytra);
+                        player.getInventory().setChestplate(elytra);
                         commandSender.sendMessage("§cVous avez été ajouté au parcours.");
                         return true;
                     } else {
@@ -199,6 +242,8 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                     if (player != null) {
                         if (ElytraParkourModule.playersInParkour.contains(player)) {
                             ElytraParkourModule.playersInParkour.remove(player);
+                            // remove elytra from player
+                            player.getInventory().setChestplate(null);
                             commandSender.sendMessage("§cLe joueur " + player.getName() + " a été retiré du parcours.");
                             return true;
                         } else {
@@ -235,11 +280,12 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         ArrayList<String> tabComplete = new ArrayList<>();
         if (args.length == 1) {
-            tabComplete.add("add");
-            tabComplete.add("remove");
-            tabComplete.add("list");
             tabComplete.add("join");
             tabComplete.add("leave");
+            tabComplete.add("resetPlayer");
+            tabComplete.add("list");
+            tabComplete.add("add");
+            tabComplete.add("remove");
             tabComplete.add("setDefaultDuration");
             tabComplete.add("setDistanceFromRing");
             tabComplete.add("setDistanceFromRingY");
@@ -254,7 +300,7 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
             } else if (args[0].equalsIgnoreCase("remove")) {
                 tabComplete.add("<num>");
                 return tabComplete;
-            } else if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("leave")) {
+            } else if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("leave") || args[0].equalsIgnoreCase("resetPlayer")) {
                 // Add players list
                 for (Player player : ElytraParkourModule.playersInParkour) {
                     tabComplete.add(player.getName());
