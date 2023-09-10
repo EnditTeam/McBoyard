@@ -161,6 +161,9 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                             meta.setDamage(432-ElytraParkourModule.defaultDuration);
                             elytra.setItemMeta((ItemMeta) meta);
                             player.getInventory().setChestplate(elytra);
+                            // Give a boat to the player
+                            ItemStack boat = new ItemStack(Material.ACACIA_BOAT);
+                            player.getInventory().addItem(boat);
 
                             commandSender.sendMessage("§cLe joueur " + player.getName() + " a été reinisialisé.");
                             return true;
@@ -181,6 +184,10 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                         meta.setDamage(432-ElytraParkourModule.defaultDuration);
                         elytra.setItemMeta((ItemMeta) meta);
                         player.getInventory().setChestplate(elytra);
+                        // Give a boat to the player
+                        ItemStack boat = new ItemStack(Material.ACACIA_BOAT);
+                        player.getInventory().addItem(boat);
+
                         commandSender.sendMessage("§cVous avez été reinisialisé.");
                         return true;
                     } else {
@@ -204,9 +211,6 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                             meta.setDamage(432-ElytraParkourModule.defaultDuration);
                             elytra.setItemMeta((ItemMeta) meta);
                             player.getInventory().setChestplate(elytra);
-                            // Give a boat to the player
-                            ItemStack boat = new ItemStack(Material.ACACIA_BOAT);
-                            player.getInventory().addItem(boat);
 
                             commandSender.sendMessage("§cLe joueur " + player.getName() + " a été ajouté au parcours.");
                             return true;
