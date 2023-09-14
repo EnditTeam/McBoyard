@@ -5,7 +5,9 @@ import eu.octanne.mcboyard.modules.elytraparkour.ElytraParkourCommand;
 import eu.octanne.mcboyard.modules.elytraparkour.ElytraRing;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
@@ -14,7 +16,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -26,19 +30,22 @@ public class ElytraParkourModule extends PlugModule implements Listener {
         ConfigurationSerialization.registerClass(ElytraRing.class, "ElytraRing");
     }
 
+    // Config variables saved in config file
     public static double distanceFromRing = 0.5;
     public static double distanceFromRingY = 0.75;
-
+    public static double distanceFromStart = 4.0;
+    public static Location startLocation = Bukkit.getWorlds().get(0).getSpawnLocation();
     public static int defaultDuration = 3;
-
     public static ArrayList<ElytraRing> ringsLocation = new ArrayList<>();
+
+    // Temporary variable
     public static ArrayList<Player> playersInParkour = new ArrayList<>();
 
     public ElytraParkourModule(JavaPlugin instance) {
         super(instance);
     }
 
-    public boolean saveElytraRings() {
+    public void saveElytraRings() {
         File configFile = new File(McBoyard.folderPath + "/elytra_rings.yml");
         if(!configFile.exists()) {
             try {
@@ -46,44 +53,28 @@ public class ElytraParkourModule extends PlugModule implements Listener {
                 configFile.createNewFile();
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return;
             }
+        }
 
-            // Save Elytra Rings to config
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-            config.set("rings", ringsLocation);
-            config.set("defaultDuration", defaultDuration);
-            config.set("distanceFromRing", distanceFromRing);
-            config.set("distanceFromRingY", distanceFromRingY);
-            try {
-                config.save(configFile);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-            return true;
-        } else {
-            // Save Elytra Rings to config
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-            config.set("rings", ringsLocation);
-            config.set("defaultDuration", defaultDuration);
-            config.set("distanceFromRing", distanceFromRing);
-            config.set("distanceFromRingY", distanceFromRingY);
-            try {
-                config.save(configFile);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-            return true;
+        // Save Elytra Rings to config
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        config.set("rings", ringsLocation);
+        config.set("defaultDuration", defaultDuration);
+        config.set("distanceFromRing", distanceFromRing);
+        config.set("distanceFromRingY", distanceFromRingY);
+        config.set("distanceFromStart", distanceFromStart);
+        config.set("startLocation", startLocation);
+        try {
+            config.save(configFile);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public boolean loadElytraRings() {
+    public void loadElytraRings() {
         File configFile = new File(McBoyard.folderPath + "/elytra_rings.yml");
-        if(!configFile.exists()) {
-            return true;
-        } else {
+        if(configFile.exists()) {
             // Load Elytra Rings from config
             YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
             ringsLocation = (ArrayList<ElytraRing>) config.get("rings", new ArrayList<ElytraRing>());
@@ -93,7 +84,10 @@ public class ElytraParkourModule extends PlugModule implements Listener {
             distanceFromRing = config.getDouble("distanceFromRing", 0.5);
             // load distance from ring Y
             distanceFromRingY = config.getDouble("distanceFromRingY", 0.75);
-            return true;
+            // load distance from start
+            distanceFromStart = config.getDouble("distanceFromStart", 4.0);
+            // load start location
+            startLocation = config.getLocation("startLocation", Bukkit.getWorlds().get(0).getSpawnLocation());
         }
     }
 
@@ -122,10 +116,38 @@ public class ElytraParkourModule extends PlugModule implements Listener {
         return Math.abs(loc1.getY()-loc2.getY());
     }
 
+    public static void resetPlayer(Player player, CommandSender commandSender) {
+        // add elytra with default duration to player
+        ItemStack elytra = new ItemStack(Material.ELYTRA);
+        Damageable meta = (Damageable) elytra.getItemMeta();
+        meta.setDamage(432-ElytraParkourModule.defaultDuration);
+        elytra.setItemMeta((ItemMeta) meta);
+        player.getInventory().setChestplate(elytra);
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+        player.sendMessage("§aVotre elytra a été réparé, vous pouvez recommencer le parcours.");
+        if(commandSender != null) commandSender.sendMessage("§cLe joueur " + player.getName() + " a été reinisialisé.");
+
+        // Check if we need to add a boat
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType().name().contains("BOAT")) {
+                return;
+            }
+        }
+
+        ItemStack boat = new ItemStack(Material.ACACIA_BOAT);
+        player.getInventory().addItem(boat);
+    }
+
     @EventHandler
     public void onEnterRing(PlayerMoveEvent e) {
         if (playersInParkour.contains(e.getPlayer())) {
-            // check if player is in elytra flight
+            // check if is near the start location
+            if (e.getTo().distance(startLocation) <= distanceFromStart && e.getFrom().distance(startLocation) > distanceFromStart) {
+                // reset player
+                resetPlayer(e.getPlayer(), null);
+            }
+
+            // check if player has elytra for rings detection
             if (e.getPlayer().getInventory()
                     .getChestplate() != null && e.getPlayer().getInventory().getChestplate().getType().name().contains("ELYTRA")) {
                 for (ElytraRing ring : ringsLocation) {

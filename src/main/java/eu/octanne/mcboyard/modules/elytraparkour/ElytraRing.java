@@ -28,9 +28,13 @@ public class ElytraRing implements ConfigurationSerializable  {
     @Override
     public String toString() {
         return "ElytraRing{" +
-                "loc=" + loc +
-                ", nbDuraGiveback=" + nbDuraGiveback +
+                "loc=(" + getLocString() +
+                "), nbDuraGiveback=" + nbDuraGiveback +
                 '}';
+    }
+
+    private String getLocString() {
+        return loc.getWorld().getName() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ();
     }
 
     @Override
