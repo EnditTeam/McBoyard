@@ -137,6 +137,7 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                 commandSender.sendMessage("§cdefaultDuration : " + ElytraParkourModule.defaultDuration);
                 commandSender.sendMessage("§cdistanceFromRing : " + ElytraParkourModule.distanceFromRing);
                 commandSender.sendMessage("§cdistanceFromRingY : " + ElytraParkourModule.distanceFromRingY);
+                commandSender.sendMessage("§cdistanceFromStart : " + ElytraParkourModule.distanceFromStart);
                 Location locStart = ElytraParkourModule.startLocation;
                 String startLocStr = locStart.getWorld().getName() + " " + locStart.getX() + " " + locStart.getY() + " " + locStart.getZ();
                 commandSender.sendMessage("§cstartLocation : " + startLocStr);
