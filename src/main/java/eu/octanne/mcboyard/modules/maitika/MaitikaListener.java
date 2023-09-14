@@ -14,7 +14,6 @@ public class MaitikaListener implements Listener {
         Player player = e.getEntity();
         Location arenaCenter = McBoyard.maitikaModule.getArenaCenter();
         double distance = player.getLocation().distanceSquared(arenaCenter);
-        player.sendMessage("You died at " + distance + " blocks from the arena center.");
         if (distance <= 9) {
             McBoyard.maitikaModule.removeArmor(player);
             e.setKeepInventory(true);
