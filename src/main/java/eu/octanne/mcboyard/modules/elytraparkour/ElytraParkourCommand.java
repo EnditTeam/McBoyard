@@ -116,7 +116,12 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                 // check if player
                 if (commandSender instanceof Player) {
                     Player player = (Player) commandSender;
-                    ElytraParkourModule.startLocation = player.getLocation();
+                    // Round location to 0.00
+                    Location loc = player.getLocation().clone();
+                    loc.setX(Math.round(loc.getX()*100.0)/100.0);
+                    loc.setY(Math.round(loc.getY()*100.0)/100.0);
+                    loc.setZ(Math.round(loc.getZ()*100.0)/100.0);
+                    ElytraParkourModule.startLocation = loc;
                     commandSender.sendMessage("§cLa position de départ a été modifiée.");
                     return true;
                 }
@@ -337,7 +342,7 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
                     tabComplete.add(player.getName());
                 }
                 return tabComplete;
-            } else  if (args[0].equalsIgnoreCase("join")) {
+            } else if (args[0].equalsIgnoreCase("join")) {
                 // Add players list
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     tabComplete.add(player.getName());
