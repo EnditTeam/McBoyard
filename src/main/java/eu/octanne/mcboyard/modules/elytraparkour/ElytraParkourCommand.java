@@ -311,6 +311,7 @@ public class ElytraParkourCommand implements CommandExecutor, TabCompleter {
             tabComplete.add("leave");
             tabComplete.add("resetPlayer");
             tabComplete.add("list");
+            tabComplete.add("config");
             tabComplete.add("add");
             tabComplete.add("remove");
             tabComplete.add("setDefaultDuration");
