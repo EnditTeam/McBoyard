@@ -50,7 +50,16 @@ public class CoffreFortAnimation {
     }
 
     public void reset() {
-        stop();
+        for (GridAnimation grid : grids) {
+            grid.placeOpen();
+        }
+        killPaperItemsInRoom();
+
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+        McBoyard.instance.getLogger().info("CoffreFortAnimation reset");
     }
 
     public void start() {
