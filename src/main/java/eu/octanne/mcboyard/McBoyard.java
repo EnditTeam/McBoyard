@@ -7,6 +7,7 @@ import eu.octanne.mcboyard.entity.CustomEntity;
 import eu.octanne.mcboyard.modules.*;
 import eu.octanne.mcboyard.modules.coffrefort.CoffreFortModule;
 import eu.octanne.mcboyard.modules.maitika.MaitikaModule;
+import eu.octanne.mcboyard.modules.telephone.TelephoneModule;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -17,12 +18,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class McBoyard extends JavaPlugin {
 	
-	static public Plugin instance;
+	public static Plugin instance;
 	
 	//FOLDER PATH
-	static public String folderPath = "plugins/McBoyard";
-	static public File fileConfig = new File(folderPath+"/config.yml");
-	static public YamlConfiguration config;
+	public static String folderPath = "plugins/McBoyard";
+	public static File fileConfig = new File(folderPath+"/config.yml");
+	public static YamlConfiguration config;
 	public static World world;
 	
 	/*
@@ -46,6 +47,7 @@ public class McBoyard extends JavaPlugin {
 	public static CoffreFortModule coffreFortModule;
 	public static MaitikaModule maitikaModule;
 	public static ElytraParkourModule elytraParkourModule;
+	public static TelephoneModule telephoneModule;
 
 	@Override
 	public void onEnable() {
@@ -94,6 +96,7 @@ public class McBoyard extends JavaPlugin {
 		coffreFortModule = new CoffreFortModule(this);
 		maitikaModule = new MaitikaModule(this);
 		elytraParkourModule = new ElytraParkourModule(this);
+		telephoneModule = new TelephoneModule(this);
 	}
 
 	public void preWorldModules() {

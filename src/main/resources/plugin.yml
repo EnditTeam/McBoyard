@@ -60,3 +60,6 @@ commands:
   maitika:
     description: Combat de boss Maïtika
     permission: mcboyard
+  telephone:
+    description: Salle du Téléphone
+    permission: mcboyard
