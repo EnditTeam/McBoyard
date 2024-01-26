@@ -1,6 +1,7 @@
 package eu.octanne.mcboyard.modules.maitika;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -139,7 +140,7 @@ public class MaitikaEntity extends EntitySpider implements IRangedEntity {
                 .stream()
                 .filter(entity -> entity.getScoreboardTags().contains("maitika"))
                 .map(entity -> (CraftSpider) entity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -279,7 +280,12 @@ public class MaitikaEntity extends EntitySpider implements IRangedEntity {
     public void moveAvoidBlocks() {
         AxisAlignedBB idbox = getBoundingBox();
         Block[] blocks = new Block[4];
-        double x, xMin, xMax, z, zMin, zMax;
+        double x;
+        double xMin;
+        double xMax;
+        double z;
+        double zMin;
+        double zMax;
         x = xMin = xMax = (idbox.minX + idbox.maxX) / 2; // mid
         z = zMin = zMax = (idbox.minZ + idbox.maxZ) / 2; // mid
         double sizeX2 = (idbox.maxX - idbox.minX) / 2; // half size
@@ -341,5 +347,18 @@ public class MaitikaEntity extends EntitySpider implements IRangedEntity {
 
     public int getTicksPreviousRangedAttack() {
         return ticksPreviousRangedAttack;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MaitikaEntity) {
+            return ((MaitikaEntity) obj).getUniqueID().equals(getUniqueID());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUniqueID().hashCode();
     }
 }

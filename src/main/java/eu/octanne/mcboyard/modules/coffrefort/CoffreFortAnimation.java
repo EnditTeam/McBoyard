@@ -2,6 +2,7 @@ package eu.octanne.mcboyard.modules.coffrefort;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,7 +46,7 @@ public class CoffreFortAnimation {
         final float speedOpen = offset / (20f * 4); // 4 seconds
         final float speedClose = offset / (20f * 60 * 5); // 5 minutes
         Location loc = new Location(McBoyard.getWorld(), posClosed.getX(), posClosed.getY(), posClosed.getZ(), yaw, 0)
-                .add(0.5, 0, 0.5);
+                           .add(0.5, 0, 0.5);
         return new GridAnimation(loc, size, 4, speedOpen, speedClose);
     }
 
@@ -95,20 +96,21 @@ public class CoffreFortAnimation {
         Location loc = dropper.getLocation().add(-0.3, 0.1, 0.5);
         Item itemEntity = loc.getWorld().dropItem(loc, item);
         itemEntity.setVelocity(new Vector(
-                random.nextGaussian(-0.15, 0.1),
-                random.nextGaussian(0, 0.05),
-                random.nextGaussian(0, 0.1)));
+            // mean + std_variation * gaussian
+            -0.15 + 0.1 * random.nextGaussian(),
+            0 + 0.05 * random.nextGaussian(),
+            0 + 0.1 * random.nextGaussian()));
         loc.getWorld().playSound(loc, Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
         loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.5, 0.5, 0.5, 0.1);
     }
 
     public List<Item> getNearbyPaperItem(Location center, Vector size) {
         return center.getWorld()
-                .getNearbyEntities(center, size.getX(), size.getY(), size.getZ(), entity -> entity instanceof Item)
-                .stream()
-                .map(entity -> (Item) entity)
-                .filter(entity -> (entity).getItemStack().getType() == Material.PAPER)
-                .toList();
+            .getNearbyEntities(center, size.getX(), size.getY(), size.getZ(), entity -> entity instanceof Item)
+            .stream()
+            .map(entity -> (Item) entity)
+            .filter(entity -> (entity).getItemStack().getType() == Material.PAPER)
+            .collect(Collectors.toList());
     }
 
     public void killCodesItems(boolean ifTooMany) {
@@ -133,10 +135,11 @@ public class CoffreFortAnimation {
 
     public void playAlarme() {
         Location loc = new Location(McBoyard.getWorld(), 41, 77, 26);
-        List<Player> players = loc.getWorld().getNearbyEntities(loc, 30, 10, 20, entity -> entity instanceof Player)
-                .stream()
-                .map(entity -> (Player) entity)
-                .toList();
+        List<Player> players = loc.getWorld()
+                                   .getNearbyEntities(loc, 30, 10, 20, entity -> entity instanceof Player)
+                                   .stream()
+                                   .map(entity -> (Player) entity)
+                                   .collect(Collectors.toList());
 
         for (Player player : players) {
             player.playSound(loc, "minecraft:alarme", SoundCategory.RECORDS, 0.02f, 0.5f);
