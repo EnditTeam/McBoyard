@@ -25,7 +25,7 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
         }
         if (args[0].equalsIgnoreCase("ring")) {
             if (args.length == 2) {
-                return Arrays.asList("pling", "banjo", "stop");
+                return Arrays.asList("pling", "banjo", "around", "stop");
             }
         }
 
@@ -85,6 +85,9 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
                 break;
             case "banjo":
                 ringType = RingType.BANJO;
+                break;
+            case "around":
+                ringType = RingType.AROUND;
                 break;
             case "stop":
                 activity.setRingingPhone(-1, null);

@@ -26,6 +26,7 @@ public class Activity {
     enum RingType {
         PLING,
         BANJO,
+        AROUND,
     }
 
     private void placeRoom() {
@@ -111,6 +112,31 @@ public class Activity {
                 if (ringTick % 60 >= 40)
                     return;
                 break;
+            case AROUND: {
+                soundPitch = 0.5f;
+                sound = Sound.BLOCK_NOTE_BLOCK_BIT;
+                int index = (ringTick / 4) % 16;
+                // Move according to the index as a square around the phone
+                loc = loc.clone();
+                if (index == 0) {
+                    loc.add(0, 0, 1);
+                } else if (index == 1) {
+                    loc.add(1, 0, 1);
+                } else if (index == 2) {
+                    loc.add(1, 0, 0);
+                } else if (index == 3) {
+                    loc.add(1, 0, -1);
+                } else if (index == 4) {
+                    loc.add(0, 0, -1);
+                } else if (index == 5) {
+                    loc.add(-1, 0, -1);
+                } else if (index == 6) {
+                    loc.add(-1, 0, 0);
+                } else if (index == 7) {
+                    loc.add(-1, 0, 1);
+                }
+                break;
+            }
             default:
                 return;
         }
