@@ -3,20 +3,32 @@ package eu.octanne.mcboyard.modules.telephone;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 import eu.octanne.mcboyard.McBoyard;
 
 public class Activity {
     private List<Entity> telephones = new ArrayList<>();
+    private BukkitTask task = null;
+    private Entity currentPhone = null;
+    private RingType currentRingType = null;
+    private int ringTick = 0;
 
-    public void placeRoom() {
+    enum RingType {
+        PLING,
+        BANJO,
+    }
+
+    private void placeRoom() {
         Material telephoneMaterial = Material.CARROT_ON_A_STICK;
         int telephoneCustomModelData = 7;
         ItemStack phoneItem = new ItemStack(telephoneMaterial);
@@ -54,16 +66,72 @@ public class Activity {
         return phone;
     }
 
-    public void removeRoom() {
+    private void removeRoom() {
         telephones.forEach(Entity::remove);
         telephones.clear();
     }
 
     public void start() {
         placeRoom();
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+        task = Bukkit.getScheduler().runTaskTimer(McBoyard.instance, this::tick, 0, 1);
     }
 
     public void stop() {
         removeRoom();
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+    }
+
+    private void tick() {
+        if (currentPhone != null) {
+            ring(currentPhone.getLocation());
+        }
+    }
+
+    private void ring(Location loc) {
+        ringTick++;
+        float soundPitch = 1;
+        Sound sound = null;
+
+        switch (currentRingType) {
+            case PLING:
+                soundPitch = 1.5f;
+                sound = Sound.BLOCK_NOTE_BLOCK_PLING;
+                if (ringTick % 40 >= 30)
+                    return;
+                break;
+            case BANJO:
+                sound = Sound.BLOCK_NOTE_BLOCK_BANJO;
+                if (ringTick % 60 >= 40)
+                    return;
+                break;
+            default:
+                return;
+        }
+
+        if (sound != null) {
+            loc.getWorld().playSound(loc, sound, 1, soundPitch);
+        }
+    }
+
+    public void setRingingPhone(int phone, RingType ringType) {
+        if (phone < 0 || phone >= telephones.size()) {
+            currentPhone = null;
+            currentRingType = null;
+            return;
+        }
+        ArmorStand phoneEntity = (ArmorStand) telephones.get(phone);
+        currentPhone = phoneEntity;
+        currentRingType = ringType;
+    }
+
+    public int getRandomPhoneId() {
+        return (int) (Math.random() * telephones.size());
     }
 }

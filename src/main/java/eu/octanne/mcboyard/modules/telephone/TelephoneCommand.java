@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import eu.octanne.mcboyard.McBoyard;
+import eu.octanne.mcboyard.modules.telephone.Activity.RingType;
 
 public class TelephoneCommand implements CommandExecutor, TabCompleter {
 
@@ -22,12 +23,9 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             return Arrays.asList("start", "stop", "restart", "ring");
         }
-        if (args.length == 2) {
-            switch (args[0].toLowerCase()) {
-                case "ring":
-                    return Arrays.asList("1", "2", "3");
-                default:
-                    return null;
+        if (args[0].equalsIgnoreCase("ring")) {
+            if (args.length == 2) {
+                return Arrays.asList("pling", "banjo", "stop");
             }
         }
 
@@ -71,6 +69,45 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
     }
 
     public boolean onRingCommand(CommandSender sender, String[] args) {
+        Activity activity = McBoyard.telephoneModule.getActivity();
+        if (activity == null) {
+            sender.sendMessage("§cLa salle Téléphone n'est pas démarrée.");
+            return false;
+        }
+        if (args.length < 2) {
+            sender.sendMessage("§cUsage: /telephone ring <pling|banjo|stop> (phoneId)");
+            return false;
+        }
+        RingType ringType;
+        switch (args[1].toLowerCase()) {
+            case "pling":
+                ringType = RingType.PLING;
+                break;
+            case "banjo":
+                ringType = RingType.BANJO;
+                break;
+            case "stop":
+                activity.setRingingPhone(-1, null);
+                sender.sendMessage("§aTéléphone arrêté.");
+                return true;
+            default:
+                sender.sendMessage("§cUsage: /telephone ring <pling|banjo|stop> (phoneId)");
+                return false;
+        }
+
+        int phoneId = -1;
+        if (args.length >= 3) {
+            try {
+                phoneId = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage("§cUsage: /telephone ring <pling|banjo|stop> (phoneId)");
+                return false;
+            }
+        } else {
+            phoneId = activity.getRandomPhoneId();
+        }
+
+        activity.setRingingPhone(phoneId, ringType);
         return true;
     }
 }

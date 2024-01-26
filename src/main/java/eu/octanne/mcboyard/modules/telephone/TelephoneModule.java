@@ -47,4 +47,8 @@ public class TelephoneModule extends PlugModule {
             start();
         }
     }
+
+    public Activity getActivity() {
+        return activity;
+    }
 }
