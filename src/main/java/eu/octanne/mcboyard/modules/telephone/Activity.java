@@ -157,7 +157,25 @@ public class Activity {
         currentRingType = ringType;
     }
 
+    public void nextRingingPhone() {
+        int phone = getRandomPhoneId();
+        RingType ringType = RingType.values()[(int) (Math.random() * RingType.values().length)];
+        setRingingPhone(phone, ringType);
+    }
+
     public int getRandomPhoneId() {
         return (int) (Math.random() * telephones.size());
+    }
+
+    public boolean isPhone(Entity entity) {
+        return telephones.contains(entity);
+    }
+
+    public boolean onPhoneInteract(Entity entity) {
+        if (currentPhone != null && currentPhone.equals(entity)) {
+            nextRingingPhone();
+            return true;
+        }
+        return false;
     }
 }
