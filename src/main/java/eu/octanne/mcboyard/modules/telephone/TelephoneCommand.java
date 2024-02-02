@@ -2,6 +2,8 @@ package eu.octanne.mcboyard.modules.telephone;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import eu.octanne.mcboyard.McBoyard;
-import eu.octanne.mcboyard.modules.telephone.Activity.RingType;
 
 public class TelephoneCommand implements CommandExecutor, TabCompleter {
 
@@ -25,7 +26,7 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
         }
         if (args[0].equalsIgnoreCase("ring")) {
             if (args.length == 2) {
-                return Arrays.asList("pling", "banjo", "around", "stop");
+                return Stream.of(RingType.values()).map(Enum::name).collect(Collectors.toList());
             }
         }
 
@@ -44,7 +45,7 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
             case "ring":
                 return onRingCommand(sender, args);
             default:
-                sender.sendMessage("§cUsage: /telephone <start|stop|reset|room|ring>");
+                sender.sendMessage("§cUsage: /telephone <start|stop|restart|ring>");
                 return false;
         }
     }
@@ -75,27 +76,15 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
             return false;
         }
         if (args.length < 2) {
-            sender.sendMessage("§cUsage: /telephone ring <pling|banjo|stop> (phoneId)");
+            sender.sendMessage("§cUsage: /telephone ring <RingType> (phoneId)");
             return false;
         }
         RingType ringType;
-        switch (args[1].toLowerCase()) {
-            case "pling":
-                ringType = RingType.PLING;
-                break;
-            case "banjo":
-                ringType = RingType.BANJO;
-                break;
-            case "around":
-                ringType = RingType.AROUND;
-                break;
-            case "stop":
-                activity.setRingingPhone(-1, null);
-                sender.sendMessage("§aTéléphone arrêté.");
-                return true;
-            default:
-                sender.sendMessage("§cUsage: /telephone ring <pling|banjo|stop> (phoneId)");
-                return false;
+        try {
+            ringType = RingType.valueOf(args[1].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage("§cUsage: /telephone ring <RingType> (phoneId)");
+            return false;
         }
 
         int phoneId = -1;
@@ -103,7 +92,7 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
             try {
                 phoneId = Integer.parseInt(args[2]);
             } catch (NumberFormatException e) {
-                sender.sendMessage("§cUsage: /telephone ring <pling|banjo|stop> (phoneId)");
+                sender.sendMessage("§cUsage: /telephone ring <RingType> (phoneId)");
                 return false;
             }
         } else {
