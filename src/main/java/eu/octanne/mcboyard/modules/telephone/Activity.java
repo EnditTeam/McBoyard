@@ -115,13 +115,13 @@ public class Activity {
 
     private void tick() {
         if (currentPhoneLocation != null) {
-            ringTick++;
             if (currentRingType.isTimesUp(ringTick)) {
                 // Restart the ring sequence by ringing in the first room
                 Entity nextPhone = getRandomPhone(Room.ROOM1);
                 setRingingPhone(nextPhone, currentRingType);
             } else {
                 currentRingType.tick(ringTick, currentPhoneLocation);
+                ringTick++;
             }
         }
     }
