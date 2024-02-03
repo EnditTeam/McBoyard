@@ -51,14 +51,15 @@ public enum RingType {
     public boolean isTimesUp(Integer ringTick) {
         switch (this) {
             case HARP:     // 5"
-            case DIAL:     // 5"
             case GLITCH:   // 5"
             case PARTICLE: // 3"
             case DUCK:     // 5"
             case CEILING:  // 4"
             case TRUCK:    // 5"
-            case HOTLINE:  // 5"
                 return ringTick >= 200;
+            case DIAL:    // 5"
+            case HOTLINE: // 5"
+                return ringTick >= 240;
             case SMOKE:   // 8"
             case SHAKING: // 9"
                 return ringTick >= 400;
@@ -67,7 +68,7 @@ public enum RingType {
         }
     }
 
-    public void deinit(Activity activity) {
+    public void stopSounds() {
         String stopSoundStr = null;
         switch (this) {
             case DIAL:
@@ -77,11 +78,7 @@ public enum RingType {
                 Activity.getNearbyPlayers().forEach(player -> player.removePotionEffect(PotionEffectType.BLINDNESS));
                 break;
             case DUCK:
-                activity.resetTelephoneItem();
                 stopSoundStr = "minecraft:telephone/canard";
-                break;
-            case CEILING:
-                activity.moveTelephones(new Vector(0, -2, 0));
                 break;
             case HOTLINE:
                 stopSoundStr = "minecraft:telephone/hotline";
@@ -110,7 +107,7 @@ public enum RingType {
     }
 
     private static void tickDialPhone(Integer ringTick, Location loc) {
-        if (ringTick % 80 == 0)
+        if (ringTick % 80 == 20)
             playSound(loc, "minecraft:telephone/dialphone", 1, 1);
     }
 
@@ -205,7 +202,7 @@ public enum RingType {
     }
 
     private static void tickHotline(Integer ringTick, Location loc) {
-        if (ringTick % 100 == 0)
+        if (ringTick % 100 == 40)
             playSound(loc, "minecraft:telephone/hotline", 1, 1);
     }
 }

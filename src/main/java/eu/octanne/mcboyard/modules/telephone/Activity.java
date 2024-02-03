@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -24,10 +25,16 @@ public class Activity {
     private List<Entity> telephones1 = new ArrayList<>();
     private List<Entity> telephones2 = new ArrayList<>();
     private BukkitTask task = null;
+    private Room currentRoom = null;
     private Entity currentPhone = null;
     private Location currentPhoneLocation = null;
     private RingType currentRingType = null;
     private int ringTick = 0;
+    private static final int TICK_PAUSE_BEFORE_NEXT_RINGING_PHONE = -20;
+    private Block blockTelephone1 = null;
+    private Block blockTelephone2 = null;
+    private Vector telephonesMoveDelta = new Vector(0, 0, 0);
+    private boolean isCustomItem = false;
 
     private List<RingType> ringTypesToDo;
 
@@ -93,16 +100,18 @@ public class Activity {
 
     public void start() {
         placeRoom();
+        currentRoom = null;
         currentPhone = null;
         currentPhoneLocation = null;
         currentRingType = null;
+        resetBlockSocles();
         if (task != null) {
             task.cancel();
             task = null;
         }
         ringTypesToDo = new ArrayList<>(List.of(RingType.values()));
         task = Bukkit.getScheduler().runTaskTimer(McBoyard.instance, this::tick, 0, 1);
-        nextRingingPhone();
+        ringTick = TICK_PAUSE_BEFORE_NEXT_RINGING_PHONE;
     }
 
     public void stop() {
@@ -114,9 +123,24 @@ public class Activity {
     }
 
     private void tick() {
+        if (ringTick < 0) {
+            // Délai de 20 ticks pour le prochain téléphone/reset des socles
+            ringTick++;
+            if (ringTick == 0) {
+                if (currentRoom == Room.ROOM2) {
+                    resetBlockSocles(); // Reset 1s after the link in room 2
+                }
+                nextRingingPhone();
+            }
+            return;
+        }
         if (currentPhoneLocation != null) {
             if (currentRingType.isTimesUp(ringTick)) {
                 // Restart the ring sequence by ringing in the first room
+                resetBlockSocles();
+                currentPhoneLocation.getWorld().playSound(currentPhoneLocation, Sound.BLOCK_CONDUIT_DEACTIVATE, 1, 1);
+                getNearbyPlayers().forEach(
+                    p -> p.sendMessage("§cLe téléphone a raccroché\n§rUn nouveau téléphone sonne dans la salle §averte"));
                 Entity nextPhone = getRandomPhone(Room.ROOM1);
                 setRingingPhone(nextPhone, currentRingType);
             } else {
@@ -127,34 +151,38 @@ public class Activity {
     }
 
     public void setRingingPhone(Entity phone, RingType ringType) {
-        if (this.currentRingType != null) {
-            this.currentRingType.deinit(this);
+        if (currentRingType != null && currentRoom == Room.ROOM2) {
+            resetTelephoneItem();
+            moveTelephones(telephonesMoveDelta.clone().multiply(-1));
         }
         if (phone == null || ringType == null) {
+            currentRoom = null;
             currentPhone = null;
             currentPhoneLocation = null;
             currentRingType = null;
             return;
         }
+        currentRoom = telephones1.contains(phone) ? Room.ROOM1 : Room.ROOM2;
         currentPhone = phone;
         currentPhoneLocation = phone.getLocation().clone().add(0, 2, 0);
         currentRingType = ringType;
         ringTick = 0;
-        currentRingType.init(this);
+        if (currentRoom == Room.ROOM1) {
+            currentRingType.init(this);
+        }
     }
 
     public void nextRingingPhone() {
-        Room currentRoom = getCurrentRoom();
         Entity nextPhone;
         RingType nextRingType;
 
         if (currentRoom == Room.ROOM1) {
             nextPhone = getRandomPhone(Room.ROOM2);
             nextRingType = currentRingType; // same ring type
+            getNearbyPlayers().forEach(p -> p.sendMessage("Un téléphone sonne dans la salle §crouge"));
         } else {
             // Room.ROOM2 or null
             if (currentRoom == Room.ROOM2) {
-                ringTypesToDo.remove(currentRingType);
                 if (ringTypesToDo.isEmpty()) {
                     win();
                     return;
@@ -163,6 +191,7 @@ public class Activity {
             nextPhone = getRandomPhone(Room.ROOM1);
             nextRingType = ringTypesToDo.get((int) (Math.random() * ringTypesToDo.size()));
             McBoyard.instance.getLogger().info("Telephone nextRingType: " + nextRingType);
+            getNearbyPlayers().forEach(p -> p.sendMessage("Un téléphone sonne dans la salle §averte"));
         }
 
         setRingingPhone(nextPhone, nextRingType);
@@ -180,14 +209,32 @@ public class Activity {
     }
 
     public boolean onPhoneInteract(Entity entity) {
-        if (currentPhone != null && currentPhone.equals(entity)) {
+        if (currentPhone != null && currentPhone.equals(entity) && ringTick > 0) {
             Location loc = currentPhoneLocation;
             if (currentRingType == RingType.DUCK) {
                 loc.getWorld().playSound(loc, "minecraft:telephone/quack1", 1, 1);
             } else {
                 loc.getWorld().playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
             }
-            nextRingingPhone();
+            this.currentRingType.stopSounds();
+            ringTick = TICK_PAUSE_BEFORE_NEXT_RINGING_PHONE;
+
+            if (currentRoom == Room.ROOM1) {
+                blockTelephone1 = currentPhone.getLocation().getBlock().getRelative(
+                    0 - telephonesMoveDelta.getBlockX(), 1 - telephonesMoveDelta.getBlockY(), 0 - telephonesMoveDelta.getBlockZ());
+                blockTelephone1.setType(Material.GLOWSTONE);
+                getNearbyPlayers().forEach(p -> p.sendMessage("Téléphone décroché"));
+            } else {
+                ringTypesToDo.remove(currentRingType);
+                blockTelephone2 = currentPhone.getLocation().getBlock().getRelative(
+                    0 - telephonesMoveDelta.getBlockX(), 1 - telephonesMoveDelta.getBlockY(), 0 - telephonesMoveDelta.getBlockZ());
+                blockTelephone2.setType(Material.GLOWSTONE);
+                int ringTypes = RingType.values().length;
+                int ringTypesDone = ringTypes - getRingTypesToDoSize();
+                getNearbyPlayers().forEach(
+                    p -> p.sendMessage("Téléphone décroché, " + ringTypesDone + " / " + ringTypes + " téléphones liés"));
+            }
+
             return true;
         }
         return false;
@@ -195,17 +242,6 @@ public class Activity {
 
     public int getRingTypesToDoSize() {
         return ringTypesToDo.size();
-    }
-
-    public Room getCurrentRoom() {
-        if (currentPhone != null) {
-            if (telephones1.contains(currentPhone)) {
-                return Room.ROOM1;
-            } else if (telephones2.contains(currentPhone)) {
-                return Room.ROOM2;
-            }
-        }
-        return null;
     }
 
     public static Collection<Player> getNearbyPlayers() {
@@ -217,13 +253,22 @@ public class Activity {
         ItemStack phoneItem = new ItemStack(material);
         phoneItem.editMeta(meta -> meta.setCustomModelData(customModelData));
         telephones.forEach(phone -> ((ArmorStand) phone).setItem(EquipmentSlot.HEAD, phoneItem.clone()));
+        isCustomItem = true;
     }
 
     protected void resetTelephoneItem() {
-        setTelephoneItem(Material.CARROT_ON_A_STICK, 7);
+        if (isCustomItem) {
+            setTelephoneItem(Material.CARROT_ON_A_STICK, 7);
+            isCustomItem = false;
+        }
     }
 
+    /**
+     * Move all telephones relatively to their current position
+     */
     protected void moveTelephones(Vector delta) {
+        Vector cumule = telephonesMoveDelta == null ? delta : telephonesMoveDelta.add(delta);
+        telephonesMoveDelta = cumule;
         telephones.forEach(phone -> phone.teleport(phone.getLocation().add(delta)));
     }
 
@@ -232,5 +277,16 @@ public class Activity {
         McBoyard.instance.getLogger().info("Telephone win");
         Location loc = new Location(McBoyard.getWorld(), -6, 99, 114);
         loc.getBlock().setType(Material.REDSTONE_BLOCK, true); // fb_cle:actions/telephone/monte_c4
+    }
+
+    private void resetBlockSocles() {
+        if (blockTelephone1 != null) {
+            blockTelephone1.setType(Material.GREEN_WOOL);
+            blockTelephone1 = null;
+        }
+        if (blockTelephone2 != null) {
+            blockTelephone2.setType(Material.RED_WOOL);
+            blockTelephone2 = null;
+        }
     }
 }

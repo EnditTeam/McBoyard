@@ -9,7 +9,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 import eu.octanne.mcboyard.McBoyard;
-import eu.octanne.mcboyard.modules.telephone.Activity.Room;
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
 
 public class TelephoneListener implements Listener {
@@ -21,13 +20,7 @@ public class TelephoneListener implements Listener {
             return false;
         if (!activity.isPhone(target))
             return false;
-        Room currentRoom = activity.getCurrentRoom();
-        if (activity.onPhoneInteract(target) && currentRoom == Room.ROOM2) {
-            int ringTypesToDo = activity.getRingTypesToDoSize();
-            int ringTypes = RingType.values().length;
-            int ringTypesDone = ringTypes - ringTypesToDo;
-            player.sendMessage("§a" + ringTypesDone + " / " + ringTypes + " téléphones liés.");
-        }
+        activity.onPhoneInteract(target);
         event.setCancelled(true);
         return true;
     }
