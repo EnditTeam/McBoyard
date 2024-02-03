@@ -8,11 +8,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public enum RingType {
-    PLING(RingType::tickPling),
-    BANJO(RingType::tickBanjo),
+    HARP(RingType::tickHarp),
+    DIAL(RingType::tickDialPhone),    // normal dial phone
     GLITCH(RingType::tickGlitch),     // around the phone
     PARTICLE(RingType::tickParticle), // particles around the phone
     SMOKE(RingType::tickSmoke),       // cloud particles
@@ -46,16 +48,43 @@ public enum RingType {
         }
     }
 
+    public boolean isTimesUp(Integer ringTick) {
+        switch (this) {
+            case HARP:
+            case DIAL:
+            case GLITCH:
+            case PARTICLE:
+            case SMOKE:
+            case SHAKING:
+            case DUCK:
+            case CEILING:
+            case TRUCK:
+            case HOTLINE:
+                return ringTick > 400;
+            default:
+                return false;
+        }
+    }
+
     public void deinit(Activity activity) {
+        String stopSoundStr = null;
         switch (this) {
             case DUCK:
                 activity.resetTelephoneItem();
+                stopSoundStr = "minecraft:telephone/canard";
                 break;
             case CEILING:
                 activity.moveTelephones(new Vector(0, -2, 0));
                 break;
+            case HOTLINE:
+                stopSoundStr = "minecraft:telephone/hotline";
+                break;
             default:
                 break;
+        }
+        if (stopSoundStr != null) {
+            final String finalStopSoundStr = stopSoundStr;
+            Activity.getNearbyPlayers().forEach(player -> player.stopSound(finalStopSoundStr));
         }
     }
 
@@ -63,23 +92,19 @@ public enum RingType {
         loc.getWorld().playSound(loc, sound, volume, pitch);
     }
 
-    private static Collection<Player> getNearbyPlayers(Location loc) {
-        return loc.getWorld().getNearbyPlayers(loc, 30, 10, 20,
-            p
-            -> !p.isInvisible() &&
-                   (p.getGameMode().equals(org.bukkit.GameMode.SURVIVAL) || p.getGameMode().equals(org.bukkit.GameMode.ADVENTURE)));
+    private static void playSound(Location loc, String sound, float volume, float pitch) {
+        loc.getWorld().playSound(loc, sound, volume, pitch);
     }
 
-    private static void tickPling(Integer ringTick, Location loc) {
+    private static void tickHarp(Integer ringTick, Location loc) {
         if (ringTick % 40 >= 30)
             return;
-        playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1.5f);
+        playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1, 1.5f);
     }
 
-    private static void tickBanjo(Integer ringTick, Location loc) {
-        if (ringTick % 60 >= 40)
-            return;
-        playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, 1, 1);
+    private static void tickDialPhone(Integer ringTick, Location loc) {
+        if (ringTick % 80 == 0)
+            playSound(loc, "minecraft:telephone/dialphone", 1, 1);
     }
 
     private static void tickGlitch(Integer ringTick, Location loc) {
@@ -114,7 +139,7 @@ public enum RingType {
 
     private static void tickSmoke(Integer ringTick, Location loc) {
         // Smoke around the players in survival mode
-        Collection<Player> players = getNearbyPlayers(loc);
+        Collection<Player> players = Activity.getNearbyPlayers();
         int i = 0;
         for (Player player : players) {
             double yaw = Math.toRadians(player.getLocation().getYaw());
@@ -125,6 +150,10 @@ public enum RingType {
             if (i > 5)
                 break;
         }
+        PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 60, 0);
+        for (Player player : players) {
+            player.addPotionEffect(blindness);
+        }
 
         playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 0.5f);
     }
@@ -133,7 +162,7 @@ public enum RingType {
         if (ringTick % 40 >= 20)
             return;
         if (ringTick % 2 == 0) {
-            Collection<Player> players = getNearbyPlayers(loc);
+            Collection<Player> players = Activity.getNearbyPlayers();
             for (Player player : players) {
                 // Add random velocity and rotation to the player
                 Vector velocity = player.getVelocity();
@@ -151,10 +180,8 @@ public enum RingType {
     }
 
     private static void tickDuck(Integer ringTick, Location loc) {
-        if (ringTick % 40 >= 20)
-            return;
-        if (ringTick % 20 == 0 || ringTick % 20 == 5 || ringTick % 20 == 10)
-            playSound(loc, Sound.ENTITY_CHICKEN_AMBIENT, 1, 1);
+        if (ringTick % 100 == 0)
+            playSound(loc, "minecraft:telephone/canard", 1, 1);
     }
 
     private static void tickCeiling(Integer ringTick, Location loc) {
@@ -164,12 +191,14 @@ public enum RingType {
     }
 
     private static void tickTruck(Integer ringTick, Location loc) {
-        playSound(loc, Sound.ENTITY_VILLAGER_NO, 0.5f, 1);
+        if (ringTick % 80 == 0)
+            playSound(loc, "minecraft:telephone/truck1", 0.5f, 1);
+        if (ringTick % 80 == 20)
+            playSound(loc, "minecraft:telephone/truck2", 0.5f, 1);
     }
 
     private static void tickHotline(Integer ringTick, Location loc) {
-        if (ringTick % 40 >= 20)
-            return;
-        playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1, 1);
+        if (ringTick % 80 == 0)
+            playSound(loc, "minecraft:telephone/hotline", 1, 1);
     }
 }

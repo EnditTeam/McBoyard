@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,30 +77,20 @@ public class TelephoneCommand implements CommandExecutor, TabCompleter {
             return false;
         }
         if (args.length < 2) {
-            sender.sendMessage("§cUsage: /telephone ring <RingType> (phoneId)");
+            sender.sendMessage("§cUsage: /telephone ring <RingType>");
             return false;
         }
         RingType ringType;
         try {
             ringType = RingType.valueOf(args[1].toUpperCase());
         } catch (IllegalArgumentException e) {
-            sender.sendMessage("§cUsage: /telephone ring <RingType> (phoneId)");
+            sender.sendMessage("§cUsage: /telephone ring <RingType>");
             return false;
         }
 
-        int phoneId = -1;
-        if (args.length >= 3) {
-            try {
-                phoneId = Integer.parseInt(args[2]);
-            } catch (NumberFormatException e) {
-                sender.sendMessage("§cUsage: /telephone ring <RingType> (phoneId)");
-                return false;
-            }
-        } else {
-            phoneId = activity.getRandomPhoneId();
-        }
+        Entity phone = activity.getRandomPhone(Activity.Room.ROOM1);
 
-        activity.setRingingPhone(phoneId, ringType);
+        activity.setRingingPhone(phone, ringType);
         return true;
     }
 }
