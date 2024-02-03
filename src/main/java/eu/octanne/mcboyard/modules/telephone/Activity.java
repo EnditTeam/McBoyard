@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -124,6 +125,8 @@ public class Activity {
 
     public boolean onPhoneInteract(Entity entity) {
         if (currentPhone != null && currentPhone.equals(entity)) {
+            Location loc = currentPhoneLocation;
+            loc.getWorld().playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
             nextRingingPhone();
             return true;
         }

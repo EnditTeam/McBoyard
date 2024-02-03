@@ -1,6 +1,5 @@
 package eu.octanne.mcboyard.modules.telephone;
 
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -17,11 +16,11 @@ public class TelephoneListener implements Listener {
         Activity activity = McBoyard.telephoneModule.getActivity();
         if (activity == null)
             return false;
+        if (player.isInvisible())
+            return false;
         if (!activity.isPhone(target))
             return false;
-        if (activity.onPhoneInteract(target)) {
-            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-        }
+        activity.onPhoneInteract(target);
         event.setCancelled(true);
         return true;
     }
