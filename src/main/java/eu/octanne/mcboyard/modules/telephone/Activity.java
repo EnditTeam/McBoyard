@@ -37,6 +37,7 @@ public class Activity {
     private boolean isCustomItem = false;
 
     private List<RingType> ringTypesToDo;
+    private static final Location ROOM_CENTER = new Location(McBoyard.getWorld(), 8, 93, 124);
 
     public enum Room { ROOM1, ROOM2 }
 
@@ -122,6 +123,14 @@ public class Activity {
         }
     }
 
+    protected int getRingTick() {
+        return ringTick;
+    }
+
+    protected Location getRingLocation() {
+        return currentPhoneLocation;
+    }
+
     private void tick() {
         if (ringTick < 0) {
             // Délai de 20 ticks pour le prochain téléphone/reset des socles
@@ -144,16 +153,17 @@ public class Activity {
                 Entity nextPhone = getRandomPhone(Room.ROOM1);
                 setRingingPhone(nextPhone, currentRingType);
             } else {
-                currentRingType.tick(ringTick, currentPhoneLocation);
+                currentRingType.tick(this);
                 ringTick++;
             }
         }
     }
 
     public void setRingingPhone(Entity phone, RingType ringType) {
-        if (currentRingType != null && currentRoom == Room.ROOM2) {
+        if (currentRingType != null && currentRingType != ringType) {
+            currentRingType.stopSounds();
             resetTelephoneItem();
-            moveTelephones(telephonesMoveDelta.clone().multiply(-1));
+            resetTelephonesLocation();
         }
         if (phone == null || ringType == null) {
             currentRoom = null;
@@ -165,9 +175,10 @@ public class Activity {
         currentRoom = telephones1.contains(phone) ? Room.ROOM1 : Room.ROOM2;
         currentPhone = phone;
         currentPhoneLocation = phone.getLocation().clone().add(0, 2, 0);
+        RingType previousRingType = currentRingType;
         currentRingType = ringType;
         ringTick = 0;
-        if (currentRoom == Room.ROOM1) {
+        if (previousRingType != currentRingType) {
             currentRingType.init(this);
         }
     }
@@ -245,8 +256,8 @@ public class Activity {
     }
 
     public static Collection<Player> getNearbyPlayers() {
-        Location loc = new Location(McBoyard.getWorld(), 8, 93, 122);
-        return loc.getWorld().getNearbyPlayers(loc, 30, 10, 20, p -> !p.isInvisible() && p.getGameMode() != org.bukkit.GameMode.SPECTATOR);
+        return ROOM_CENTER.getWorld().getNearbyPlayers(
+            ROOM_CENTER, 18, 5, 11, p -> !p.isInvisible() && p.getGameMode() != org.bukkit.GameMode.SPECTATOR);
     }
 
     protected void setTelephoneItem(Material material, int customModelData) {
@@ -270,6 +281,36 @@ public class Activity {
         Vector cumule = telephonesMoveDelta == null ? delta : telephonesMoveDelta.add(delta);
         telephonesMoveDelta = cumule;
         telephones.forEach(phone -> phone.teleport(phone.getLocation().add(delta)));
+    }
+
+    protected List<Entity> getTelephones() {
+        return telephones;
+    }
+
+    protected void resetTelephonesLocation() {
+        // From -5 93 118 to 3 93 132, summon a phone with a step of 2
+        int index = 0;
+        for (int x = -5; x <= 3; x += 2) {
+            for (int z = 118; z <= 132; z += 2) {
+                Location loc = new Location(McBoyard.getWorld(), x + 0.5, 92.45, z + 0.5, 180, 0);
+                Entity phone = telephones1.get(index);
+                phone.teleport(loc);
+                index++;
+            }
+        }
+
+        // From 12 93 114 to 24 93 124, summon a phone with a step of 2
+        index = 0;
+        for (int x = 12; x <= 24; x += 2) {
+            for (int z = 114; z <= 124; z += 2) {
+                Location loc = new Location(McBoyard.getWorld(), x + 0.5, 92.45, z + 0.5, 90, 0);
+                Entity phone = telephones2.get(index);
+                phone.teleport(loc);
+                index++;
+            }
+        }
+
+        telephonesMoveDelta = new Vector(0, 0, 0);
     }
 
     private void win() {

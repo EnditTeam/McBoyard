@@ -1,7 +1,7 @@
 package eu.octanne.mcboyard.modules.telephone;
 
 import java.util.Collection;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,14 +25,14 @@ public enum RingType {
     HOTLINE(RingType::tickHotline),   // red phone
     ;
 
-    private BiConsumer<Integer, Location> tickConsumer;
+    private Consumer<Activity> tickConsumer;
 
-    private RingType(BiConsumer<Integer, Location> tickConsumer) {
+    private RingType(Consumer<Activity> tickConsumer) {
         this.tickConsumer = tickConsumer;
     }
 
-    public void tick(Integer ringTick, Location loc) {
-        tickConsumer.accept(ringTick, loc);
+    public void tick(Activity activity) {
+        tickConsumer.accept(activity);
     }
 
     public void init(Activity activity) {
@@ -100,21 +100,27 @@ public enum RingType {
         loc.getWorld().playSound(loc, sound, volume, pitch);
     }
 
-    private static void tickHarp(Integer ringTick, Location loc) {
+    private static void tickHarp(Activity activity) {
+        int ringTick = activity.getRingTick();
         if (ringTick % 40 >= 30)
             return;
+        Location loc = activity.getRingLocation();
         playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1, 1.5f);
     }
 
-    private static void tickDialPhone(Integer ringTick, Location loc) {
-        if (ringTick % 80 == 20)
+    private static void tickDialPhone(Activity activity) {
+        int ringTick = activity.getRingTick();
+        if (ringTick % 80 == 20) {
+            Location loc = activity.getRingLocation();
             playSound(loc, "minecraft:telephone/dialphone", 1, 1);
+        }
     }
 
-    private static void tickGlitch(Integer ringTick, Location loc) {
+    private static void tickGlitch(Activity activity) {
+        int ringTick = activity.getRingTick();
         int index = (ringTick / 4) % 16;
         // Move according to the index as a square around the phone
-        loc = loc.clone();
+        Location loc = activity.getRingLocation().clone();
         if (index == 0) {
             loc.add(0, 0, 1);
         } else if (index == 1) {
@@ -135,13 +141,15 @@ public enum RingType {
         playSound(loc, Sound.BLOCK_NOTE_BLOCK_BIT, 1, 0.5f);
     }
 
-    private static void tickParticle(Integer ringTick, Location loc) {
+    private static void tickParticle(Activity activity) {
+        int ringTick = activity.getRingTick();
         if (ringTick % 40 >= 20)
             return;
+        Location loc = activity.getRingLocation();
         loc.getWorld().spawnParticle(Particle.NOTE, loc, 1, 0, 0, 0, 0);
     }
 
-    private static void tickSmoke(Integer ringTick, Location loc) {
+    private static void tickSmoke(Activity activity) {
         // Smoke around the players in survival mode
         Collection<Player> players = Activity.getNearbyPlayers();
         int i = 0;
@@ -158,11 +166,12 @@ public enum RingType {
         for (Player player : players) {
             player.addPotionEffect(blindness);
         }
-
+        Location loc = activity.getRingLocation();
         playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 0.5f);
     }
 
-    private static void tickShaking(Integer ringTick, Location loc) {
+    private static void tickShaking(Activity activity) {
+        int ringTick = activity.getRingTick();
         if (ringTick % 40 >= 20)
             return;
         if (ringTick % 2 == 0) {
@@ -180,29 +189,50 @@ public enum RingType {
                 player.setVelocity(velocity);
             }
         }
+        Location loc = activity.getRingLocation();
         playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 0.5f);
     }
 
-    private static void tickDuck(Integer ringTick, Location loc) {
-        if (ringTick % 100 == 0)
+    private static void tickDuck(Activity activity) {
+        int ringTick = activity.getRingTick();
+        if (ringTick % 100 == 0) {
+            Location loc = activity.getRingLocation();
             playSound(loc, "minecraft:telephone/canard", 1, 1);
+        }
     }
 
-    private static void tickCeiling(Integer ringTick, Location loc) {
+    private static void tickCeiling(Activity activity) {
+        int ringTick = activity.getRingTick();
+        activity.getTelephones().forEach(entity -> {
+            int seed = entity.hashCode();
+            // wave of period T = 200 ticks and delta y = 0.3
+            double y1 = Math.sin((ringTick + seed) / 200.0 * 2 * Math.PI) * 0.15;
+            double y2 = Math.sin((ringTick + seed + 1) / 200.0 * 2 * Math.PI) * 0.15;
+            Location loc = entity.getLocation();
+            loc.add(0, y1 - y2, 0);
+            entity.teleport(loc);
+        });
+
         if (ringTick % 40 >= 20)
             return;
+        Location loc = activity.getRingLocation();
         playSound(loc, Sound.BLOCK_NOTE_BLOCK_COW_BELL, 1, 1.5f);
     }
 
-    private static void tickTruck(Integer ringTick, Location loc) {
+    private static void tickTruck(Activity activity) {
+        int ringTick = activity.getRingTick();
+        Location loc = activity.getRingLocation();
         if (ringTick % 80 == 0)
             playSound(loc, "minecraft:telephone/truck1", 0.5f, 1);
         if (ringTick % 80 == 20)
             playSound(loc, "minecraft:telephone/truck2", 0.5f, 1);
     }
 
-    private static void tickHotline(Integer ringTick, Location loc) {
-        if (ringTick % 100 == 40)
+    private static void tickHotline(Activity activity) {
+        int ringTick = activity.getRingTick();
+        if (ringTick % 100 == 40) {
+            Location loc = activity.getRingLocation();
             playSound(loc, "minecraft:telephone/hotline", 1, 1);
+        }
     }
 }
