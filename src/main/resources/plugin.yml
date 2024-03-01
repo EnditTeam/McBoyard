@@ -63,3 +63,6 @@ commands:
   telephone:
     description: Salle du Téléphone
     permission: mcboyard
+  morse:
+    description: Salle SOS (Code morse)
+    permission: mcboyard

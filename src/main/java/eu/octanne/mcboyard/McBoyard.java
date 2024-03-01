@@ -8,6 +8,7 @@ import eu.octanne.mcboyard.modules.*;
 import eu.octanne.mcboyard.modules.coffrefort.CoffreFortModule;
 import eu.octanne.mcboyard.modules.maitika.MaitikaModule;
 import eu.octanne.mcboyard.modules.telephone.TelephoneModule;
+import eu.octanne.mcboyard.modules.morse.MorseModule;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -47,17 +48,17 @@ public class McBoyard extends JavaPlugin {
 	public static CoffreFortModule coffreFortModule;
 	public static MaitikaModule maitikaModule;
 	public static ElytraParkourModule elytraParkourModule;
-	public static TelephoneModule telephoneModule;
+    public static TelephoneModule telephoneModule;
+    public static MorseModule morseModule;
 
-	@Override
-	public void onEnable() {
-		instance = Bukkit.getPluginManager().getPlugin("McBoyard");
-		Bukkit.getPluginManager().registerEvents(new CustomEntity(), this);
-		preWorldModules();
+    @Override
+    public void onEnable() {
+        instance = Bukkit.getPluginManager().getPlugin("McBoyard");
+        Bukkit.getPluginManager().registerEvents(new CustomEntity(), this);
+        preWorldModules();
 
-		new BukkitRunnable() {
-
-			@Override
+        new BukkitRunnable() {
+            @Override
 			public void run() {
 				config = YamlConfiguration.loadConfiguration(fileConfig);
 				if(!fileConfig.exists()) {
@@ -70,18 +71,18 @@ public class McBoyard extends JavaPlugin {
 				}
 				postWorldModules();
 			}
-		}.runTaskLater(this, 1);
-	}
-	
-	@Override
-	public void onDisable() {
-		unloadModules();
-	}
-	
-	public void postWorldModules() {
-		counterPieceModule = new CounterPiece(this);
-		chronoModule = new Chrono(this);
-		clapModule = new ClapModule(this);
+        }.runTaskLater(this, 1);
+    }
+
+    @Override
+    public void onDisable() {
+        unloadModules();
+    }
+
+    public void postWorldModules() {
+        counterPieceModule = new CounterPiece(this);
+        chronoModule = new Chrono(this);
+        clapModule = new ClapModule(this);
 		kitModule = new KitSystem(this);
 		noChangeWeatherModule = new NoChangeWeather(this);
 		autoMessageModule = new AutoMessage(this);
@@ -96,29 +97,30 @@ public class McBoyard extends JavaPlugin {
 		coffreFortModule = new CoffreFortModule(this);
 		maitikaModule = new MaitikaModule(this);
 		elytraParkourModule = new ElytraParkourModule(this);
-		telephoneModule = new TelephoneModule(this);
-	}
+        telephoneModule = new TelephoneModule(this);
+        morseModule = new MorseModule(this);
+    }
 
-	public void preWorldModules() {
-		excaliburModule = new ExcaliburSystem(this);
-	}
-	
-	/*
-	 * MODULES
-	 * LOAD / UNLOAD
-	 */
-	public void loadModules() {
-		for (PlugModule mod : PlugModule.modules) {
-			mod.onEnable();
-		}
-	}
-	public void unloadModules() {
-		for (PlugModule mod : PlugModule.modules) {
+    public void preWorldModules() {
+        excaliburModule = new ExcaliburSystem(this);
+    }
+
+    /*
+     * MODULES
+     * LOAD / UNLOAD
+     */
+    public void loadModules() {
+        for (PlugModule mod : PlugModule.modules) {
+            mod.onEnable();
+        }
+    }
+    public void unloadModules() {
+        for (PlugModule mod : PlugModule.modules) {
 			mod.onDisable();
 		}
-	}
+    }
 
-	public static World getWorld() {
+    public static World getWorld() {
 		if (world != null)
 			return world;
 		world = Bukkit.getWorld("FB");
