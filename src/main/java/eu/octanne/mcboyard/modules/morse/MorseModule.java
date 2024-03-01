@@ -1,6 +1,7 @@
 package eu.octanne.mcboyard.modules.morse;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -11,7 +12,10 @@ import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.PlugModule;
 
 public class MorseModule extends PlugModule {
-    private static ComputerAnimation computer = null;
+    private ComputerAnimation computer = null;
+    private String computerInputWord = null;
+    private Player computerPlayer = null;
+    private Block computerBlock = null;
 
     public MorseModule(JavaPlugin instance) {
         super(instance);
@@ -34,28 +38,55 @@ public class MorseModule extends PlugModule {
         if (computer != null) {
             computer.reset();
         }
+        computerInputWord = null;
     }
 
     public Block getComputerBlock() {
-        World world = McBoyard.getWorld();
-        // Block is at -34 84 22
-        return world.getBlockAt(-34, 84, 22);
+        if (computerBlock == null) {
+            World world = McBoyard.getWorld();
+            computerBlock = world.getBlockAt(-34, 84, 22);
+        }
+        return computerBlock;
     }
 
-    public void startComputerAnimation() {
+    public boolean computerInteraction(Player player, ItemStack item) {
+        if (computerInputWord != null) {
+            player.sendMessage("§cL'ordinateur est occupé.");
+            return false;
+        }
+
+        computerPlayer = player;
+        computerInputWord = "MORSE";
+        if (item != null) {
+            computerInputWord = MorseTranslator.getItemName(item);
+        }
+
+        player.sendMessage("§eL'ordinateur analyse le mot...");
         if (computer == null) {
             computer = new ComputerAnimation(getComputerBlock(), this::computerAnimationEnd);
         }
         computer.startAnimation();
+        return true;
     }
 
     private void computerAnimationEnd() {
-        // TODO: give a book
+        if (computerPlayer != null) {
+            computerPlayer.sendMessage("§eL'ordinateur a fini d'analyser le mot.");
+            computerPlayer = null;
+        }
+        if (computerInputWord != null) {
+            spawnTranslatedBook(computerInputWord);
+            computerInputWord = null;
+        }
     }
 
-    public void interactWithComputer(Player player, ItemStack item) {
-        startComputerAnimation();
-        // TODO: lock the animation
+    /**
+     * Spawn a book with the MORSE translation of the word
+     */
+    protected void spawnTranslatedBook(String word) {
+        ItemStack book = MorseTranslator.translateWithBook(word);
+        Location loc = getComputerBlock().getLocation().add(0.5, 0.5, 0.5);
+        loc.getWorld().dropItem(loc, book);
     }
 
     public boolean isActive() {
