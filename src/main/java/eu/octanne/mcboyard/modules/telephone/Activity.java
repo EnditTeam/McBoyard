@@ -116,6 +116,11 @@ public class Activity {
     }
 
     public void stop() {
+        resetBlockSocles();
+        if (currentRingType != null) {
+            currentRingType.stopSounds();
+            currentRingType = null;
+        }
         removeRoom();
         if (task != null) {
             task.cancel();

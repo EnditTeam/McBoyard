@@ -157,7 +157,7 @@ public enum RingType {
             double yaw = Math.toRadians(player.getLocation().getYaw());
             double x = -Math.sin(yaw);
             double z = Math.cos(yaw);
-            player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(x, 1.2, z), 20, 1, 0.2, 1, 0.02);
+            player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(x, 1.2, z), 10, 1, 0.2, 1, 0.02);
             i++;
             if (i > 5)
                 break;
