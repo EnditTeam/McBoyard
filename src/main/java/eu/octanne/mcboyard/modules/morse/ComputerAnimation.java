@@ -60,6 +60,9 @@ public class ComputerAnimation {
 
         Skull skull = (Skull) headBlock.getState();
         PlayerProfile profile = skull.getPlayerProfile();
+        if (profile == null) {
+            profile = McBoyard.instance.getServer().createProfile("Octanne");
+        }
         Set<ProfileProperty> properties = profile.getProperties();
 
         // Set the texture value
