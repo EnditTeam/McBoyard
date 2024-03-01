@@ -30,6 +30,14 @@ public class MorseCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         switch (args.length > 0 ? args[0] : "") {
+            case "start":
+                McBoyard.morseModule.start();
+                return true;
+            case "stop":
+                McBoyard.morseModule.stop();
+                return true;
+            case "give_words":
+                return giveWords(sender);
             case "computer_animation":
                 return startComputerAnimation(sender);
             case "translate":
@@ -74,6 +82,21 @@ public class MorseCommand implements CommandExecutor, TabCompleter {
         }
 
         McBoyard.morseModule.spawnTranslatedBook(word);
+        return true;
+    }
+
+    private boolean giveWords(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("§cVous devez être un joueur pour utiliser cette commande.");
+            return false;
+        }
+        Player player = (Player) sender;
+
+        for (String word : MorseModule.WORDS) {
+            ItemStack item = MorseModule.createWordItem(word);
+            player.getInventory().addItem(item);
+        }
+
         return true;
     }
 }

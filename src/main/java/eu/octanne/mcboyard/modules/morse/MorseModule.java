@@ -2,20 +2,37 @@ package eu.octanne.mcboyard.modules.morse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.octanne.mcboyard.McBoyard;
 import eu.octanne.mcboyard.modules.PlugModule;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class MorseModule extends PlugModule {
     private ComputerAnimation computer = null;
     private String computerInputWord = null;
     private Player computerPlayer = null;
     private Block computerBlock = null;
+    private boolean isActive = false;
+    public static final String[] WORDS = {
+        "Camion",
+        "Maquette",
+        "Jamy",
+        "Sabine",
+        "Marcelle",
+        "Sorcier",
+        "Fred",
+        "Science",
+        "Expérience",
+    };
 
     public MorseModule(JavaPlugin instance) {
         super(instance);
@@ -32,6 +49,7 @@ public class MorseModule extends PlugModule {
     @Override
     public void onDisable() {
         reset();
+        computerBlock = null;
     }
 
     public void reset() {
@@ -39,6 +57,16 @@ public class MorseModule extends PlugModule {
             computer.reset();
         }
         computerInputWord = null;
+        computerPlayer = null;
+    }
+
+    public static ItemStack createWordItem(String word) {
+        ItemStack item = new ItemStack(Material.PAPER);
+        ItemMeta meta = item.getItemMeta();
+        Component text = Component.text(word, Style.empty().decoration(TextDecoration.ITALIC, false));
+        meta.displayName(text);
+        item.setItemMeta(meta);
+        return item;
     }
 
     public Block getComputerBlock() {
@@ -89,8 +117,16 @@ public class MorseModule extends PlugModule {
         loc.getWorld().dropItem(loc, book);
     }
 
+    public void start() {
+        isActive = true;
+    }
+
+    public void stop() {
+        isActive = false;
+        reset();
+    }
+
     public boolean isActive() {
-        // TODO
-        return false;
+        return isActive;
     }
 }
