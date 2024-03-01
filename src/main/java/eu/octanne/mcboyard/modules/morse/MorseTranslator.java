@@ -116,6 +116,52 @@ public class MorseTranslator {
      * Return the morse code of a character (non accentuated)
      */
     public static String getMorseChar(char c) {
+        // Remove common accents
+        switch (c) {
+            case 'á':
+            case 'à':
+            case 'â':
+            case 'ä':
+                c = 'a';
+                break;
+            case 'é':
+            case 'è':
+            case 'ê':
+            case 'ë':
+                c = 'e';
+                break;
+            case 'í':
+            case 'ì':
+            case 'î':
+            case 'ï':
+                c = 'i';
+                break;
+            case 'ó':
+            case 'ò':
+            case 'ô':
+            case 'ö':
+                c = 'o';
+                break;
+            case 'ú':
+            case 'ù':
+            case 'û':
+            case 'ü':
+                c = 'u';
+                break;
+            case 'ý':
+            case 'ỳ':
+            case 'ŷ':
+            case 'ÿ':
+                c = 'y';
+                break;
+            case 'ñ':
+                c = 'n';
+                break;
+            case 'ç':
+                c = 'c';
+                break;
+        }
+
         if (c >= 'A' && c <= 'Z') {
             return morseTable[c - 'A'];
         } else if (c >= 'a' && c <= 'z') {
