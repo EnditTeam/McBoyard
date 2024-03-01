@@ -106,10 +106,7 @@ public class ComputerAnimation {
 
         if (play) {
             // Can play more than one sound at once with a different probability
-            playSoundWithProbability(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, 0.5f, 0.5f, 0.05f);
-            playSoundWithProbability(loc, Sound.BLOCK_NOTE_BLOCK_HAT, 0.5f, 0.5f, 0.1f);
-            playSoundWithProbability(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 0.5f, 0.5f, 0.2f);
-            playSoundWithProbability(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 0.5f, 0.5f, 0.2f);
+            playSoundWithProbability(loc, Sound.BLOCK_NOTE_BLOCK_HAT, 0.5f, 0.5f, 0.9f);
         }
         return play;
     }
