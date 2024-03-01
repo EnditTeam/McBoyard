@@ -54,6 +54,10 @@ public class LootTableBuilder {
         return add(item, chance, min, max);
     }
 
+    public int size() {
+        return entries.size();
+    }
+
     /**
      * Fill an inventory (chest) with the items of this loot table
      * 

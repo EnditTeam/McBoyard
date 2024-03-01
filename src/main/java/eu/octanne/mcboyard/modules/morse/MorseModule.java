@@ -22,17 +22,6 @@ public class MorseModule extends PlugModule {
     private Player computerPlayer = null;
     private Block computerBlock = null;
     private boolean isActive = false;
-    public static final String[] WORDS = {
-        "Camion",
-        "Maquette",
-        "Jamy",
-        "Sabine",
-        "Marcelle",
-        "Sorcier",
-        "Fred",
-        "Science",
-        "Expérience",
-    };
 
     public MorseModule(JavaPlugin instance) {
         super(instance);
@@ -119,6 +108,7 @@ public class MorseModule extends PlugModule {
 
     public void start() {
         isActive = true;
+        ArchiveRoom.fillChests();
     }
 
     public void stop() {

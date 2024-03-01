@@ -92,7 +92,7 @@ public class MorseCommand implements CommandExecutor, TabCompleter {
         }
         Player player = (Player) sender;
 
-        for (String word : MorseModule.WORDS) {
+        for (String word : ArchiveRoom.WORDS) {
             ItemStack item = MorseModule.createWordItem(word);
             player.getInventory().addItem(item);
         }
