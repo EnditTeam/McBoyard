@@ -235,16 +235,18 @@ public class Activity {
             this.currentRingType.stopSounds();
             ringTick = TICK_PAUSE_BEFORE_NEXT_RINGING_PHONE;
 
+            Location locPhone = currentPhone.getLocation().clone();
+            locPhone.add(-telephonesMoveDelta.getX(), -telephonesMoveDelta.getY(), -telephonesMoveDelta.getZ());
+            locPhone.setY(getTelephonesDefaultY() + 1);
+            Block blockTelephone = locPhone.getBlock();
+            blockTelephone.setType(Material.GLOWSTONE);
+
             if (currentRoom == Room.ROOM1) {
-                blockTelephone1 = currentPhone.getLocation().getBlock().getRelative(
-                    0 - telephonesMoveDelta.getBlockX(), 1 - telephonesMoveDelta.getBlockY(), 0 - telephonesMoveDelta.getBlockZ());
-                blockTelephone1.setType(Material.GLOWSTONE);
+                blockTelephone1 = blockTelephone;
                 getNearbyPlayers().forEach(p -> p.sendMessage("Téléphone décroché"));
             } else {
+                blockTelephone2 = blockTelephone;
                 ringTypesToDo.remove(currentRingType);
-                blockTelephone2 = currentPhone.getLocation().getBlock().getRelative(
-                    0 - telephonesMoveDelta.getBlockX(), 1 - telephonesMoveDelta.getBlockY(), 0 - telephonesMoveDelta.getBlockZ());
-                blockTelephone2.setType(Material.GLOWSTONE);
                 int ringTypes = RingType.values().length;
                 int ringTypesDone = ringTypes - getRingTypesToDoSize();
                 getNearbyPlayers().forEach(
@@ -290,6 +292,10 @@ public class Activity {
 
     protected List<Entity> getTelephones() {
         return telephones;
+    }
+
+    protected double getTelephonesDefaultY() {
+        return 92.45;
     }
 
     protected void resetTelephonesLocation() {

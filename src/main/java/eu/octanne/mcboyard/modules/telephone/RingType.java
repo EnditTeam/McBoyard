@@ -40,9 +40,6 @@ public enum RingType {
             case DUCK:
                 activity.setTelephoneItem(Material.TOTEM_OF_UNDYING, 0);
                 break;
-            case CEILING:
-                activity.moveTelephones(new Vector(0, 2, 0));
-                break;
             default:
                 break;
         }
@@ -157,7 +154,7 @@ public enum RingType {
             double yaw = Math.toRadians(player.getLocation().getYaw());
             double x = -Math.sin(yaw);
             double z = Math.cos(yaw);
-            player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(x, 1.2, z), 10, 1, 0.2, 1, 0.02);
+            player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(x, 1.2, z), 8, 1, 0.2, 1, 0.02);
             i++;
             if (i > 5)
                 break;
@@ -203,13 +200,13 @@ public enum RingType {
 
     private static void tickCeiling(Activity activity) {
         int ringTick = activity.getRingTick();
+        double baseY = activity.getTelephonesDefaultY();
         activity.getTelephones().forEach(entity -> {
             int seed = entity.hashCode();
-            // wave of period T = 200 ticks and delta y = 0.3
-            double y1 = Math.sin((ringTick + seed) / 200.0 * 2 * Math.PI) * 0.15;
-            double y2 = Math.sin((ringTick + seed + 1) / 200.0 * 2 * Math.PI) * 0.15;
+            // wave of period T = 200 ticks and delta y = 0.6
+            double y1 = Math.sin((ringTick + seed) / 200.0 * 2 * Math.PI) * 0.3;
             Location loc = entity.getLocation();
-            loc.add(0, y1 - y2, 0);
+            loc.setY(baseY + 1.5 + y1);
             entity.teleport(loc);
         });
 
