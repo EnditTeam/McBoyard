@@ -43,9 +43,9 @@ public class MorseTranslator {
             }
 
             String morse = getMorseChar(c);
-            builder.append(c).append(" : ").append(morse).endOfLine();
             numberOfDash += morse.chars().filter(ch -> ch == '-').count();
             numberOfDot += morse.chars().filter(ch -> ch == '.').count();
+            builder.append("        ").append(c).append(" : ").append(morse.replace('.', '●').replace('-', '—')).endOfLine();
         }
 
         builder.endOfLine();
@@ -108,6 +108,10 @@ public class MorseTranslator {
             case 'ç':
                 c = 'c';
                 break;
+            case ' ':
+                return " ";
+            case '_':
+                return "..--.-";
         }
 
         if (c >= 'A' && c <= 'Z') {
