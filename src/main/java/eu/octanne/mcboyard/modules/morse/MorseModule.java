@@ -47,6 +47,7 @@ public class MorseModule extends PlugModule {
         }
         computerInputWord = null;
         computerPlayer = null;
+        ArchiveRoom.clearChests();
     }
 
     public static ItemStack createWordItem(String word) {

@@ -31,6 +31,13 @@ public class ArchiveRoom {
     private ArchiveRoom() {
     }
 
+    public static void clearChests() {
+        List<Chest> chests = getChests();
+        for (Chest c : chests) {
+            c.getBlockInventory().clear();
+        }
+    }
+
     public static void fillChests() {
         List<Chest> chests = getChests();
         if (chests.isEmpty()) {
