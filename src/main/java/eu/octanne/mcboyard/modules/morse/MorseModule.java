@@ -47,7 +47,6 @@ public class MorseModule extends PlugModule {
         }
         computerInputWord = null;
         computerPlayer = null;
-        ArchiveRoom.clearChests();
     }
 
     public static ItemStack createWordItem(String word) {
@@ -115,6 +114,7 @@ public class MorseModule extends PlugModule {
     public void stop() {
         isActive = false;
         reset();
+        ArchiveRoom.clearChests();
     }
 
     public boolean isActive() {
