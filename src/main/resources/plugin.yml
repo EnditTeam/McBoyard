@@ -66,3 +66,6 @@ commands:
   morse:
     description: Salle SOS (Code morse)
     permission: mcboyard
+  grandeporte:
+    description: Gestion des grandes portes
+    permission: mcboyard

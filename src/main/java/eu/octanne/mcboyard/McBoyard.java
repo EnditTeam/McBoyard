@@ -6,6 +6,7 @@ import java.io.IOException;
 import eu.octanne.mcboyard.entity.CustomEntity;
 import eu.octanne.mcboyard.modules.*;
 import eu.octanne.mcboyard.modules.coffrefort.CoffreFortModule;
+import eu.octanne.mcboyard.modules.grandeporte.GrandePorteModule;
 import eu.octanne.mcboyard.modules.maitika.MaitikaModule;
 import eu.octanne.mcboyard.modules.telephone.TelephoneModule;
 import eu.octanne.mcboyard.modules.morse.MorseModule;
@@ -50,6 +51,7 @@ public class McBoyard extends JavaPlugin {
 	public static ElytraParkourModule elytraParkourModule;
     public static TelephoneModule telephoneModule;
     public static MorseModule morseModule;
+    public static GrandePorteModule grandePorteModule;
 
     @Override
     public void onEnable() {
@@ -99,6 +101,7 @@ public class McBoyard extends JavaPlugin {
 		elytraParkourModule = new ElytraParkourModule(this);
         telephoneModule = new TelephoneModule(this);
         morseModule = new MorseModule(this);
+        grandePorteModule = new GrandePorteModule(this);
     }
 
     public void preWorldModules() {
