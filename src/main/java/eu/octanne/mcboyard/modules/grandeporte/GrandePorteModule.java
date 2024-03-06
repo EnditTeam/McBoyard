@@ -48,7 +48,7 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
         if (!sender.hasPermission("mcboyard"))
             return null;
         if (args.length == 1) {
-            return Arrays.asList("reset", "open", "close", "toggle");
+            return Arrays.asList("replace", "open", "close", "toggle");
         }
         if (args.length == 2) {
             return Stream.of(PORTES.values()).map(Enum::name).toList();
@@ -60,8 +60,8 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         switch (args.length > 0 ? args[0] : "") {
-            case "reset":
-                return onResetCommand(sender, args);
+            case "replace":
+                return onReplaceCommand(sender, args);
             case "open":
                 return onOpenCommand(sender, args);
             case "close":
@@ -69,7 +69,7 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
             case "toggle":
                 return onToggleCommand(sender, args);
             default:
-                sender.sendMessage("§cUsage: /grandeporte <reset|open|close|toggle>");
+                sender.sendMessage("§cUsage: /grandeporte <replace|open|close|toggle>");
                 return false;
         }
     }
@@ -91,16 +91,16 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
         }
     }
 
-    private boolean onResetCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+    private boolean onReplaceCommand(@NotNull CommandSender sender, @NotNull String[] args) {
         GrandePorte porte = args.length > 1 ? getPorte(args[1]) : null;
         if (porte == null) {
             for (PORTES p : PORTES.values()) {
-                getPorte(p).reset();
+                getPorte(p).replace();
             }
             sender.sendMessage("Portes réinitialisées");
         } else {
-            porte.reset();
-            sender.sendMessage("Porte " + porte.getPorte() + " réinitialisée");
+            porte.replace();
+            sender.sendMessage("Porte réinitialisée");
         }
         return true;
     }
@@ -111,7 +111,12 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
             sender.sendMessage("§cUsage: /grandeporte open <porte>");
             return false;
         } else {
+            if (porte.isOpen() && !porte.isAnimationRunning()) {
+                sender.sendMessage("§cLa porte est déjà ouverte");
+                return false;
+            }
             porte.open();
+            sender.sendMessage("La porte s'ouvre");
             return true;
         }
     }
@@ -122,7 +127,12 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
             sender.sendMessage("§cUsage: /grandeporte close <porte>");
             return false;
         } else {
+            if (!porte.isOpen() && !porte.isAnimationRunning()) {
+                sender.sendMessage("§cLa porte est déjà fermée");
+                return false;
+            }
             porte.close();
+            sender.sendMessage("La porte se ferme");
             return true;
         }
     }

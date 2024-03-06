@@ -190,17 +190,52 @@ public class GrandePorte {
             Location locRight = getRightLocation(animationRotation);
             entityRight.teleport(locRight);
         }
+        if (animationRotation == 45) {
+            if (isOpen) {
+                // Opening
+                fillWithBlocks(Material.AIR);
+            } else {
+                // Closing
+                fillWithBlocks(Material.BARRIER);
+            }
+        }
+    }
+
+    private void fillWithBlocks(Material material) {
+        Location bottomLeft = getLeftPivotLocation();
+        Location topRight = getRightPivotLocation();
+        bottomLeft.add(0, -1, 0);
+        topRight.add(0, 2, 0);
+        int numberOfBlocks = (topRight.getBlockX() - bottomLeft.getBlockX() + 1) * (topRight.getBlockY() - bottomLeft.getBlockY() + 1) *
+                             (topRight.getBlockZ() - bottomLeft.getBlockZ() + 1);
+        if (numberOfBlocks >= 20) {
+            McBoyard.instance.getLogger().warning("Too many blocks to fill for the door " + porte + " (" + numberOfBlocks + " blocks)");
+            return;
+        }
+        Location loc = bottomLeft.clone();
+        for (int x = bottomLeft.getBlockX(); x <= topRight.getBlockX(); x++) {
+            loc.setX(x);
+            for (int y = bottomLeft.getBlockY(); y <= topRight.getBlockY(); y++) {
+                loc.setY(y);
+                for (int z = bottomLeft.getBlockZ(); z <= topRight.getBlockZ(); z++) {
+                    loc.setZ(z);
+                    loc.getBlock().setType(material);
+                }
+            }
+        }
     }
 
     public void placeOpen() {
         stopTaskAnimation();
         setRotations(ANIMATION_TICKS);
+        fillWithBlocks(Material.AIR);
         setIsOpen(true);
     }
 
     public void placeClose() {
         stopTaskAnimation();
         setRotations(0);
+        fillWithBlocks(Material.BARRIER);
         setIsOpen(false);
     }
 
@@ -234,15 +269,38 @@ public class GrandePorte {
 
             if (animationRotation <= 0) {
                 placeClose();
+                return;
             } else if (animationRotation >= ANIMATION_TICKS) {
                 placeOpen();
+                return;
             }
-
+            
             setRotations(animationRotation);
+            playSounds();
         }, 1, 1);
     }
 
-    public void reset() {
+    private void playSounds() {
+        boolean playSoundLeft = false;
+        boolean playSoundRight = false;
+        if (isOpen) {
+            playSoundLeft = animationRotation == 40 || animationRotation == 60;
+            playSoundRight = animationRotation == 2 || animationRotation == 22;
+        } else {
+            playSoundLeft = animationRotation == 70 || animationRotation == 90;
+            playSoundRight = animationRotation == 108 || animationRotation == 128;
+        }
+        if (playSoundLeft) {
+            Location loc = getLeftPivotLocation();
+            loc.getWorld().playSound(loc, "minecraft:bd.drawbridge-rattling", 1, 0.5f);
+        }
+        if (playSoundRight) {
+            Location loc = getRightPivotLocation();
+            loc.getWorld().playSound(loc, "minecraft:bd.drawbridge-rattling", 1, 0.5f);
+        }
+    }
+
+    public void replace() {
         spawnEntities();
     }
 
@@ -264,5 +322,13 @@ public class GrandePorte {
         } else {
             open();
         }
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public boolean isAnimationRunning() {
+        return taskAnimation != null;
     }
 }
