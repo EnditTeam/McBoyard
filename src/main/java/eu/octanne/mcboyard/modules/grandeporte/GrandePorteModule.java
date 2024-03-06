@@ -17,9 +17,10 @@ import eu.octanne.mcboyard.modules.PlugModule;
 
 public class GrandePorteModule extends PlugModule implements CommandExecutor, TabCompleter {
     enum PORTES {
+        // Format : PORTE_FACE_ETAGE
         PORTE_OUEST_0,
-        // PORTE_NORD_1,
-        // PORTE_SUD_0,
+        PORTE_NORD_1,
+        PORTE_SUD_0,
     }
 
     private EnumMap<PORTES, GrandePorte> portes = new EnumMap<>(PORTES.class);
@@ -144,6 +145,11 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
             return false;
         } else {
             porte.toggle();
+            if (porte.isOpen()) {
+                sender.sendMessage("La porte s'ouvre");
+            } else {
+                sender.sendMessage("La porte se ferme");
+            }
             return true;
         }
     }

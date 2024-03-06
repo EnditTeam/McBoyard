@@ -38,8 +38,12 @@ public class GrandePorte {
         switch (porte) {
             case PORTE_OUEST_0:
                 return 90f;
-            default:
+            case PORTE_NORD_1:
+                return 180f;
+            case PORTE_SUD_0:
                 return 0f;
+            default:
+                throw new IllegalArgumentException("Invalid door " + porte);
         }
     }
 
@@ -53,8 +57,12 @@ public class GrandePorte {
         switch (porte) {
             case PORTE_OUEST_0:
                 return new Location(world, -54.68, 74, 25.32, yaw, 0f);
+            case PORTE_NORD_1:
+                return new Location(world, -1.32, 84, -81.68, yaw, 0f);
+            case PORTE_SUD_0:
+                return new Location(world, -1.68, 74, 135.68, yaw, 0f);
             default:
-                return null;
+                throw new IllegalArgumentException("Invalid door " + porte);
         }
     }
 
@@ -68,8 +76,12 @@ public class GrandePorte {
         switch (porte) {
             case PORTE_OUEST_0:
                 return new Location(world, -54.68, 74, 28.68, yaw, 0f);
+            case PORTE_NORD_1:
+                return new Location(world, -4.68, 84, -81.68, yaw, 0f);
+            case PORTE_SUD_0:
+                return new Location(world, 1.68, 74, 135.68, yaw, 0f);
             default:
-                return null;
+                throw new IllegalArgumentException("Invalid door " + porte);
         }
     }
 
@@ -202,24 +214,31 @@ public class GrandePorte {
     }
 
     private void fillWithBlocks(Material material) {
-        Location bottomLeft = getLeftPivotLocation();
-        Location topRight = getRightPivotLocation();
-        bottomLeft.add(0, -1, 0);
-        topRight.add(0, 2, 0);
-        int numberOfBlocks = (topRight.getBlockX() - bottomLeft.getBlockX() + 1) * (topRight.getBlockY() - bottomLeft.getBlockY() + 1) *
-                             (topRight.getBlockZ() - bottomLeft.getBlockZ() + 1);
+        Location locLeft = getLeftPivotLocation();
+        Location locRight = getRightPivotLocation();
+
+        int minX = Math.min(locLeft.getBlockX(), locRight.getBlockX());
+        int minY = Math.min(locLeft.getBlockY(), locRight.getBlockY()) - 1;
+        int minZ = Math.min(locLeft.getBlockZ(), locRight.getBlockZ());
+        int maxX = Math.max(locLeft.getBlockX(), locRight.getBlockX());
+        int maxY = Math.max(locLeft.getBlockY(), locRight.getBlockY()) + 2;
+        int maxZ = Math.max(locLeft.getBlockZ(), locRight.getBlockZ());
+
+        int numberOfBlocks = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
         if (numberOfBlocks >= 20) {
             McBoyard.instance.getLogger().warning("Too many blocks to fill for the door " + porte + " (" + numberOfBlocks + " blocks)");
             return;
         }
-        Location loc = bottomLeft.clone();
-        for (int x = bottomLeft.getBlockX(); x <= topRight.getBlockX(); x++) {
+        Location loc = locLeft.clone();
+        for (int x = minX; x <= maxX; x++) {
             loc.setX(x);
-            for (int y = bottomLeft.getBlockY(); y <= topRight.getBlockY(); y++) {
+            for (int y = minY; y <= maxY; y++) {
                 loc.setY(y);
-                for (int z = bottomLeft.getBlockZ(); z <= topRight.getBlockZ(); z++) {
+                for (int z = minZ; z <= maxZ; z++) {
                     loc.setZ(z);
-                    loc.getBlock().setType(material);
+                    if (loc.getBlock().getType() == Material.AIR || loc.getBlock().getType() == Material.BARRIER) {
+                        loc.getBlock().setType(material);
+                    }
                 }
             }
         }
