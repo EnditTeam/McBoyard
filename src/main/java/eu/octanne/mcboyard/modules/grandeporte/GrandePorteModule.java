@@ -49,10 +49,15 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
         if (!sender.hasPermission("mcboyard"))
             return null;
         if (args.length == 1) {
-            return Arrays.asList("replace", "open", "close", "toggle");
+            return Arrays.asList("replace", "open", "close", "toggle", "rotate");
         }
         if (args.length == 2) {
             return Stream.of(PORTES.values()).map(Enum::name).toList();
+        }
+        if (args.length == 3) {
+            if (args[0].equals("rotate")) {
+                return Arrays.asList("0", "50", "90", "130");
+            }
         }
 
         return null;
@@ -69,6 +74,8 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
                 return onCloseCommand(sender, args);
             case "toggle":
                 return onToggleCommand(sender, args);
+            case "rotate":
+                return onRotateCommand(sender, args);
             default:
                 sender.sendMessage("§cUsage: /grandeporte <replace|open|close|toggle>");
                 return false;
@@ -152,5 +159,31 @@ public class GrandePorteModule extends PlugModule implements CommandExecutor, Ta
             }
             return true;
         }
+    }
+
+    private boolean onRotateCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+        GrandePorte porte = args.length > 1 ? getPorte(args[1]) : null;
+        if (porte == null) {
+            sender.sendMessage("§cUsage: /grandeporte rotate <porte> <angle>");
+            return false;
+        }
+        if (args.length < 3) {
+            sender.sendMessage("§cUsage: /grandeporte rotate <porte> <angle> (angle2)");
+            return false;
+        }
+
+        float angle1;
+        float angle2;
+        try {
+            angle1 = Integer.parseInt(args[2]);
+            angle2 = args.length > 3 ? Integer.parseInt(args[3]) : angle1;
+        } catch (NumberFormatException e) {
+            sender.sendMessage("§cL'angle doit être un nombre");
+            return false;
+        }
+
+        porte.setRotation(angle1, angle2);
+        sender.sendMessage("L'ouverture de la porte a changé");
+        return true;
     }
 }

@@ -94,7 +94,7 @@ public class GrandePorte {
     private Location getLeftLocation(int rotation) {
         rotation = Math.max(0, rotation - ANIMATION_TICK_OFFSET);
         Location loc = getLeftPivotLocation();
-        loc.setYaw(loc.getYaw() - rotation - 90f);
+        loc.setYaw(loc.getYaw() - (rotation - 90f));
         loc.add(loc.getDirection().multiply(PIVOT_OFFSET));
         loc.setYaw(loc.getYaw() + 90f);
         return loc;
@@ -210,6 +210,27 @@ public class GrandePorte {
                 // Closing
                 fillWithBlocks(Material.BARRIER);
             }
+        }
+    }
+
+    public void setRotation(float leftRotation, float rightRotation) {
+        // Remove the barrier blocks and do as if the door is open
+        placeOpen();
+        float yaw = getClosedYaw(porte);
+        if (entityLeft != null && entityLeft.isValid()) {
+            Location loc = getLeftPivotLocation();
+            loc.setYaw(loc.getYaw() - leftRotation - 90f);
+            loc.add(loc.getDirection().multiply(PIVOT_OFFSET));
+            loc.setYaw(loc.getYaw() + 90f);
+            loc.setYaw(yaw - leftRotation);
+            entityLeft.teleport(loc);
+        }
+        if (entityRight != null && entityRight.isValid()) {
+            Location loc = getRightPivotLocation();
+            loc.setYaw(loc.getYaw() + rightRotation + 90f);
+            loc.add(loc.getDirection().multiply(PIVOT_OFFSET));
+            loc.setYaw(loc.getYaw() - 90f);
+            entityRight.teleport(loc);
         }
     }
 
